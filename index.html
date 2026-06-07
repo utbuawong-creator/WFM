@@ -340,7 +340,7 @@
     <div class="card-title">รายงานตัวมาทำงาน</div>
     <div class="form-group">
       <label class="form-label">ชื่อ-นามสกุล</label>
-      <select class="form-control" id="ci-name">
+      <select class="form-control" id="ci-name" onchange="toggleCustomName('ci-name','ci-name-custom')">
         <option value="">— เลือกชื่อ —</option>
         <option value="กรภัทร จีนอนันต์">กรภัทร จีนอนันต์</option>
         <option value="คมกริช ทาแกง">คมกริช ทาแกง</option>
@@ -401,7 +401,11 @@
         <option value="เอกลักษณ์ ดอกสม">เอกลักษณ์ ดอกสม</option>
         <option value="โพธิยา มหาชัย">โพธิยา มหาชัย</option>
         <option value="ไกรสิทธิ์ เชื้อสมเกียรติ">ไกรสิทธิ์ เชื้อสมเกียรติ</option>
+        <option value="__other__">✏️ พิมพ์ชื่ออื่น...</option>
       </select>
+      <input class="form-control" id="ci-name-custom" type="text"
+        placeholder="พิมพ์ชื่อ-นามสกุล..."
+        style="display:none;margin-top:8px;" />
     </div>
     <div class="form-group">
       <label class="form-label">LB Zone</label>
@@ -444,7 +448,7 @@
     <div class="card-title">แจ้งลางาน</div>
     <div class="form-group">
       <label class="form-label">ชื่อ-นามสกุล</label>
-      <select class="form-control" id="lv-name">
+      <select class="form-control" id="lv-name" onchange="toggleCustomName('lv-name','lv-name-custom')">
         <option value="">— เลือกชื่อ —</option>
         <option value="กรภัทร จีนอนันต์">กรภัทร จีนอนันต์</option>
         <option value="คมกริช ทาแกง">คมกริช ทาแกง</option>
@@ -505,7 +509,11 @@
         <option value="เอกลักษณ์ ดอกสม">เอกลักษณ์ ดอกสม</option>
         <option value="โพธิยา มหาชัย">โพธิยา มหาชัย</option>
         <option value="ไกรสิทธิ์ เชื้อสมเกียรติ">ไกรสิทธิ์ เชื้อสมเกียรติ</option>
+        <option value="__other__">✏️ พิมพ์ชื่ออื่น...</option>
       </select>
+      <input class="form-control" id="lv-name-custom" type="text"
+        placeholder="พิมพ์ชื่อ-นามสกุล..."
+        style="display:none;margin-top:8px;" />
     </div>
     <div class="form-group">
       <label class="form-label">LB Zone</label>
@@ -615,6 +623,26 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6
 const DAYS = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
+function toggleCustomName(selectId, inputId) {
+  const sel = document.getElementById(selectId);
+  const inp = document.getElementById(inputId);
+  if (sel.value === '__other__') {
+    inp.style.display = 'block';
+    inp.focus();
+  } else {
+    inp.style.display = 'none';
+    inp.value = '';
+  }
+}
+
+function getNameValue(selectId, inputId) {
+  const sel = document.getElementById(selectId);
+  if (sel.value === '__other__') {
+    return document.getElementById(inputId).value.trim();
+  }
+  return sel.value;
+}
+
 function initDate() {
   const now = new Date();
   const dateStr = `วัน${DAYS[now.getDay()]}ที่ ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()+543}`;
@@ -657,7 +685,7 @@ function loadProfile() {
 }
 
 function saveProfile() {
-  const name = document.getElementById('ci-name').value;
+  const name = getNameValue('ci-name', 'ci-name-custom');
   const zone = document.getElementById('ci-zone').value;
   if (name) localStorage.setItem('wfm_name', name);
   if (zone) localStorage.setItem('wfm_zone', zone);
@@ -706,13 +734,13 @@ function callAPI(params, callback) {
 
 // ========== CHECK-IN ==========
 function submitCheckIn() {
-  const name = document.getElementById('ci-name').value;
+  const name = getNameValue('ci-name', 'ci-name-custom');
   const zone = document.getElementById('ci-zone').value;
   const shift = document.getElementById('ci-shift').value;
   const task = document.getElementById('ci-task').value.trim();
   const location = document.getElementById('ci-location').value.trim();
 
-  if (!name) { showToast('⚠️ กรุณาเลือกชื่อ'); return; }
+  if (!name) { showToast('⚠️ กรุณาใส่ชื่อ'); return; }
   if (!zone) { showToast('⚠️ กรุณาเลือก Zone'); return; }
 
   saveProfile();
@@ -744,13 +772,13 @@ function submitCheckIn() {
 
 // ========== LEAVE ==========
 function submitLeave() {
-  const name = document.getElementById('lv-name').value;
+  const name = getNameValue('lv-name', 'lv-name-custom');
   const zone = document.getElementById('lv-zone').value;
   const leaveType = document.getElementById('lv-type').value;
   const leaveDate = document.getElementById('lv-date').value;
   const note = document.getElementById('lv-note').value.trim();
 
-  if (!name) { showToast('⚠️ กรุณาเลือกชื่อ'); return; }
+  if (!name) { showToast('⚠️ กรุณาใส่ชื่อ'); return; }
   if (!zone) { showToast('⚠️ กรุณาเลือก Zone'); return; }
 
   saveProfile();
@@ -890,5 +918,6 @@ initDate();
 loadProfile();
 loadTodayLog();
 </script>
+
 </body>
 </html>
