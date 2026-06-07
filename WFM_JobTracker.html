@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WFM Jobs">
+<title>WFM Job Tracker | NOPBIGMAN</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ais-orange: #f47920;
+  --ais-green: #8dc63f;
+  --grad-main: linear-gradient(135deg, #f47920 0%, #8dc63f 100%);
+  --grad-blue: linear-gradient(135deg, #003087 0%, #00a651 100%);
+  --critical: #e8001d;
+  --critical-bg: #fff0f1;
+  --critical-border: #ffcdd2;
+  --major: #f47920;
+  --major-bg: #fff8f0;
+  --major-border: #ffe0b2;
+  --minor: #0057b8;
+  --minor-bg: #f0f5ff;
+  --minor-border: #bbdefb;
+  --sla-ok: #00a651;
+  --sla-warn: #f47920;
+  --sla-breach: #e8001d;
+  --bg: #f0f4f0;
+  --surface: #ffffff;
+  --border: #e0e8e0;
+  --text: #1a2a1a;
+  --text2: #5a7a5a;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  background: var(--grad-main);
+  color: #fff;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 20px rgba(244,121,32,0.3);
+}
+.header-inner {
+  max-width: 1400px; margin: 0 auto;
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap;
+}
+.header-brand { display: flex; flex-direction: column; }
+.header-dept { font-family: 'Kanit', sans-serif; font-size: 10px; letter-spacing: 3px; opacity: 0.8; text-transform: uppercase; }
+.header-title { font-family: 'Kanit', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.1; }
+.header-sub { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.clock-badge {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 24px;
+  padding: 7px 16px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px; font-weight: 600; letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+.auto-badge {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 24px;
+  padding: 5px 12px;
+  font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; gap: 5px;
+}
+.auto-dot { width: 7px; height: 7px; border-radius: 50%; background: #8dc63f; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+/* ===== NAV TABS ===== */
+.main-nav {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  position: sticky; top: 70px; z-index: 99;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.nav-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; overflow-x: auto; scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-tab {
+  padding: 14px 24px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 15px; font-weight: 500;
+  color: var(--text2); border: none; background: none;
+  cursor: pointer; white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 7px;
+}
+.nav-tab.active { color: var(--ais-orange); border-bottom-color: var(--ais-orange); }
+.nav-tab:hover:not(.active) { color: var(--text); background: var(--bg); }
+.nav-badge {
+  background: var(--ais-orange); color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center;
+}
+.nav-badge.red { background: var(--critical); }
+
+/* ===== SCREEN ===== */
+.screen { display: none; }
+.screen.active { display: block; }
+.page-content { max-width: 1400px; margin: 0 auto; padding: 20px 16px 100px; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--text2); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 16px;
+}
+
+/* ===== FORM ===== */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .priority-grid { grid-template-columns: repeat(2,1fr); } }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px; font-weight: 600; color: var(--text2);
+}
+.form-control {
+  width: 100%; padding: 13px 16px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 16px; font-family: 'Sarabun', sans-serif;
+  color: var(--text); background: var(--surface);
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.form-control:focus { outline: none; border-color: var(--ais-orange); }
+select.form-control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a7a5a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+}
+
+/* PRIORITY SELECTOR */
+.priority-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.priority-btn {
+  padding: 14px 8px; border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--surface); cursor: pointer;
+  text-align: center; font-family: 'Kanit', sans-serif;
+  font-size: 14px; font-weight: 600;
+  transition: all 0.15s;
+}
+.priority-btn .p-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+.priority-btn .p-sla { font-size: 10px; font-weight: 400; color: var(--text2); margin-top: 2px; display: block; }
+.priority-btn[data-p="Critical"] { border-color: var(--critical-border); color: var(--critical); }
+.priority-btn[data-p="Critical"].selected { background: var(--critical); color: #fff; border-color: var(--critical); }
+.priority-btn[data-p="Major"] { border-color: var(--major-border); color: var(--major); }
+.priority-btn[data-p="Major"].selected { background: var(--major); color: #fff; border-color: var(--major); }
+.priority-btn[data-p="Minor"] { border-color: var(--minor-border); color: var(--minor); }
+.priority-btn[data-p="Minor"].selected { background: var(--minor); color: #fff; border-color: var(--minor); }
+.priority-btn[data-p="Other"] { border-color: #d1d5db; color: #6b7280; }
+.priority-btn[data-p="Other"].selected { background: #6b7280; color: #fff; border-color: #6b7280; }
+.priority-btn:active { transform: scale(0.96); }
+
+/* SUBMIT BTN */
+.btn-submit {
+  width: 100%; padding: 16px;
+  background: var(--grad-main); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Kanit', sans-serif;
+  font-size: 18px; font-weight: 700; cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 4px 16px rgba(244,121,32,0.35);
+  letter-spacing: 0.5px;
+  margin-top: 6px;
+}
+.btn-submit:active { opacity: 0.85; transform: scale(0.98); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===== ACTIVE JOBS ===== */
+.active-jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.job-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.job-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.job-card-header {
+  padding: 14px 16px 10px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+}
+.job-number {
+  font-family: 'Kanit', sans-serif;
+  font-size: 18px; font-weight: 700; color: var(--text);
+}
+.job-team { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.priority-pill {
+  font-family: 'Kanit', sans-serif;
+  font-size: 12px; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.pill-critical { background: var(--critical-bg); color: var(--critical); border: 1px solid var(--critical-border); }
+.pill-major { background: var(--major-bg); color: var(--major); border: 1px solid var(--major-border); }
+.pill-minor { background: var(--minor-bg); color: var(--minor); border: 1px solid var(--minor-border); }
+.pill-other { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+
+.job-timer-area {
+  padding: 10px 16px;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.timer-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.timer-value {
+  font-family: 'Kanit', sans-serif;
+  font-size: 22px; font-weight: 700;
+  letter-spacing: 1px;
+}
+.timer-ok { color: var(--sla-ok); }
+.timer-warn { color: var(--sla-warn); animation: blink 1.5s infinite; }
+.timer-breach { color: var(--sla-breach); animation: blink 0.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.sla-bar-wrap { padding: 0 16px 10px; }
+.sla-bar-track {
+  height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.sla-bar-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 1s linear, background 0.5s;
+}
+.sla-info { font-size: 11px; color: var(--text2); margin-top: 4px; text-align: right; }
+
+.job-card-footer {
+  padding: 10px 16px 14px;
+  display: flex; gap: 8px;
+}
+.btn-done {
+  flex: 1; padding: 11px;
+  background: var(--grad-main); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-done:active { opacity: 0.85; transform: scale(0.97); }
+.btn-next {
+  flex: 1; padding: 11px;
+  background: var(--grad-blue); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-next:active { opacity: 0.85; transform: scale(0.97); }
+
+/* SLA BREACH GLOW */
+.job-card.sla-breach { border-color: var(--critical) !important; box-shadow: 0 0 0 3px rgba(232,0,29,0.15), var(--shadow); }
+.job-card.sla-warn { border-color: var(--major) !important; }
+
+/* ===== REPORT SCREEN ===== */
+.report-filters {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center;
+}
+.filter-select {
+  padding: 9px 14px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 14px; font-family: 'Sarabun', sans-serif;
+  background: var(--surface); color: var(--text);
+  cursor: pointer; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a7a5a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+.filter-select:focus { outline: none; border-color: var(--ais-orange); }
+.btn-refresh {
+  padding: 9px 18px;
+  background: var(--grad-main); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.15s;
+}
+.btn-refresh:active { opacity: 0.85; }
+
+/* SUMMARY STATS */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px; margin-bottom: 16px;
+}
+.summary-card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  padding: 16px;
+  text-align: center;
+}
+.summary-num {
+  font-family: 'Kanit', sans-serif;
+  font-size: 36px; font-weight: 800; line-height: 1;
+}
+.summary-lbl {
+  font-size: 12px; color: var(--text2); margin-top: 4px; font-weight: 500;
+}
+
+/* TABLE */
+.report-table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.report-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.report-table th {
+  background: var(--bg);
+  padding: 12px 14px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--text2); text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.report-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  vertical-align: middle;
+}
+.report-table tr:last-child td { border-bottom: none; }
+.report-table tr:hover td { background: var(--bg); }
+.td-job { font-family: 'Kanit', sans-serif; font-weight: 700; font-size: 15px; }
+.td-time { font-family: 'Kanit', sans-serif; font-weight: 600; }
+.status-done { color: var(--sla-ok); font-weight: 600; }
+.status-active { color: var(--ais-orange); font-weight: 600; }
+.breach-tag {
+  background: var(--critical-bg); color: var(--critical);
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px;
+  border: 1px solid var(--critical-border);
+}
+.ok-tag {
+  background: #e8f8ef; color: var(--sla-ok);
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--grad-main); color: #fff;
+  padding: 13px 24px; border-radius: 24px;
+  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 600;
+  opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(244,121,32,0.4);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 24px; width: 100%; max-width: 440px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 18px; font-weight: 700; margin-bottom: 16px;
+}
+.modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+.btn-cancel {
+  flex: 1; padding: 13px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text2);
+  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer;
+}
+.btn-confirm {
+  flex: 1; padding: 13px;
+  background: var(--grad-main); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(244,121,32,0.3);
+}
+
+.empty-state {
+  text-align: center; padding: 48px 20px; color: var(--text2);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-text { font-family: 'Kanit', sans-serif; font-size: 16px; }
+
+@media (max-width: 600px) {
+  .header-title { font-size: 18px; }
+  .clock-badge { font-size: 13px; padding: 6px 12px; }
+  .nav-tab { padding: 12px 16px; font-size: 13px; }
+  .active-jobs-grid { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- APPS SCRIPT URL -->
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
+const ZONES = ['CMI Zone 1','CMI Zone 2','CMI Zone 3','CMI Zone 4','CMI Zone 5','Zone LPN','Zone MSN','Zone Fang'];
+const SLA_HOURS = { Critical: 3, Major: 10, Minor: 24, Other: 24 };
+
+const TEAM_MEMBERS = {
+  'RON-CMI201': ['ประสาร สุพรรณคง','ธนกฤต ดอกดวง'],
+  'RON-CMI202': ['โพธิยา มหาชัย','จักรพงษ์ บัวปะทะ'],
+  'RON-CMI203': ['อภิรักษ์ จันทร์คำ','นิธิพันธ์ ศิริโปทา'],
+  'RON-CMI104': ['ฐกลวิทย์ กิตติกุลสุวรรณ','ทักษิณ ลาดกำแพง'],
+  'RON-CMI002': ['ปิยะวัฒน์ ปงกันทา','นพดล เมืองชัย'],
+  'RON-CMI105': ['อัมพวัฒน์ พัชรพัฒนชัย','เมธาศิษฐ์ เศรษฐ์วุฒิภัทร'],
+  'RON-CMI004': ['วรชัย นุ่มตูม','พัทธนันท์ ปันเขียว'],
+  'RON-CMI301': ['สัจจะ ดวงชื่น','วิชัย ทำนุศาสตร์'],
+  'RON-CMI302': ['อภิสิทธิ์ ศิริกิจ','ไกรสิทธิ์ เชื้อสมเกียรติ'],
+  'RON-CMI303': ['กรภัทร จีนอนันต์','คมกริช สายวงศ์เปียง'],
+  'RON-CMI401': ['เอกรินทร์ โสภา','วัชริศ ปินใจ'],
+  'RON-CMI402': ['ณัฐพล พัชรพัฒนชัย','คมกริช ทาแกง'],
+  'RON-CMI403': ['สรศักดิ์ ผิวขาว','ศรายุทธ สมพงษ์'],
+  'RON-CMI103': ['พุฒิพงษ์ บดินทร์ชัยการ','วีรยุทธ อินทจักร'],
+  'RON-CMI106': ['ภาสกร ญาติฝูง','มงคล ไทยประเทศ'],
+  'RON-CMI108': ['นพดนัย อมรวิโรจน์รัตน์','มานิตย์ ทิวาประดับดาว'],
+  'RON-CMI109': ['อภิวัฒน์ ไชยสุรินทร์','ณัฏฐพล พิศพันธุ์'],
+  'RON-LPN102': ['วิทยา แสนเกรียง','จิรพงศ์ ใจจิต','พงษ์นคร กองมี'],
+  'RON-LPN103': ['ณัฐนนท์ สุวรรณ์','ธนาพันธ์ อินทะจันทร์'],
+  'RON-LPN101': ['นิเวศ ตาแม่ก๋ง','จิรวัฒน์ พรธนานิธินันท์'],
+  'RON-CMI101': ['อนุชิต คำเขียว','วรเชษฐ์ จันต๊ะคาด'],
+  'RON-CMI107': ['สุทธิพงศ์ ปาลี','นวพล ธรรมขันแก้ว'],
+  'RON-CMI006': ['เจษฎา จิโน','บดินทร์ อาษากิจ'],
+  'RON-CMI501': ['ปรัตถกร คุ้มประคอง','อลงกรณ์ โปธิ'],
+  'RON-CMI502': ['นำโชค คงอิ่ม','ธงชัย มณีสิงหราช'],
+  'RON-CMI503': ['เอกลักษณ์ ดอกสม','สุรศักดิ์ ใหม่ป้อ'],
+  'RON-MSN101': ['สมเพชร ก้อยมาเลิศ','สรายุทธ กรนทีกาญจน์'],
+  'RON-MSN102': ['ธนิน ถึงสุข','นนทพัทธ์ ใฝ่หาวิทย์'],
+  'RON-MSN103': ['ชัชชัย ก้อยมาเลิศ','บรรจง ติ๊เนาะ'],
+};
+const TEAMS = Object.keys(TEAM_MEMBERS);
+
+let jobs = [];
+let selectedPriority = '';
+let completingJob = null;
+let autoRefreshInterval = null;
+let pendingJoinJob = null;
+</script>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-dept">WFM · NOPBIGMAN</div>
+      <div class="header-title">Job Tracker</div>
+      <div class="header-sub">ติดตาม Job งานซ่อมทีม WFM</div>
+    </div>
+    <div class="header-right">
+      <div class="auto-badge"><div class="auto-dot"></div> Auto Refresh</div>
+      <div class="clock-badge" id="hdr-clock">--:--:--</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="main-nav">
+  <div class="nav-inner">
+    <button class="nav-tab active" id="nav-new" onclick="showScreen('new')">➕ รับ Job ใหม่</button>
+    <button class="nav-tab" id="nav-active" onclick="showScreen('active')">
+      🔧 Job กำลังทำ <span class="nav-badge" id="badge-active">0</span>
+    </button>
+    <button class="nav-tab" id="nav-report" onclick="showScreen('report'); loadReport()">
+      📊 รายงาน <span class="nav-badge red" id="badge-breach">0</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: NEW JOB ===== -->
+<div class="screen active" id="screen-new">
+  <div class="page-content">
+    <div class="card">
+      <div class="card-title">📋 ลงทะเบียนรับ Job</div>
+
+      <!-- Job Number บนสุด -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label" style="font-size:14px;color:var(--ais-orange);">🔢 Job Number</label>
+        <div style="display:flex;align-items:center;border:2.5px solid var(--ais-orange);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface);box-shadow:0 3px 10px rgba(244,121,32,0.2);" id="job-wrap">
+          <span style="background:var(--ais-orange);padding:14px 16px;font-family:'Kanit',sans-serif;font-size:20px;font-weight:800;color:#fff;white-space:nowrap;letter-spacing:1px;">JB26-</span>
+          <input id="nj-job" type="text" inputmode="numeric" pattern="[0-9]*"
+            placeholder="10023856"
+            style="flex:1;border:none;outline:none;padding:14px 12px;font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;letter-spacing:3px;background:transparent;color:var(--text);width:100%;"
+            onfocus="document.getElementById('job-wrap').style.boxShadow='0 0 0 3px rgba(244,121,32,0.25)'"
+            onblur="document.getElementById('job-wrap').style.boxShadow='0 3px 10px rgba(244,121,32,0.2)'"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">ทีม (Team)</label>
+          <select class="form-control" id="nj-team" onchange="updateMemberDropdown(this.value); saveProfile()">
+            <option value="">เลือกทีม</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อ-นามสกุล</label>
+          <div style="display:flex;gap:8px;">
+            <select class="form-control" id="nj-name" onchange="saveProfile()" style="flex:1;">
+              <option value="">— เลือกชื่อ —</option>
+            </select>
+            <button type="button" onclick="addOperator()"
+              style="padding:0 14px;background:var(--ais-green);color:#fff;border:none;
+              border-radius:var(--radius-sm);font-family:'Kanit',sans-serif;font-size:18px;
+              font-weight:700;cursor:pointer;flex-shrink:0;box-shadow:0 3px 0 #3d7a12;
+              transition:transform 0.1s;" title="เพิ่มผู้ดำเนินการ">➕</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">LB Zone</label>
+          <select class="form-control" id="nj-zone">
+            <option value="">เลือก Zone</option>
+            <option value="CMI Zone 1">CMI Zone 1</option>
+            <option value="CMI Zone 2">CMI Zone 2</option>
+            <option value="CMI Zone 3">CMI Zone 3</option>
+            <option value="CMI Zone 4">CMI Zone 4</option>
+            <option value="CMI Zone 5">CMI Zone 5</option>
+            <option value="Zone LPN">Zone LPN</option>
+            <option value="Zone MSN">Zone MSN</option>
+            <option value="Zone Fang">Zone Fang</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">👥 ผู้ดำเนินการ <span style="font-size:11px;color:var(--text2);font-weight:400;">(กดเลือกสมาชิกที่ร่วมงาน)</span></label>
+          <div id="operators-display" style="background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;min-height:52px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1.5px solid var(--border);">
+            <span style="font-size:13px;color:var(--text2);">⬅️ เลือกทีมและชื่อด้านบนก่อนครับ</span>
+          </div>
+          <input type="hidden" id="operators-hidden" value="" />
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Priority (เลือก 1 อย่าง)</label>
+          <div class="priority-grid">
+            <button class="priority-btn" data-p="Critical" onclick="selectPriority('Critical')">
+              <span class="p-icon">🔴</span>
+              Critical
+              <span class="p-sla">SLA ≤ 3 ชม.</span>
+            </button>
+            <button class="priority-btn" data-p="Major" onclick="selectPriority('Major')">
+              <span class="p-icon">🟠</span>
+              Major
+              <span class="p-sla">SLA ≤ 10 ชม.</span>
+            </button>
+            <button class="priority-btn" data-p="Minor" onclick="selectPriority('Minor')">
+              <span class="p-icon">🔵</span>
+              Minor
+              <span class="p-sla">SLA ≤ 24 ชม.</span>
+            </button>
+            <button class="priority-btn" data-p="Other" onclick="selectPriority('Other')">
+              <span class="p-icon">⚙️</span>
+              Other
+              <span class="p-sla">SLA ≤ 24 ชม.</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <button class="btn-submit" id="nj-btn" onclick="submitNewJob()">🚀 เริ่มรับ Job นี้</button>
+    </div>
+
+    <!-- Profile hint -->
+    <div style="text-align:center;font-size:13px;color:var(--text2);">
+      ข้อมูลชื่อและ Zone จะถูกจำอัตโนมัติสำหรับครั้งต่อไป
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: ACTIVE JOBS ===== -->
+<div class="screen" id="screen-active">
+  <div class="page-content">
+    <!-- Search Bar -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <input class="form-control" id="search-job" type="text"
+        placeholder="🔍 ค้นหา Job Number หรือชื่อ..."
+        oninput="renderActiveJobs()"
+        style="flex:1;min-width:200px;font-size:15px;" />
+      <button class="btn-refresh" onclick="renderActiveJobs()" style="white-space:nowrap;">🔄 รีเฟรช</button>
+    </div>
+    <div id="active-jobs-container">
+      <div class="empty-state">
+        <div class="empty-icon">🔧</div>
+        <div class="empty-text">ยังไม่มี Job กำลังทำอยู่</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Issue & OT -->
+<div class="modal-overlay" id="modal-issue">
+  <div class="modal">
+    <div class="modal-title">📝 บันทึกปัญหา / OT</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">
+      Job: <strong id="issue-job-num" style="font-family:'Kanit',sans-serif;color:var(--text);font-size:16px;"></strong>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">📝 ปัญหา / อุปสรรค (ถ้ามี)</label>
+      <textarea class="form-control" id="issue-text" rows="3"
+        placeholder="เช่น ไม่มีอุปกรณ์, รอ spare part, ลูกค้าไม่อยู่บ้าน..."></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:8px;">
+      <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="ot-check" onchange="toggleOTModal()"
+          style="width:18px;height:18px;accent-color:var(--ais-orange);cursor:pointer;">
+        ⏰ ทำ OT (เกินเวลางาน)
+      </label>
+    </div>
+    <div id="ot-modal-fields" style="display:none;">
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-top:8px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;letter-spacing:0.5px;">⏰ ช่วงเวลา OT</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" style="color:var(--ais-green);">📅 วันที่เริ่ม OT</label>
+            <input class="form-control" id="ot-start-date" type="date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--ais-green);">🕐 เวลาเริ่ม OT (24 ชม.)</label>
+            <input class="form-control" id="ot-start" type="text"
+              style="font-family:'Kanit',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;text-align:center;"
+              placeholder="เช่น 22:30" maxlength="5"
+              oninput="formatTimeInput(this)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--critical);">📅 วันที่สิ้นสุด OT</label>
+            <input class="form-control" id="ot-end-date" type="date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color:var(--critical);">🕐 เวลาสิ้นสุด OT (24 ชม.)</label>
+            <input class="form-control" id="ot-end" type="text"
+              style="font-family:'Kanit',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;text-align:center;"
+              placeholder="เช่น 02:00" maxlength="5"
+              oninput="formatTimeInput(this)" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeIssueModal()">ยกเลิก</button>
+      <button class="btn-confirm" onclick="saveIssueOT()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: REPORT ===== -->
+<div class="screen" id="screen-report">
+  <div class="page-content">
+    <div class="report-filters">
+      <select class="filter-select" id="r-zone" onchange="filterReport()">
+        <option value="">ทุก Zone</option>
+        <option value="CMI Zone 1">CMI Zone 1</option>
+        <option value="CMI Zone 2">CMI Zone 2</option>
+        <option value="CMI Zone 3">CMI Zone 3</option>
+        <option value="CMI Zone 4">CMI Zone 4</option>
+        <option value="CMI Zone 5">CMI Zone 5</option>
+        <option value="Zone LPN">Zone LPN</option>
+        <option value="Zone MSN">Zone MSN</option>
+        <option value="Zone Fang">Zone Fang</option>
+      </select>
+      <select class="filter-select" id="r-priority" onchange="filterReport()">
+        <option value="">ทุก Priority</option>
+        <option value="Critical">Critical</option>
+        <option value="Major">Major</option>
+        <option value="Minor">Minor</option>
+      <option value="Other">Other</option>
+      </select>
+      <select class="filter-select" id="r-status" onchange="filterReport()">
+        <option value="">ทุกสถานะ</option>
+        <option value="active">กำลังทำ</option>
+        <option value="done">เสร็จแล้ว</option>
+        <option value="breach">เกิน SLA</option>
+      </select>
+      <button class="btn-refresh" onclick="loadReport()">🔄 รีเฟรช</button>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-num" id="r-total" style="color:var(--ais-orange)">0</div>
+        <div class="summary-lbl">Job ทั้งหมด</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" id="r-active" style="color:var(--ais-green)">0</div>
+        <div class="summary-lbl">กำลังทำ</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" id="r-done" style="color:var(--sla-ok)">0</div>
+        <div class="summary-lbl">เสร็จแล้ว</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" id="r-breach" style="color:var(--critical)">0</div>
+        <div class="summary-lbl">เกิน SLA 🚨</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="report-table-wrap">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Job Number</th>
+            <th>ทีม</th>
+            <th>ชื่อ</th>
+            <th>Zone</th>
+            <th>Priority</th>
+            <th>เวลาเริ่ม</th>
+            <th>ใช้เวลา</th>
+            <th>ปัญหา</th>
+            <th>OT</th>
+            <th>สถานะ</th>
+            <th>SLA</th>
+          </tr>
+        </thead>
+        <tbody id="report-tbody">
+          <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text2);">กำลังโหลด...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Job ซ้ำ - เข้าร่วม -->
+<div class="modal-overlay" id="modal-join">
+  <div class="modal" style="max-width:440px;">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:40px;margin-bottom:8px;">👥</div>
+      <div class="modal-title" style="font-size:20px;">Job นี้มีทีมรับแล้ว!</div>
+    </div>
+    <div style="background:var(--major-bg);border:1.5px solid var(--major-border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">Job Number</div>
+      <div id="join-job-num" style="font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;color:var(--text);"></div>
+    </div>
+    <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px;">👥 ทีมที่รับ Job นี้แล้ว:</div>
+      <div id="join-existing-members" style="font-size:14px;line-height:1.8;"></div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;text-align:center;">
+      ต้องการเข้าร่วม Job นี้ในฐานะ<br>
+      <strong id="join-my-name" style="color:var(--text);font-family:'Kanit',sans-serif;font-size:15px;"></strong>
+      <span style="color:var(--text2);"> · </span>
+      <strong id="join-my-team" style="color:var(--ais-orange);font-family:'Kanit',sans-serif;font-size:15px;"></strong>
+      ?
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeJoinModal()">ยกเลิก</button>
+      <button class="btn-confirm" style="background:var(--grad-main);" onclick="confirmJoinJob()">👥 เข้าร่วม Job นี้</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Complete Job -->
+<div class="modal-overlay" id="modal-complete">
+  <div class="modal">
+    <div class="modal-title">✅ ยืนยันเสร็จ Job นี้</div>
+    <div style="font-size:15px;color:var(--text2);margin-bottom:12px;">
+      Job: <strong id="modal-job-num" style="font-family:'Kanit',sans-serif;color:var(--text);font-size:17px;"></strong>
+    </div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:8px;">ใช้เวลา: <strong id="modal-elapsed" style="color:var(--ais-orange);font-family:'Kanit',sans-serif;"></strong></div>
+    <div style="font-size:14px;color:var(--text2);">⚠️ หลังกดยืนยัน Job นี้จะ<strong style="color:var(--critical);">ล็อคทันที แก้ไขไม่ได้</strong> และพร้อมรับ Job ใหม่</div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn-confirm" onclick="confirmDone(true)">✅ ยืนยัน — รับ Job ใหม่</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Job Detail / Edit -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-title">📋 รายละเอียด Job</div>
+    <div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;">
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <tr><td style="padding:6px 0;color:var(--text2);width:110px;">Job Number</td><td id="d-jobnum" style="font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;color:var(--text);"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">ทีม</td><td id="d-team" style="font-weight:600;"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">ชื่อ</td><td id="d-name"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">Zone</td><td id="d-zone"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">Priority</td><td id="d-priority"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">เวลาเริ่ม</td><td id="d-start" style="font-family:'Kanit',sans-serif;"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">เวลาที่ใช้</td><td id="d-elapsed" style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--ais-orange);"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">ปัญหา</td><td id="d-issue" style="color:var(--critical);"></td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);">OT</td><td id="d-ot" style="color:var(--ais-orange);"></td></tr>
+      </table>
+    </div>
+    <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--amber-dark);">
+      ⚠️ ถ้าต้องการแก้ไขข้อมูลอื่น กรุณาติดต่อ Admin เพราะ Job ที่กด <strong>"เสร็จแล้ว"</strong> จะล็อคทันที
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeDetailModal()">ปิด</button>
+      <button class="btn-confirm" onclick="closeDetailModal(); openIssueModal(currentDetailJobId)">📝 แก้ไขปัญหา/OT</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ทีมว่าง -->
+<div class="modal-overlay" id="modal-free-teams">
+  <div class="modal" style="max-width:500px;max-height:80vh;overflow-y:auto;">
+    <div class="modal-title" style="display:flex;align-items:center;gap:10px;">
+      🟢 ทีมที่ว่าง พร้อมรับงาน
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">ทีมต่อไปนี้ยังไม่มี Job กำลังทำอยู่ครับ</div>
+    <div id="free-teams-list"></div>
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="btn-confirm" onclick="document.getElementById('modal-free-teams').classList.remove('show')" style="width:100%;">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CLOCK =====
+function updateClock() {
+  const n = new Date();
+  const d = String(n.getDate()).padStart(2,'0');
+  const m = String(n.getMonth()+1).padStart(2,'0');
+  const y = n.getFullYear();
+  const h = String(n.getHours()).padStart(2,'0');
+  const mi = String(n.getMinutes()).padStart(2,'0');
+  const s = String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('hdr-clock').textContent = `${d}/${m}/${y} ${h}:${mi}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===== SCREEN =====
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'active') renderActiveJobs();
+  window.scrollTo(0, 0);
+}
+
+// ===== INIT DROPDOWNS =====
+function initDropdowns() {
+  const teamSel = document.getElementById('nj-team');
+  TEAMS.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    teamSel.appendChild(o);
+  });
+  updateMemberDropdown('');
+}
+
+function updateMemberDropdown(team) {
+  const nameSel = document.getElementById('nj-name');
+  nameSel.innerHTML = '<option value="">— เลือกชื่อ —</option>';
+  const members = team ? (TEAM_MEMBERS[team] || []) : [];
+  members.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    nameSel.appendChild(o);
+  });
+  nameSel.value = '';
+  // ไม่ล้าง selectedOperators เมื่อเปลี่ยนทีม เพื่อให้เพิ่มคนจากหลายทีมได้
+  renderOperatorsDisplay();
+}
+
+let selectedOperators = [];
+
+function addOperator() {
+  const nameSel = document.getElementById('nj-name');
+  const name = nameSel.value;
+  if (!name) { showToast('⚠️ กรุณาเลือกชื่อก่อนครับ'); return; }
+  if (selectedOperators.includes(name)) { showToast('⚠️ เพิ่มชื่อนี้แล้วครับ'); return; }
+  selectedOperators.push(name);
+  nameSel.value = '';
+  renderOperatorsDisplay();
+}
+
+function removeOperator(name) {
+  selectedOperators = selectedOperators.filter(n => n !== name);
+  renderOperatorsDisplay();
+}
+
+function renderOperatorsDisplay() {
+  const display = document.getElementById('operators-display');
+  const hidden = document.getElementById('operators-hidden');
+  if (!display) return;
+
+  if (selectedOperators.length === 0) {
+    display.innerHTML = '<span style="font-size:13px;color:var(--text2);">ยังไม่มีผู้ดำเนินการ — เลือกชื่อแล้วกด ➕ เพิ่มครับ</span>';
+    if (hidden) hidden.value = '';
+    return;
+  }
+
+  display.innerHTML = selectedOperators.map((m, i) => `
+    <div style="display:flex;align-items:center;gap:6px;background:${i===0?'var(--ais-orange)':'var(--ais-green)'};
+      color:#fff;padding:7px 12px;border-radius:20px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+      <span style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;">
+        ${i===0?'👑':'👤'} ${m}
+      </span>
+      <button type="button" onclick="removeOperator('${m}')"
+        style="background:rgba(255,255,255,0.3);border:none;border-radius:50%;
+        width:20px;height:20px;cursor:pointer;color:#fff;font-size:12px;
+        display:flex;align-items:center;justify-content:center;font-weight:700;
+        padding:0;line-height:1;">✕</button>
+    </div>`).join('');
+
+  if (hidden) hidden.value = selectedOperators.join(', ');
+}
+
+function updateOperatorsDisplay() { renderOperatorsDisplay(); }
+
+// ===== PROFILE =====
+function loadProfile() {
+  const name = localStorage.getItem('wfm_name') || '';
+  const team = localStorage.getItem('wfm_team') || '';
+  const zone = localStorage.getItem('wfm_zone') || '';
+  if (team) {
+    document.getElementById('nj-team').value = team;
+    updateMemberDropdown(team);
+  }
+  if (name) document.getElementById('nj-name').value = name;
+  if (zone) document.getElementById('nj-zone').value = zone;
+
+}
+function saveProfile() {
+  const n = document.getElementById('nj-name').value;
+  const t = document.getElementById('nj-team').value;
+  const z = document.getElementById('nj-zone').value;
+  if (n) localStorage.setItem('wfm_name', n);
+  if (t) localStorage.setItem('wfm_team', t);
+  if (z) localStorage.setItem('wfm_zone', z);
+}
+
+
+
+// ===== PRIORITY =====
+function selectPriority(p) {
+  selectedPriority = p;
+  document.querySelectorAll('.priority-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.p === p);
+  });
+}
+
+// ===== API CALL =====
+function callAPI(params, callback) {
+  const url = new URL(SCRIPT_URL);
+  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  url.searchParams.set('callback', cbName);
+  window[cbName] = function(data) {
+    delete window[cbName];
+    document.getElementById(cbName + '_s')?.remove();
+    callback(null, data);
+  };
+  const s = document.createElement('script');
+  s.id = cbName + '_s';
+  s.src = url.toString();
+  s.onerror = () => callback(new Error('Network error'));
+  document.body.appendChild(s);
+  setTimeout(() => { if (window[cbName]) { delete window[cbName]; s.remove(); callback(new Error('Timeout')); } }, 15000);
+}
+
+// ===== SUBMIT NEW JOB =====
+function submitNewJob() {
+  if (selectedOperators.length === 0) { showToast('⚠️ กรุณาเพิ่มผู้ดำเนินการอย่างน้อย 1 คน'); return; }
+  const name = selectedOperators[0];
+  const team = document.getElementById('nj-team').value || '';
+  const zone = document.getElementById('nj-zone').value;
+  const jobNum = 'JB26-' + document.getElementById('nj-job').value.trim();
+  const priority = selectedPriority;
+  const operatorsStr = document.getElementById('operators-hidden')?.value || name;
+
+  if (!zone) { showToast('⚠️ กรุณาเลือก Zone'); return; }
+  if (!document.getElementById('nj-job').value.trim()) { showToast('⚠️ กรุณาใส่เลข Job Number'); return; }
+  if (!priority) { showToast('⚠️ กรุณาเลือก Priority'); return; }
+
+  saveProfile();
+  const btn = document.getElementById('nj-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก...'; }
+  const startTime = new Date().toISOString();
+  callAPI({ action: 'addJob', name, team, zone, jobNum, priority, startTime, operators: operatorsStr }, (err, data) => {
+    if (btn) { btn.disabled = false; btn.textContent = '🚀 เริ่มรับ Job นี้'; }
+    if (err || !data.success) { showToast('❌ เกิดข้อผิดพลาด กรุณาลองใหม่'); return; }
+    jobs.push({ id: data.jobId, name, team, zone, jobNum, priority, startTime, status: 'active', issue: '', otInfo: '', operators: operatorsStr });
+    savejobsLocal();
+    updateBadges();
+    clearNewJobForm();
+    showToast('✅ รับ Job ' + jobNum + ' แล้ว!');
+    showScreen('active');
+  });
+}
+
+
+
+function clearNewJobForm() {
+  document.getElementById('nj-job').value = '';
+  document.getElementById('job-wrap').style.borderColor = 'var(--border)';
+  selectedPriority = '';
+  document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('selected'));
+}
+
+// ===== LOCAL STORAGE JOBS =====
+function savejobsLocal() {
+  localStorage.setItem('wfm_jobs', JSON.stringify(jobs));
+}
+function loadJobsLocal() {
+  try { jobs = JSON.parse(localStorage.getItem('wfm_jobs') || '[]'); } catch(e) { jobs = []; }
+}
+
+// ===== TIMER =====
+function getElapsedMs(startTime) {
+  return Date.now() - new Date(startTime).getTime();
+}
+function formatElapsed(ms) {
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function formatElapsedH(ms) {
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  if (h > 0) return `${h} ชม. ${m} นาที`;
+  return `${m} นาที`;
+}
+function getSLAStatus(priority, ms) {
+  const slaMs = SLA_HOURS[priority] * 3600000;
+  const pct = ms / slaMs;
+  if (pct >= 1) return 'breach';
+  if (pct >= 0.8) return 'warn';
+  return 'ok';
+}
+
+// ===== RENDER ACTIVE JOBS =====
+function renderActiveJobs() {
+  const searchVal = (document.getElementById('search-job')?.value || '').toLowerCase().trim();
+  let active = jobs.filter(j => j.status === 'active');
+
+  if (searchVal) {
+    active = active.filter(j =>
+      (j.jobNum || '').toLowerCase().includes(searchVal) ||
+      (j.name || '').toLowerCase().includes(searchVal) ||
+      (j.team || '').toLowerCase().includes(searchVal)
+    );
+  }
+
+  const container = document.getElementById('active-jobs-container');
+
+  if (jobs.filter(j => j.status === 'active').length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">ไม่มี Job ที่กำลังทำอยู่ในอุปกรณ์นี้</div><div style="font-size:13px;color:var(--text2);margin-top:8px;">กด "รับ Job ใหม่" เพื่อเริ่มรับงาน</div></div>`;
+    return;
+  }
+
+  if (active.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">ไม่พบ Job ที่ค้นหา</div></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="active-jobs-grid">${active.map(j => buildJobCard(j)).join('')}</div>`;
+  active.forEach(j => startJobTimer(j.id));
+}
+
+function buildJobCard(j) {
+  const pillClass = j.priority === 'Critical' ? 'pill-critical' : j.priority === 'Major' ? 'pill-major' : j.priority === 'Minor' ? 'pill-minor' : 'pill-other';
+  const slaH = SLA_HOURS[j.priority];
+  return `<div class="job-card" id="card-${j.id}">
+    <div class="job-card-header">
+      <div style="flex:1;">
+        <div class="job-number">${j.jobNum}</div>
+        <div class="job-team">${j.team || ''} · ${j.name}</div>
+        <div class="job-team" style="font-size:11px;">${j.zone}</div>
+        ${j.members && j.members.length > 1 ?
+          `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
+            ${j.members.map(m => `<span style="background:var(--ais-green);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'Kanit',sans-serif;">👤 ${m.name.split(' ')[0]}</span>`).join('')}
+          </div>` : ''}
+      </div>
+      <span class="priority-pill ${pillClass}">${j.priority}</span>
+    </div>
+    <div class="job-timer-area">
+      <div>
+        <div class="timer-label">⏱ เวลาที่ใช้</div>
+        <div class="timer-value timer-ok" id="timer-${j.id}">00:00</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="timer-label">SLA Limit</div>
+        <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:600;color:var(--text2);">${slaH} ชม.</div>
+      </div>
+    </div>
+    <div class="sla-bar-wrap">
+      <div class="sla-bar-track">
+        <div class="sla-bar-fill" id="bar-${j.id}" style="width:0%;background:var(--sla-ok);"></div>
+      </div>
+      <div class="sla-info" id="sla-info-${j.id}">เริ่ม: ${new Date(j.startTime).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>
+    ${j.issue ? `<div style="padding:6px 16px 2px;"><span style="font-size:12px;color:var(--critical);">⚠️ ปัญหา: ${j.issue}</span></div>` : ''}
+    ${j.otInfo ? `<div style="padding:2px 16px 4px;"><span style="font-size:12px;color:var(--ais-orange);">⏰ OT: ${j.otInfo}</span></div>` : ''}
+    <div class="job-card-footer" style="flex-direction:column;gap:8px;">
+      <div style="display:flex;gap:8px;">
+        <button onclick="openIssueModal('${j.id}')"
+          style="flex:1;padding:10px;border:1.5px dashed var(--ais-orange);border-radius:var(--radius-sm);background:transparent;color:var(--ais-orange);font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+          📝 บันทึกปัญหา / OT
+        </button>
+        <button onclick="openDetailModal('${j.id}')"
+          style="flex:1;padding:10px;border:1.5px solid var(--ais-green);border-radius:var(--radius-sm);background:transparent;color:var(--ais-green);font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">
+          📋 รายละเอียด Job
+        </button>
+      </div>
+      <button class="btn-done" onclick="openCompleteModal('${j.id}')" style="width:100%;padding:13px;font-size:15px;">
+        ✅ เสร็จ Job นี้ — พร้อมรับ Job ใหม่
+      </button>
+    </div>
+  </div>`;
+}
+
+let timerIntervals = {};
+function startJobTimer(id) {
+  clearInterval(timerIntervals[id]);
+  timerIntervals[id] = setInterval(() => {
+    const job = jobs.find(j => j.id === id);
+    if (!job || job.status !== 'active') { clearInterval(timerIntervals[id]); return; }
+    const ms = getElapsedMs(job.startTime);
+    const status = getSLAStatus(job.priority, ms);
+    const timerEl = document.getElementById('timer-' + id);
+    const barEl = document.getElementById('bar-' + id);
+    const card = document.getElementById('card-' + id);
+    const slaInfoEl = document.getElementById('sla-info-' + id);
+    if (!timerEl) { clearInterval(timerIntervals[id]); return; }
+
+    timerEl.textContent = formatElapsed(ms);
+    timerEl.className = 'timer-value timer-' + status;
+
+    const slaMs = SLA_HOURS[job.priority] * 3600000;
+    const pct = Math.min((ms / slaMs) * 100, 100);
+    barEl.style.width = pct + '%';
+    barEl.style.background = status === 'breach' ? 'var(--sla-breach)' : status === 'warn' ? 'var(--sla-warn)' : 'var(--sla-ok)';
+
+    if (card) {
+      card.classList.toggle('sla-breach', status === 'breach');
+      card.classList.toggle('sla-warn', status === 'warn');
+    }
+    if (slaInfoEl) {
+      const remain = slaMs - ms;
+      if (status === 'breach') slaInfoEl.textContent = `🚨 เกิน SLA ${formatElapsedH(ms - slaMs)}`;
+      else slaInfoEl.textContent = `เหลือเวลา: ${formatElapsedH(remain)}`;
+    }
+    updateBadges();
+  }, 1000);
+}
+
+// ===== COMPLETE JOB =====
+function openCompleteModal(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  completingJob = { id, goNext: true };
+  const ms = getElapsedMs(job.startTime);
+  document.getElementById('modal-job-num').textContent = job.jobNum;
+  document.getElementById('modal-elapsed').textContent = formatElapsedH(ms);
+  document.getElementById('modal-complete').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-complete').classList.remove('show');
+  completingJob = null;
+}
+function confirmDone(forceNext) {
+  if (!completingJob) return;
+  const { id } = completingJob;
+  const goNext = forceNext || completingJob.goNext;
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+
+  const endTime = new Date().toISOString();
+  const ms = getElapsedMs(job.startTime);
+
+  callAPI({ action: 'completeJob', jobId: id, endTime, elapsedMs: ms }, (err, data) => {});
+
+  job.status = 'done';
+  job.endTime = endTime;
+  savejobsLocal();
+  clearInterval(timerIntervals[id]);
+  closeModal();
+  updateBadges();
+
+  showToast(`✅ Job ${job.jobNum} เสร็จแล้ว!`);
+
+  if (goNext) {
+    setTimeout(() => showScreen('new'), 800);
+  } else {
+    renderActiveJobs();
+  }
+}
+
+// ===== BADGES =====
+function updateBadges() {
+  const active = jobs.filter(j => j.status === 'active');
+  const breached = active.filter(j => getSLAStatus(j.priority, getElapsedMs(j.startTime)) === 'breach');
+  document.getElementById('badge-active').textContent = active.length;
+  document.getElementById('badge-breach').textContent = breached.length;
+}
+
+// ===== QUICK FILTER =====
+function quickFilter(status) {
+  document.getElementById('r-status').value = status;
+  document.getElementById('r-zone').value = '';
+  document.getElementById('r-priority').value = '';
+  filterReport();
+  // highlight active card
+  ['all','active','done','breach'].forEach(k => {
+    const el = document.getElementById('sc-' + k);
+    if (el) el.style.opacity = '1';
+  });
+}
+
+// ===== ทีมว่าง =====
+function showFreeTeams() {
+  const busyTeams = new Set(
+    reportData.filter(j => j.status === 'active').map(j => j.team).filter(Boolean)
+  );
+  const allTeams = Object.keys(TEAM_MEMBERS);
+  const freeTeams = allTeams.filter(t => !busyTeams.has(t));
+  const busyList = allTeams.filter(t => busyTeams.has(t));
+
+  const listEl = document.getElementById('free-teams-list');
+  if (freeTeams.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">ทุกทีมมี Job อยู่แล้วครับ 👏</div>';
+  } else {
+    listEl.innerHTML = `
+      <div style="font-size:12px;font-weight:700;color:var(--ais-green);letter-spacing:1px;margin-bottom:8px;">ว่าง (${freeTeams.length} ทีม)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+        ${freeTeams.map(t => `
+          <div style="background:linear-gradient(135deg,#e8f8ef,#f0fff8);border:2px solid #10b981;
+            border-radius:10px;padding:8px 14px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#065f46;
+            box-shadow:0 3px 0 #065f46;">
+            🟢 ${t}<br>
+            <span style="font-size:11px;font-weight:400;color:#2a8a4a;">${TEAM_MEMBERS[t]?.join(', ') || ''}</span>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--ais-orange);letter-spacing:1px;margin-bottom:8px;">กำลังทำ Job (${busyList.length} ทีม)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${busyList.map(t => `
+          <div style="background:linear-gradient(135deg,#fff8f3,#fff);border:2px solid var(--ais-orange);
+            border-radius:10px;padding:8px 14px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#b85710;
+            box-shadow:0 3px 0 #b85710;">
+            🔧 ${t}
+          </div>`).join('')}
+      </div>`;
+  }
+  document.getElementById('modal-free-teams').classList.add('show');
+}
+
+// ===== REPORT =====
+let reportData = [];
+function loadReport() {
+  document.getElementById('report-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text2);">⏳ กำลังโหลด...</td></tr>';
+
+  callAPI({ action: 'getJobs' }, (err, data) => {
+    if (err || !data.success) {
+      // fallback ใช้ local jobs
+      reportData = jobs;
+    } else {
+      reportData = data.jobs || [];
+      // merge กับ local jobs ที่ยังไม่ sync
+      const serverIds = reportData.map(j => j.id);
+      jobs.filter(j => !serverIds.includes(j.id)).forEach(j => reportData.push(j));
+    }
+    filterReport();
+  });
+}
+
+function filterReport() {
+  const zoneF = document.getElementById('r-zone').value;
+  const prioF = document.getElementById('r-priority').value;
+  const statusF = document.getElementById('r-status').value;
+
+  let filtered = reportData.filter(j => {
+    if (zoneF && j.zone !== zoneF) return false;
+    if (prioF && j.priority !== prioF) return false;
+    if (statusF) {
+      const ms = j.endTime ? (new Date(j.endTime) - new Date(j.startTime)) : getElapsedMs(j.startTime);
+      const slaBreached = ms > SLA_HOURS[j.priority] * 3600000;
+      if (statusF === 'active' && j.status !== 'active') return false;
+      if (statusF === 'done' && j.status !== 'done') return false;
+      if (statusF === 'breach' && !slaBreached) return false;
+    }
+    return true;
+  });
+
+  // Sort: active ก่อน แล้วตาม startTime ใหม่สุด
+  filtered.sort((a, b) => {
+    if (a.status === 'active' && b.status !== 'active') return -1;
+    if (b.status === 'active' && a.status !== 'active') return 1;
+    return new Date(b.startTime) - new Date(a.startTime);
+  });
+
+  // Summary
+  const total = filtered.length;
+  const active = filtered.filter(j => j.status === 'active').length;
+  const done = filtered.filter(j => j.status === 'done').length;
+  const breach = filtered.filter(j => {
+    const ms = j.endTime ? (new Date(j.endTime) - new Date(j.startTime)) : getElapsedMs(j.startTime);
+    return ms > SLA_HOURS[j.priority] * 3600000;
+  }).length;
+
+  document.getElementById('r-total').textContent = total;
+  document.getElementById('r-active').textContent = active;
+  document.getElementById('r-done').textContent = done;
+  document.getElementById('r-breach').textContent = breach;
+
+  if (filtered.length === 0) {
+    document.getElementById('report-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text2);">ไม่มีข้อมูล</td></tr>';
+    return;
+  }
+
+  document.getElementById('report-tbody').innerHTML = filtered.map(j => {
+    const ms = j.endTime
+      ? (new Date(j.endTime) - new Date(j.startTime))
+      : (j.status === 'active' ? getElapsedMs(j.startTime) : 0);
+    const slaMs = SLA_HOURS[j.priority] * 3600000;
+    const breached = ms > slaMs;
+    const pillClass = j.priority === 'Critical' ? 'pill-critical' : j.priority === 'Major' ? 'pill-major' : j.priority === 'Minor' ? 'pill-minor' : 'pill-other';
+    const startStr = new Date(j.startTime).toLocaleString('th-TH', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+
+    return `<tr>
+      <td class="td-job">${j.jobNum}</td>
+      <td style="font-family:'Kanit',sans-serif;font-weight:600;font-size:13px;">${j.team || '-'}</td>
+      <td>${j.name}</td>
+      <td>${j.zone}</td>
+      <td><span class="priority-pill ${pillClass}" style="font-size:12px;">${j.priority}</span></td>
+      <td>${startStr}</td>
+      <td class="td-time" style="color:${breached?'var(--critical)':'var(--text)'}">${formatElapsedH(ms)}</td>
+      <td style="font-size:12px;color:var(--critical);">${j.issue ? '⚠️ '+j.issue : '-'}</td>
+      <td style="font-size:12px;">${j.otInfo ? '⏰ '+j.otInfo : '-'}</td>
+      <td>${j.status === 'active' ? '<span class="status-active">🔧 กำลังทำ</span>' : '<span class="status-done">✅ เสร็จแล้ว</span>'}</td>
+      <td>${breached ? '<span class="breach-tag">🚨 เกิน SLA</span>' : '<span class="ok-tag">✅ ปกติ</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== AUTO REFRESH REPORT =====
+function startAutoRefresh() {
+  clearInterval(autoRefreshInterval);
+  autoRefreshInterval = setInterval(() => {
+    if (document.getElementById('screen-report').classList.contains('active')) {
+      loadReport();
+    }
+    renderActiveJobs();
+    updateBadges();
+  }, 60000); // ทุก 1 นาที
+}
+
+// ===== ISSUE & OT MODAL =====
+let currentIssueJobId = null;
+
+function openIssueModal(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  currentIssueJobId = id;
+  document.getElementById('issue-job-num').textContent = job.jobNum;
+  document.getElementById('issue-text').value = job.issue || '';
+  document.getElementById('ot-check').checked = !!job.otInfo;
+  document.getElementById('ot-modal-fields').style.display = job.otInfo ? 'block' : 'none';
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  if (job.otInfo) {
+    // format: "startDate startTime - endDate endTime"
+    const match = job.otInfo.match(/^(\S+)\s+(\S+)\s*-\s*(\S+)\s+(\S+)$/);
+    if (match) {
+      document.getElementById('ot-start-date').value = match[1] || todayStr;
+      document.getElementById('ot-start').value = match[2] || '';
+      document.getElementById('ot-end-date').value = match[3] || todayStr;
+      document.getElementById('ot-end').value = match[4] || '';
+    } else {
+      document.getElementById('ot-start-date').value = todayStr;
+      document.getElementById('ot-start').value = '';
+      document.getElementById('ot-end-date').value = todayStr;
+      document.getElementById('ot-end').value = '';
+    }
+  } else {
+    document.getElementById('ot-start-date').value = todayStr;
+    document.getElementById('ot-start').value = '';
+    document.getElementById('ot-end-date').value = todayStr;
+    document.getElementById('ot-end').value = '';
+  }
+  // reset border color
+  ['ot-start','ot-end'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.borderColor = '';
+  });
+  document.getElementById('modal-issue').classList.add('show');
+}
+
+function closeIssueModal() {
+  document.getElementById('modal-issue').classList.remove('show');
+  currentIssueJobId = null;
+}
+
+function toggleOTModal() {
+  const show = document.getElementById('ot-check').checked;
+  document.getElementById('ot-modal-fields').style.display = show ? 'block' : 'none';
+}
+
+function saveIssueOT() {
+  if (!currentIssueJobId) return;
+  const job = jobs.find(j => j.id === currentIssueJobId);
+  if (!job) return;
+
+  const issue = document.getElementById('issue-text').value.trim();
+  const hasOT = document.getElementById('ot-check').checked;
+  const otStartDate = document.getElementById('ot-start-date').value;
+  const otStart = document.getElementById('ot-start').value;
+  const otEndDate = document.getElementById('ot-end-date').value;
+  const otEnd = document.getElementById('ot-end').value;
+
+  if (hasOT && (!otStartDate || !otEndDate)) {
+    showToast('⚠️ กรุณาเลือกวันที่ OT ให้ครบ'); return;
+  }
+  if (hasOT && (!isValidTime(otStart) || !isValidTime(otEnd))) {
+    showToast('⚠️ กรุณากรอกเวลา OT ให้ถูกต้อง (เช่น 22:30)'); return;
+  }
+
+  job.issue = issue;
+  job.otInfo = hasOT ? `${otStartDate} ${otStart} - ${otEndDate} ${otEnd}` : '';
+  savejobsLocal();
+
+  // sync ไป Apps Script
+  callAPI({ action: 'updateJobIssue', jobId: currentIssueJobId, issue, otInfo: job.otInfo }, () => {});
+
+  closeIssueModal();
+  showToast('💾 บันทึกเรียบร้อยแล้วครับ');
+  renderActiveJobs();
+}
+
+// ===== TIME INPUT HELPER =====
+function formatTimeInput(el) {
+  let val = el.value.replace(/[^0-9]/g, '');
+  if (val.length > 4) val = val.slice(0, 4);
+  if (val.length >= 3) {
+    val = val.slice(0, 2) + ':' + val.slice(2);
+  }
+  el.value = val;
+  // validate
+  if (val.length === 5) {
+    const [h, m] = val.split(':').map(Number);
+    if (h > 23 || m > 59) {
+      el.style.borderColor = 'var(--critical)';
+      el.title = 'เวลาไม่ถูกต้อง (00:00 - 23:59)';
+    } else {
+      el.style.borderColor = 'var(--ais-green)';
+      el.title = '';
+    }
+  } else {
+    el.style.borderColor = '';
+  }
+}
+
+function isValidTime(val) {
+  if (!val || val.length !== 5) return false;
+  const [h, m] = val.split(':').map(Number);
+  return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+}
+
+// ===== JOIN JOB =====
+function closeJoinModal() {
+  document.getElementById('modal-join').classList.remove('show');
+  pendingJoinJob = null;
+}
+
+function confirmJoinJob() {
+  if (!pendingJoinJob) return;
+  const { name, team, zone, jobNum, priority } = pendingJoinJob;
+  closeJoinModal();
+
+  const btn = document.getElementById('nj-btn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังเข้าร่วม...';
+
+  callAPI({ action: 'joinJob', name, team, jobNum }, (err, data) => {
+    btn.disabled = false; btn.textContent = '🚀 เริ่มรับ Job นี้';
+    if (err || !data.success) { showToast('❌ เกิดข้อผิดพลาด'); return; }
+
+    // เพิ่ม Job เข้า local โดยใช้ ID เดิมจาก server
+    const existing = jobs.find(j => j.jobNum === jobNum && j.status === 'active');
+    if (existing) {
+      if (!existing.members) existing.members = [];
+      existing.members.push({ name, team });
+    } else {
+      const startTime = data.startTime || new Date().toISOString();
+      jobs.push({
+        id: data.jobId, name, team, zone, jobNum, priority,
+        startTime, status: 'active', issue: '', otInfo: '',
+        members: data.members || [{ name, team }],
+        isJoined: true
+      });
+    }
+    savejobsLocal();
+    updateBadges();
+    clearNewJobForm();
+    showToast(`👥 เข้าร่วม Job ${jobNum} แล้ว!`);
+    showScreen('active');
+  });
+}
+
+// ===== DETAIL MODAL =====
+let currentDetailJobId = null;
+
+function openDetailModal(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  currentDetailJobId = id;
+  const ms = getElapsedMs(job.startTime);
+  document.getElementById('d-jobnum').textContent = job.jobNum;
+  document.getElementById('d-team').textContent = job.team || '-';
+  document.getElementById('d-name').textContent = job.name || '-';
+  document.getElementById('d-zone').textContent = job.zone || '-';
+  document.getElementById('d-priority').innerHTML = `<span class="priority-pill pill-${job.priority?.toLowerCase()}" style="font-size:12px;">${job.priority}</span>`;
+  document.getElementById('d-start').textContent = new Date(job.startTime).toLocaleString('th-TH', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('d-elapsed').textContent = formatElapsedH(ms);
+  document.getElementById('d-issue').textContent = job.issue || '-';
+  document.getElementById('d-ot').textContent = job.otInfo || '-';
+  document.getElementById('modal-detail').classList.add('show');
+}
+
+function closeDetailModal() {
+  document.getElementById('modal-detail').classList.remove('show');
+  currentDetailJobId = null;
+}
+
+// ===== INIT =====
+// reset btn ให้แน่ใจว่าไม่ disable ค้าง
+const _btn = document.getElementById('nj-btn');
+if (_btn) { _btn.disabled = false; _btn.textContent = '🚀 เริ่มรับ Job นี้'; }
+initDropdowns();
+loadJobsLocal();
+loadProfile();
+updateBadges();
+startAutoRefresh();
+</script>
+</body>
+</html>
