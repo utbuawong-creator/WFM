@@ -1054,6 +1054,56 @@ function loadJobsLocal() {
   try { jobs = JSON.parse(localStorage.getItem('wfm_jobs') || '[]'); } catch(e) { jobs = []; }
 }
 
+// ดึง Job ที่ active จาก Server มาแสดง (รวมกับของตัวเอง)
+function loadJobsFromServer() {
+  loadJobsLocal(); // โหลด local ก่อน
+  updateBadges();
+  
+  callAPI({ action: 'getJobs' }, (err, data) => {
+    if (err || !data.success) {
+      // ถ้า server ไม่ตอบ ใช้ local แทน
+      renderActiveJobs();
+      return;
+    }
+    
+    const serverJobs = (data.jobs || []).filter(j => j.status === 'active').map(j => ({
+      id: j.id,
+      name: j.name || '',
+      team: j.team || '',
+      zone: j.zone || '',
+      jobNum: j.jobNum || j.job_number || '',
+      priority: j.priority || 'Other',
+      startTime: j.startTime || new Date().toISOString(),
+      status: 'active',
+      issue: j.issue || '',
+      otInfo: j.otInfo || '',
+      operators: j.operators || j.name || '',
+      fromServer: true
+    }));
+
+    // รวม server jobs กับ local jobs (ไม่ซ้ำกัน)
+    const localIds = jobs.map(j => j.id);
+    serverJobs.forEach(sj => {
+      if (!localIds.includes(sj.id)) {
+        jobs.push(sj);
+      }
+    });
+
+    // sync local ให้ตรงกับ server
+    jobs = jobs.filter(j => {
+      if (j.fromServer) return true;
+      if (j.status === 'done') return true;
+      // ถ้า job local ยัง active แต่ไม่อยู่ใน server แล้ว ให้ mark done
+      const inServer = serverJobs.find(sj => sj.id === j.id);
+      return inServer !== undefined || j.status === 'done';
+    });
+
+    savejobsLocal();
+    updateBadges();
+    renderActiveJobs();
+  });
+}
+
 // ===== TIMER =====
 function getElapsedMs(startTime) {
   return Date.now() - new Date(startTime).getTime();
@@ -1390,9 +1440,9 @@ function startAutoRefresh() {
     if (document.getElementById('screen-report').classList.contains('active')) {
       loadReport();
     }
-    renderActiveJobs();
-    updateBadges();
-  }, 60000); // ทุก 1 นาที
+    // ดึงจาก server ทุก 1 นาที
+    loadJobsFromServer();
+  }, 60000);
 }
 
 // ===== ISSUE & OT MODAL =====
@@ -1572,13 +1622,11 @@ function closeDetailModal() {
 }
 
 // ===== INIT =====
-// reset btn ให้แน่ใจว่าไม่ disable ค้าง
 const _btn = document.getElementById('nj-btn');
 if (_btn) { _btn.disabled = false; _btn.textContent = '🚀 เริ่มรับ Job นี้'; }
 initDropdowns();
-loadJobsLocal();
 loadProfile();
-updateBadges();
+loadJobsFromServer(); // ดึงจาก Server แทน localStorage
 startAutoRefresh();
 </script>
 
