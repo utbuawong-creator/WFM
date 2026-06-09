@@ -880,7 +880,7 @@ function showScreen(name) {
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   document.getElementById('nav-' + name).classList.add('active');
-  if (name === 'active') renderActiveJobs();
+  if (name === 'active') loadJobsFromServer(); // ดึงจาก server ทุกครั้ง
   window.scrollTo(0, 0);
 }
 
@@ -1056,49 +1056,33 @@ function loadJobsLocal() {
 
 // ดึง Job ที่ active จาก Server มาแสดง (รวมกับของตัวเอง)
 function loadJobsFromServer() {
-  loadJobsLocal(); // โหลด local ก่อน
-  updateBadges();
-  
+  // ดึงจาก Server อย่างเดียว ทำให้ทุกเครื่องเห็นเหมือนกัน
   callAPI({ action: 'getJobs' }, (err, data) => {
     if (err || !data.success) {
-      // ถ้า server ไม่ตอบ ใช้ local แทน
+      // fallback ใช้ local ถ้า server ไม่ตอบ
+      loadJobsLocal();
       renderActiveJobs();
+      updateBadges();
       return;
     }
-    
-    const serverJobs = (data.jobs || []).filter(j => j.status === 'active').map(j => ({
-      id: j.id,
+
+    // ใช้ข้อมูลจาก Server ทั้งหมด
+    jobs = (data.jobs || []).map(j => ({
+      id: String(j.id || ''),
       name: j.name || '',
       team: j.team || '',
       zone: j.zone || '',
-      jobNum: j.jobNum || j.job_number || '',
+      jobNum: j.jobNum || '',
       priority: j.priority || 'Other',
       startTime: j.startTime || new Date().toISOString(),
-      status: 'active',
+      endTime: j.endTime || null,
+      status: j.status || 'active',
       issue: j.issue || '',
       otInfo: j.otInfo || '',
-      operators: j.operators || j.name || '',
-      fromServer: true
+      operators: j.operators || j.name || ''
     }));
 
-    // รวม server jobs กับ local jobs (ไม่ซ้ำกัน)
-    const localIds = jobs.map(j => j.id);
-    serverJobs.forEach(sj => {
-      if (!localIds.includes(sj.id)) {
-        jobs.push(sj);
-      }
-    });
-
-    // sync local ให้ตรงกับ server
-    jobs = jobs.filter(j => {
-      if (j.fromServer) return true;
-      if (j.status === 'done') return true;
-      // ถ้า job local ยัง active แต่ไม่อยู่ใน server แล้ว ให้ mark done
-      const inServer = serverJobs.find(sj => sj.id === j.id);
-      return inServer !== undefined || j.status === 'done';
-    });
-
-    savejobsLocal();
+    savejobsLocal(); // sync local ให้ตรงกับ server
     updateBadges();
     renderActiveJobs();
   });
@@ -1437,12 +1421,12 @@ function filterReport() {
 function startAutoRefresh() {
   clearInterval(autoRefreshInterval);
   autoRefreshInterval = setInterval(() => {
+    // ดึงจาก server ทุก 30 วินาที ทำให้ทุกเครื่องเห็นข้อมูลตรงกัน
+    loadJobsFromServer();
     if (document.getElementById('screen-report').classList.contains('active')) {
       loadReport();
     }
-    // ดึงจาก server ทุก 1 นาที
-    loadJobsFromServer();
-  }, 60000);
+  }, 30000);
 }
 
 // ===== ISSUE & OT MODAL =====
