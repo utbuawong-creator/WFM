@@ -1066,22 +1066,28 @@ function clearNewJobForm() {
 
 // ===== LOCAL STORAGE JOBS =====
 function savejobsLocal() {
-  localStorage.setItem('wfm_jobs', JSON.stringify(jobs));
+  // ไม่ใช้ localStorage แล้ว เพื่อป้องกัน cache เก่า
 }
 function loadJobsLocal() {
-  try { jobs = JSON.parse(localStorage.getItem('wfm_jobs') || '[]'); } catch(e) { jobs = []; }
+  jobs = []; // ไม่ใช้ localStorage แล้ว ดึงจาก Server ทั้งหมด
 }
 
 // ดึง Job ที่ active จาก Server มาแสดง (รวมกับของตัวเอง)
 function loadJobsFromServer() {
   callAPI({ action: 'getJobs' }, (err, data) => {
     if (err || !data.success) {
-      loadJobsLocal();
-      renderActiveJobs();
+      // ถ้า server error ล้าง jobs ให้ว่าง
+      jobs = [];
       updateBadges();
+      renderActiveJobs();
       return;
     }
-    // ดึงทุก Job จาก Server — ทุกเครื่องเห็นเหมือนกัน
+
+    const today = new Date();
+    const todayStr = today.toLocaleDateString('th-TH', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const todayDate = today.toDateString();
+
+    // ดึงทุก Job จาก Server ไม่กรองวัน (แสดงทั้ง active ทั้งหมด)
     jobs = (data.jobs || []).map(j => ({
       id: String(j.id || ''),
       name: j.name || '',
@@ -1091,14 +1097,14 @@ function loadJobsFromServer() {
       priority: j.priority || 'Other',
       startTime: j.startTime || new Date().toISOString(),
       endTime: j.endTime || null,
-      status: (j.status || 'active').toString().includes('done') ? 'done' : 'active',
+      status: (j.status || '').toString().includes('done') ? 'done' : 'active',
       issue: j.issue || '',
       otInfo: j.otInfo || '',
       operators: j.operators || j.name || ''
     }));
-    savejobsLocal();
+
+    // ไม่บันทึก localStorage เพื่อป้องกัน cache เก่า
     updateBadges();
-    // แสดงหน้า active ถ้ากำลังอยู่ที่หน้านั้น
     if (document.getElementById('screen-active').classList.contains('active')) {
       renderActiveJobs();
     }
@@ -1443,7 +1449,7 @@ function startAutoRefresh() {
     if (document.getElementById('screen-report').classList.contains('active')) {
       loadReport();
     }
-  }, 30000);
+  }, 20000); // refresh ทุก 20 วินาที
 }
 
 // ===== ISSUE & OT MODAL =====
@@ -1623,6 +1629,9 @@ function closeDetailModal() {
 }
 
 // ===== INIT =====
+// ล้าง cache เก่าออกทุกครั้ง
+localStorage.removeItem('wfm_jobs');
+jobs = [];
 const _btn = document.getElementById('nj-btn');
 if (_btn) { _btn.disabled = false; _btn.textContent = '🚀 เริ่มรับ Job นี้'; }
 initDropdowns();
