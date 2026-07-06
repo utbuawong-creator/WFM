@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบออกบิลค่าน้ำ — บ้านสันป่าสักเหนือ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700;900&family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f0f6ff;--card:#fff;--border:#d0dff0;--blue:#1565c0;--blue2:#1976d2;--cyan:#0288d1;--red:#c62828;--green:#2e7d32;--orange:#e65100;--text:#1a1a2e;--muted:#607d8b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);font-family:'Noto Sans Thai',sans-serif;color:var(--text);}
+.nav{background:var(--blue);color:white;padding:14px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.nav-title{font-size:17px;font-weight:800;}
+.nav-sub{font-size:12px;opacity:0.75;margin-top:2px;}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px;}
+.ctrl-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;}
+.ctrl-title{font-size:13px;font-weight:800;color:var(--blue);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;}
+.ctrl-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
+.field{display:flex;flex-direction:column;gap:5px;}
+label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+input,select{background:#f5f8ff;border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-family:'Noto Sans Thai',sans-serif;font-size:14px;color:var(--text);}
+input:focus,select:focus{outline:none;border-color:var(--blue);}
+.btn{padding:10px 22px;border:none;border-radius:10px;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-blue{background:var(--blue);color:white;}.btn-blue:hover{background:var(--blue2);}
+.btn-green{background:var(--green);color:white;}.btn-green:hover{opacity:0.85;}
+.btn-orange{background:var(--orange);color:white;}.btn-orange:hover{opacity:0.85;}
+.tbl-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead{background:var(--blue);color:white;}
+th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
+td{padding:9px 12px;border-bottom:1px solid #eef2f8;vertical-align:middle;}
+tr:hover td{background:#f0f6ff;}
+tr.pending td{background:#fff8e1 !important;}
+tr.pending:hover td{background:#fff3cd !important;}
+.num{font-family:'Sarabun',sans-serif;font-weight:600;}
+.red{color:var(--red);font-weight:700;}.zero{color:#bbb;}
+.gen-btn{background:var(--cyan);color:white;border:none;padding:5px 12px;border-radius:20px;font-family:'Noto Sans Thai',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.gen-btn:hover{opacity:0.85;}
+.edit-btn{background:var(--orange);color:white;border:none;padding:5px 12px;border-radius:20px;font-family:'Noto Sans Thai',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px;}
+.edit-btn:hover{opacity:0.85;}
+.pending-badge{display:inline-block;background:#ff6f00;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px;}
+.sum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.sum-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.sum-n{font-family:'Sarabun',sans-serif;font-size:28px;font-weight:700;}
+.sum-n.blue{color:var(--blue);}.sum-n.red{color:var(--red);}.sum-n.green{color:var(--green);}.sum-n.orange{color:var(--orange);}
+.sum-l{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* EDIT MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:999;align-items:center;justify-content:center;padding:16px;}
+.overlay.show{display:flex;}
+.modal{background:white;border-radius:20px;max-width:520px;width:100%;max-height:94vh;overflow-y:auto;}
+.modal-head{padding:14px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+.modal-head-title{font-weight:800;font-size:15px;}
+.close{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;}
+.modal-body{padding:20px;}
+.modal-foot{padding:14px 18px;border-top:1px solid #eee;display:flex;gap:10px;}
+.save-btn{flex:1;background:var(--green);color:white;border:none;border-radius:10px;padding:12px;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+.save-btn:hover{opacity:0.85;}
+.dl-btn{flex:1;background:var(--blue);color:white;border:none;border-radius:10px;padding:12px;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+.dl-btn:hover{opacity:0.85;}
+
+/* Edit form inside modal */
+.edit-info{background:#f0f6ff;border-radius:12px;padding:14px 18px;margin-bottom:16px;}
+.edit-info-name{font-size:20px;font-weight:800;color:var(--blue);}
+.edit-info-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.edit-result{background:#fff8e1;border:2px solid #ffc107;border-radius:12px;padding:14px 18px;text-align:center;}
+.edit-result-label{font-size:13px;color:var(--muted);}
+.edit-result-units{font-size:36px;font-weight:800;color:var(--orange);font-family:'Sarabun',sans-serif;}
+.edit-result-total{font-size:20px;font-weight:700;color:var(--red);margin-top:4px;}
+
+.btn-excel{background:#1d6f42;color:white;}.btn-excel:hover{background:#145a32;}
+.btn-next{background:#6a1b9a;color:white;}.btn-next:hover{background:#4a148c;}
+.btn-stats{background:#01579b;color:white;border:none;padding:10px 22px;border-radius:10px;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;}.btn-stats:hover{background:#0277bd;}
+.btn-add-mem{background:#004d40;color:white;border:none;padding:10px 22px;border-radius:10px;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;}.btn-add-mem:hover{background:#00695c;}
+
+/* ===== STATS MODAL ===== */
+.stats-overlay{display:none;position:fixed;inset:0;background:rgba(8,18,40,0.82);z-index:1001;overflow-y:auto;padding:20px 12px 40px;}
+.stats-overlay.show{display:block;}
+.stats-modal{background:#f0f6ff;border-radius:22px;max-width:980px;margin:0 auto;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.4);}
+.stats-head{background:linear-gradient(130deg,#0d47a1 0%,#1565c0 55%,#0288d1 100%);color:white;padding:22px 28px;display:flex;justify-content:space-between;align-items:flex-start;}
+.stats-head-left{}
+.stats-head-title{font-size:22px;font-weight:900;letter-spacing:-0.3px;}
+.stats-head-sub{font-size:12px;opacity:0.75;margin-top:3px;}
+.stats-ctrl{background:#fff;padding:14px 24px;border-bottom:1px solid #dde8f5;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.stab{padding:7px 18px;border:2px solid #1565c0;border-radius:20px;font-family:'Noto Sans Thai',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:#1565c0;transition:all 0.18s;}
+.stab.active{background:#1565c0;color:white;}
+.stats-body{padding:22px 24px 30px;}
+.s-sec{font-size:14px;font-weight:800;color:#1565c0;margin-bottom:14px;padding-bottom:7px;border-bottom:2px solid #d8e8f8;letter-spacing:0.4px;text-transform:uppercase;}
+.scards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.scard{background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 14px rgba(21,101,192,0.09);border-top:4px solid #ccc;position:relative;overflow:hidden;}
+.scard::after{content:'';position:absolute;right:-18px;top:-18px;width:72px;height:72px;border-radius:50%;opacity:0.07;}
+.scard.sc-blue{border-top-color:#1565c0;}.scard.sc-blue::after{background:#1565c0;}
+.scard.sc-teal{border-top-color:#00897b;}.scard.sc-teal::after{background:#00897b;}
+.scard.sc-green{border-top-color:#2e7d32;}.scard.sc-green::after{background:#2e7d32;}
+.scard.sc-orange{border-top-color:#e65100;}.scard.sc-orange::after{background:#e65100;}
+.scard-icon{font-size:22px;margin-bottom:6px;}
+.scard-num{font-family:'Sarabun',sans-serif;font-size:34px;font-weight:800;color:#0d1b3e;line-height:1;}
+.scard-label{font-size:11px;font-weight:700;color:#607d8b;margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.scard-sub{font-size:11px;color:#90a4ae;margin-top:5px;line-height:1.4;}
+.scharts-row{display:flex;gap:14px;margin-bottom:14px;}
+.schart-box{flex:1;background:#fff;border:1px solid #dde8f5;border-radius:14px;padding:16px 18px;box-shadow:0 1px 6px rgba(21,101,192,0.06);}
+.schart-title{font-size:12px;font-weight:800;color:#1565c0;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;}
+.stbl-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 1px 6px rgba(21,101,192,0.07);}
+.stbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+.stbl thead{background:linear-gradient(90deg,#1565c0,#0288d1);color:white;}
+.stbl th{padding:10px 12px;text-align:left;font-size:10px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;white-space:nowrap;}
+.stbl td{padding:9px 12px;border-bottom:1px solid #f0f5fb;vertical-align:middle;}
+.stbl tr:last-child td{border-bottom:none;}
+.stbl tr.tr-total td{background:#e8f0fe;font-weight:700;border-top:2px solid #c5d5f0;}
+.stbl tr.tr-nodata td{opacity:0.38;}
+.stbl .tc-green{color:#2e7d32;font-weight:700;}.stbl .tc-orange{color:#e65100;font-weight:700;}.stbl .tc-red{color:#c62828;font-weight:700;}.stbl .tc-num{font-family:'Sarabun',sans-serif;font-weight:600;}
+.bdg{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;}
+.bdg-done{background:#e8f5e9;color:#2e7d32;}
+.bdg-pend{background:#fff8e1;color:#e65100;}
+.bdg-none{background:#f5f5f5;color:#9e9e9e;}
+.stats-nodata{text-align:center;padding:60px 24px;color:#90a4ae;}
+.stats-nodata-icon{font-size:52px;margin-bottom:14px;}
+.stats-nodata-title{font-size:17px;font-weight:700;color:#607d8b;}
+.stats-nodata-sub{font-size:13px;margin-top:6px;}
+
+/* ===== ADD MEMBER MODAL ===== */
+.add-head{background:linear-gradient(130deg,#004d40,#00695c,#00897b);color:white;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;}
+.add-head-title{font-weight:800;font-size:16px;}
+.add-section{font-size:11px;font-weight:800;color:#00695c;letter-spacing:1px;text-transform:uppercase;margin:16px 0 10px;}
+.add-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.add-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.add-note{background:#e8f5e9;border-left:4px solid #2e7d32;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;color:#2e7d32;line-height:1.6;margin-top:12px;}
+.add-warn{background:#fff8e1;border-left:4px solid #e65100;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;color:#bf360c;line-height:1.6;margin:12px 0;}
+.req{color:#c62828;}
+
+@media(max-width:640px){
+  .scards{grid-template-columns:repeat(2,1fr);}
+  .scharts-row{flex-direction:column;}
+  .add-grid2,.add-grid3{grid-template-columns:1fr;}
+}
+#preview-img{width:100%;border-radius:8px;}
+@media(max-width:640px){.sum-row{grid-template-columns:repeat(2,1fr);}.ctrl-row{flex-direction:column;}th,td{padding:7px 8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div>
+    <div class="nav-title">💧 ระบบออกบิลค่าน้ำประปา</div>
+    <div class="nav-sub">กลุ่มน้ำประปาบ้านสันป่าสักเหนือ หมู่ที่ 9 ต.หนองแฝก อ.สารภี จ.เชียงใหม่</div>
+  </div>
+</nav>
+<div class="wrap">
+
+<div class="ctrl-card">
+  <div class="ctrl-title">⚙️ ตั้งค่าบิล</div>
+  <div class="ctrl-row">
+    <div class="field"><label>ประจำเดือน</label><input type="month" id="s-month" value="2026-06" onchange="loadMonth()"></div>
+    <div class="field"><label>ราคา/หน่วย (บาท)</label><input type="number" id="s-rate" value="6" min="1" step="0.5" style="width:110px"></div>
+    <div class="field"><label>ผู้รับเงิน</label><input type="text" id="s-signer" value="มานพ อุดบัววงค์" style="width:200px"></div>
+    <div class="field"><label>กรองซอย</label>
+      <select id="s-soi" onchange="renderTable()">
+        <option value="all">ทั้งหมด</option>
+        <option value="0">ซอย 0</option><option value="1">ซอย 1</option><option value="2">ซอย 2</option>
+        <option value="3">ซอย 3</option><option value="4">ซอย 4</option><option value="5">ซอย 5</option>
+      </select>
+    </div>
+    <div class="field"><label>กรองสถานะ</label>
+      <select id="s-status" onchange="renderTable()">
+        <option value="all">ทั้งหมด</option>
+        <option value="pending">⏳ รอมิเตอร์</option>
+        <option value="done">✅ มีข้อมูลแล้ว</option>
+      </select>
+    </div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-green" onclick="generateAll()">🖨️ ออกบิลทั้งหมด</button></div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-excel" onclick="exportExcel()">📊 Export Excel</button></div>
+    <div class="field"><label>&nbsp;</label><button class="btn btn-next" onclick="rollToNextMonth()">📅 สร้างเดือนถัดไป</button></div>
+    <div class="field"><label>&nbsp;</label><button class="btn-stats" onclick="openStats()">📊 รายงานสถิติ</button></div>
+    <div class="field"><label>&nbsp;</label><button class="btn-add-mem" onclick="openAddMember()">➕ เพิ่มสมาชิก</button></div>
+  </div>
+</div>
+
+<div class="sum-row" id="summary"></div>
+
+<div class="tbl-card">
+  <table>
+    <thead><tr>
+      <th>#</th><th>รหัส</th><th>ชื่อ-สกุล</th><th>บ้านเลขที่</th><th>ซอย</th>
+      <th>มิเตอร์เก่า</th><th>มิเตอร์ใหม่</th><th>หน่วย</th><th>ยอด (บาท)</th><th>จัดการ</th>
+    </tr></thead>
+    <tbody id="tbl-body"></tbody>
+  </table>
+</div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-title" id="edit-modal-title">✏️ แก้ไขมิเตอร์</div>
+      <button class="close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="edit-info">
+        <div class="edit-info-name" id="edit-name"></div>
+        <div class="edit-info-sub" id="edit-sub"></div>
+      </div>
+      <div class="edit-grid">
+        <div class="field">
+          <label>มิเตอร์ครั้งก่อน</label>
+          <input type="number" id="edit-prev" min="0" oninput="calcEdit()">
+        </div>
+        <div class="field">
+          <label>มิเตอร์ครั้งหลัง ⬅️ กรอกตรงนี้</label>
+          <input type="number" id="edit-curr" min="0" oninput="calcEdit()" style="border-color:#e65100;border-width:2px;background:#fff8f0;">
+        </div>
+      </div>
+      <div class="edit-result">
+        <div class="edit-result-label">หน่วยที่ใช้ / ยอดชำระ</div>
+        <div class="edit-result-units" id="edit-units">0 หน่วย</div>
+        <div class="edit-result-total" id="edit-total">0 บาท</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="save-btn" onclick="saveEdit()">💾 บันทึกมิเตอร์</button>
+      <button class="dl-btn" onclick="saveAndBill()">🧾 บันทึก + ออกบิล</button>
+    </div>
+  </div>
+</div>
+
+<!-- BILL MODAL -->
+<div class="overlay" id="bill-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-title">🧾 ใบเสร็จรับเงินค่าน้ำ</div>
+      <button class="close" onclick="closeBill()">✕</button>
+    </div>
+    <div class="modal-body"><canvas id="bill-canvas" width="720" height="1080"></canvas><img id="preview-img" /></div>
+    <div class="modal-foot"><button class="dl-btn" onclick="downloadBill()">💾 บันทึกรูปเพื่อส่ง Line</button></div>
+  </div>
+</div>
+
+<!-- ===== STATS MODAL ===== -->
+<div class="stats-overlay" id="stats-overlay">
+  <div class="stats-modal">
+    <div class="stats-head">
+      <div class="stats-head-left">
+        <div class="stats-head-title">📊 รายงานสถิติการใช้น้ำประปา</div>
+        <div class="stats-head-sub">กลุ่มน้ำประปาบ้านสันป่าสักเหนือ หมู่ที่ 9 ต.หนองแฝก อ.สารภี จ.เชียงใหม่</div>
+      </div>
+      <button class="close" onclick="closeStats()" style="color:rgba(255,255,255,0.7);font-size:26px;">✕</button>
+    </div>
+    <div class="stats-ctrl">
+      <button class="stab active" data-view="month" onclick="switchStatsView('month',this)">📅 รายเดือน</button>
+      <button class="stab" data-view="year" onclick="switchStatsView('year',this)">📆 รายปี</button>
+      <div id="stats-month-wrap" class="field" style="margin:0;">
+        <input type="month" id="stats-month-sel" style="font-size:13px;padding:7px 11px;">
+      </div>
+      <div id="stats-year-wrap" class="field" style="margin:0;display:none;">
+        <select id="stats-year-sel" style="font-size:13px;padding:7px 11px;">
+          <option value="2024">2024 (พ.ศ. 2567)</option>
+          <option value="2025">2025 (พ.ศ. 2568)</option>
+          <option value="2026" selected>2026 (พ.ศ. 2569)</option>
+          <option value="2027">2027 (พ.ศ. 2570)</option>
+        </select>
+      </div>
+      <button class="btn btn-blue" onclick="renderStats()" style="padding:7px 18px;font-size:13px;">🔄 โหลดรายงาน</button>
+    </div>
+    <div class="stats-body" id="stats-content">
+      <div class="stats-nodata"><div class="stats-nodata-icon">📊</div><div class="stats-nodata-title">กดปุ่ม "โหลดรายงาน" เพื่อแสดงข้อมูลครับ</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD MEMBER MODAL ===== -->
+<div class="overlay" id="add-member-overlay">
+  <div class="modal" style="max-width:560px;">
+    <div class="add-head">
+      <div class="add-head-title">➕ เพิ่มสมาชิกผู้ใช้น้ำใหม่</div>
+      <button class="close" onclick="closeAddMember()" style="color:rgba(255,255,255,0.7);">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="add-warn">⚠️ กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนบันทึก เพราะข้อมูลมิเตอร์เริ่มต้นมีผลต่อการคำนวณทุกเดือนถัดไป</div>
+      <div class="add-section">ข้อมูลส่วนตัว</div>
+      <div class="add-grid2">
+        <div class="field">
+          <label>ลำดับที่ (อัตโนมัติ)</label>
+          <input type="number" id="add-seq" readonly style="background:#eee;color:#888;">
+        </div>
+        <div class="field">
+          <label>รหัสผู้ใช้ <span style="color:#90a4ae;">(ถ้ายังไม่มีใส่ "-")</span></label>
+          <input type="text" id="add-code" placeholder="เช่น 139 หรือ -">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>ชื่อ-สกุล <span class="req">*</span></label>
+        <input type="text" id="add-name" placeholder="เช่น คุณ สมชาย ใจดี" style="width:100%;">
+      </div>
+      <div class="add-grid3">
+        <div class="field">
+          <label>บ้านเลขที่ <span class="req">*</span></label>
+          <input type="text" id="add-house" placeholder="เช่น 185/80">
+        </div>
+        <div class="field">
+          <label>ซอย <span class="req">*</span></label>
+          <select id="add-soi">
+            <option value="0">ซอย 0</option>
+            <option value="1" selected>ซอย 1</option>
+            <option value="2">ซอย 2</option>
+            <option value="3">ซอย 3</option>
+            <option value="4">ซอย 4</option>
+            <option value="5">ซอย 5</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>เลขมิเตอร์เริ่มต้น <span class="req">*</span></label>
+          <input type="number" id="add-prev" min="0" placeholder="เช่น 0 หรือ 1234">
+        </div>
+      </div>
+      <div class="add-note">
+        ✅ สมาชิกใหม่จะถูกเพิ่มเข้าเดือนปัจจุบันทันที<br>
+        ✅ เมื่อกด "สร้างเดือนถัดไป" สมาชิกนี้จะถูกส่งต่อไปทุกเดือนอัตโนมัติ<br>
+        ✅ เลขมิเตอร์เริ่มต้นจะเป็น "มิเตอร์เก่า" ของเดือนแรกที่เข้าระบบ
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="save-btn" style="background:#00695c;" onclick="saveAddMember()">✅ บันทึกสมาชิกใหม่</button>
+      <button class="dl-btn" style="background:#607d8b;" onclick="closeAddMember()">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE_MEMBERS = [{"seq": 1, "code": "087", "name": "คุณ สมศักดิ์ ปันหล้า", "house": "217", "soi": "0", "prev": 4083, "curr": 4083, "units": 0, "total": 0}, {"seq": 2, "code": "092", "name": "อ้ายหมวด ชัชวาล  นวลจันทร์", "house": "185/1", "soi": "1", "prev": 7412, "curr": 7412, "units": 0, "total": 0}, {"seq": 3, "code": "091", "name": "คุณประภัทร กาญจนวราห์", "house": "185/59", "soi": "1", "prev": 101, "curr": 101, "units": 0, "total": 0}, {"seq": 4, "code": "111", "name": "คุณ นิตยา  บุญหล้า", "house": "185/4", "soi": "1", "prev": 3447, "curr": 3447, "units": 0, "total": 0}, {"seq": 5, "code": "-", "name": "คุณ เจริญ ฟองคำ", "house": "185/6", "soi": "1", "prev": 2234, "curr": 2234, "units": 0, "total": 0}, {"seq": 6, "code": "-", "name": "คุณ ทิพวรรณ ชัยมงคล", "house": "185/7", "soi": "1", "prev": 765, "curr": 765, "units": 0, "total": 0}, {"seq": 7, "code": "093", "name": "คุณ สมคิด  นันทะปิน", "house": "185/9", "soi": "1", "prev": 4048, "curr": 4048, "units": 0, "total": 0}, {"seq": 8, "code": "112", "name": "คุณ สมบัติ(ตี๋)  ชูวัฒนกุล", "house": "185/15", "soi": "1", "prev": 3992, "curr": 3992, "units": 0, "total": 0}, {"seq": 9, "code": "-", "name": "คุณ จินดา  ทับกล้า", "house": "185/17", "soi": "1", "prev": 1563, "curr": 1563, "units": 0, "total": 0}, {"seq": 10, "code": "-", "name": "คุณ แจ๊ด", "house": "185/19", "soi": "1", "prev": 279, "curr": 279, "units": 0, "total": 0}, {"seq": 11, "code": "095", "name": "คุณ ขวัญสุดา  บุญหลาย", "house": "185/23", "soi": "1", "prev": 566, "curr": 566, "units": 0, "total": 0}, {"seq": 12, "code": "120", "name": "คุณ รุ่งนิรันดร์   ศรีบรรจง", "house": "185/10", "soi": "2", "prev": 1324, "curr": 1324, "units": 0, "total": 0}, {"seq": 13, "code": "114", "name": "คุณ สงกรานต์  โกวัง", "house": "185/12", "soi": "2", "prev": 179, "curr": 179, "units": 0, "total": 0}, {"seq": 14, "code": "115", "name": "คุณ จำลอง  จิตวรรณา", "house": "185/14", "soi": "2", "prev": 3236, "curr": 3236, "units": 0, "total": 0}, {"seq": 15, "code": "-", "name": "คุณ สมคิด  คำสวรรณ์", "house": "185/22", "soi": "2", "prev": 1945, "curr": 1945, "units": 0, "total": 0}, {"seq": 16, "code": "096", "name": "คุณ สุเพชร​ วิวัฒนาไชย", "house": "185/24", "soi": "2", "prev": 2465, "curr": 2465, "units": 0, "total": 0}, {"seq": 17, "code": "121", "name": "คุณ นิวัต  ชูวงค์", "house": "185/26", "soi": "2", "prev": 2520, "curr": 2520, "units": 0, "total": 0}, {"seq": 18, "code": "116", "name": "คุณ กมลวรรณ  ศรชัย", "house": "185/28", "soi": "2", "prev": 886, "curr": 886, "units": 0, "total": 0}, {"seq": 19, "code": "137", "name": "คุณ ดวงดาว กันทะอินทร์", "house": "185/30", "soi": "2", "prev": 4875, "curr": 4875, "units": 0, "total": 0}, {"seq": 20, "code": "125", "name": "คุณ นที  ศรีบุตรทอง", "house": "185/32", "soi": "2", "prev": 2925, "curr": 2925, "units": 0, "total": 0}, {"seq": 21, "code": "099", "name": "คุณ นิคม  มันตะนา", "house": "185/34", "soi": "2", "prev": 55, "curr": 55, "units": 0, "total": 0}, {"seq": 22, "code": "128", "name": "คุณ เกศรินทร์  จุมปา", "house": "185/35", "soi": "2", "prev": 2683, "curr": 2683, "units": 0, "total": 0}, {"seq": 23, "code": "098", "name": "คุณ สมศรี กาบมาลา", "house": "185/36", "soi": "2", "prev": 3126, "curr": 3126, "units": 0, "total": 0}, {"seq": 24, "code": "097", "name": "คุณ พัฒนา  ใบนานา", "house": "185/38", "soi": "2", "prev": 4838, "curr": 4838, "units": 0, "total": 0}, {"seq": 25, "code": "136", "name": "คุณ กานดา  จุณจันทร์ขาว", "house": "185/29", "soi": "3", "prev": 1511, "curr": 1511, "units": 0, "total": 0}, {"seq": 26, "code": "126", "name": "คุณ วราการ เอกวงษา", "house": "185/33", "soi": "3", "prev": 1377, "curr": 1377, "units": 0, "total": 0}, {"seq": 27, "code": "-", "name": "นายเชาวโรจน์  ศักดิ์สิริบูรณ์", "house": "185/37", "soi": "3", "prev": 684, "curr": 684, "units": 0, "total": 0}, {"seq": 28, "code": "100", "name": "คุณ รัชดา เทวาพิทักษ์ (ปุ๊)", "house": "185/40", "soi": "3", "prev": 5325, "curr": 5325, "units": 0, "total": 0}, {"seq": 29, "code": "101", "name": "คุณ เนตรดาว พันธ์เกษม", "house": "185/39", "soi": "3", "prev": 7232, "curr": 7232, "units": 0, "total": 0}, {"seq": 30, "code": "124", "name": "คุณ มานพ  อุตบัววงค์", "house": "185/41", "soi": "3", "prev": 4192, "curr": 4192, "units": 0, "total": 0}, {"seq": 31, "code": "132", "name": "คุณ ณัช  ศิรินันท์", "house": "185/46", "soi": "3", "prev": 3416, "curr": 3416, "units": 0, "total": 0}, {"seq": 32, "code": "-", "name": "คุณ วราภรณ์  คำมา", "house": "185/50", "soi": "3", "prev": 2086, "curr": 2086, "units": 0, "total": 0}, {"seq": 33, "code": "-", "name": "คุณ รุ่งทิพย์  ดำรงค์", "house": "185/56", "soi": "3", "prev": 9, "curr": 9, "units": 0, "total": 0}, {"seq": 34, "code": "-", "name": "คุณ แอร์", "house": "185/43", "soi": "4", "prev": 348, "curr": 348, "units": 0, "total": 0}, {"seq": 35, "code": "138", "name": "คุณ แอน", "house": "185/47", "soi": "4", "prev": 774, "curr": 774, "units": 0, "total": 0}, {"seq": 36, "code": "129", "name": "คุณ ปฏิวัติ  อุตตาล", "house": "185/55", "soi": "4", "prev": 2940, "curr": 2940, "units": 0, "total": 0}, {"seq": 37, "code": "119", "name": "คุณ ประพันธ์ พรหมวงศ์", "house": "185/57", "soi": "4", "prev": 1655, "curr": 1655, "units": 0, "total": 0}, {"seq": 38, "code": "135", "name": "คุณ เสน่ห์  จำปาทอง", "house": "185/58", "soi": "4", "prev": 6494, "curr": 6494, "units": 0, "total": 0}, {"seq": 39, "code": "-", "name": "คุณ ปฐมชัย มาลัยทอง", "house": "185/53", "soi": "4", "prev": 3600, "curr": 3600, "units": 0, "total": 0}, {"seq": 40, "code": "133", "name": "คุณ วิไลพร  สิทธิลิขิตกุล", "house": "185/67", "soi": "4", "prev": 2291, "curr": 2291, "units": 0, "total": 0}, {"seq": 41, "code": "-", "name": "คุณ แป้น", "house": "185/69", "soi": "4", "prev": 2762, "curr": 2762, "units": 0, "total": 0}, {"seq": 42, "code": "117", "name": "คุณ อมร รัตนิล", "house": "185/71", "soi": "5", "prev": 3833, "curr": 3833, "units": 0, "total": 0}, {"seq": 43, "code": "118", "name": "คุณ กฤตยา ทิพย์เกษตร", "house": "185/72", "soi": "5", "prev": 2722, "curr": 2722, "units": 0, "total": 0}, {"seq": 44, "code": "127", "name": "คุณ ภัทราภรณ์ นิลทอง", "house": "185/73", "soi": "5", "prev": 3263, "curr": 3263, "units": 0, "total": 0}, {"seq": 45, "code": "134", "name": "คุณ ณัชภร จักรนรินทร์", "house": "185/74", "soi": "5", "prev": 2209, "curr": 2209, "units": 0, "total": 0}, {"seq": 46, "code": "122", "name": "คุณ ปภาวี  เคิร์กแลนด์", "house": "185/75", "soi": "5", "prev": 2537, "curr": 2537, "units": 0, "total": 0}, {"seq": 47, "code": "-", "name": "คุณ มณีรัตน์  พิมพ์ประเสริฐ", "house": "185/76", "soi": "5", "prev": 1609, "curr": 1609, "units": 0, "total": 0}, {"seq": 48, "code": "-", "name": "คุณ ฐานิษา  โยธาวัน", "house": "185/25", "soi": "2", "prev": 1495, "curr": 1495, "units": 0, "total": 0}, {"seq": 49, "code": "-", "name": "หมวดมน", "house": "185/65", "soi": "4", "prev": 2536, "curr": 2536, "units": 0, "total": 0}, {"seq": 50, "code": "-", "name": "คุณ หวาน", "house": "185/68", "soi": "4", "prev": 908, "curr": 908, "units": 0, "total": 0}, {"seq": 51, "code": "-", "name": "พิชชานันน์  แสงเจริญ", "house": "185/64", "soi": "4", "prev": 3328, "curr": 3328, "units": 0, "total": 0}, {"seq": 52, "code": "-", "name": "อินสอน  ชัยเลิศ", "house": "185/21", "soi": "1", "prev": 1766, "curr": 1766, "units": 0, "total": 0}, {"seq": 53, "code": "-", "name": "ป้าจันทร์", "house": "185/49", "soi": "4", "prev": 1417, "curr": 1417, "units": 0, "total": 0}, {"seq": 54, "code": "-", "name": "พวงผกา  ลาวตุม", "house": "185/66", "soi": "4", "prev": 4674, "curr": 4674, "units": 0, "total": 0}, {"seq": 55, "code": "-", "name": "สงกรานต์ กิตติพิทักษ์กุล", "house": "185/27", "soi": "4", "prev": 315, "curr": 315, "units": 0, "total": 0}, {"seq": 56, "code": "-", "name": "คุณ ขวัญสุดา  บุญหลาย", "house": "185/5", "soi": "4", "prev": 126, "curr": 126, "units": 0, "total": 0}, {"seq": 57, "code": "-", "name": "คุณ รัชฎาภรณ์ เรือนแก้ว", "house": "185/13", "soi": "1", "prev": 664, "curr": 664, "units": 0, "total": 0}];
+function getStorageKey(){ const m=document.getElementById('s-month').value; return 'water_members_'+(m||'2026-06'); }
+const JUNE_2026_DATA = [{"seq": 1, "code": "087", "name": "คุณ สมศักดิ์ ปันหล้า", "house": "217", "soi": "0", "prev": 4083, "curr": 4083, "units": 0, "total": 0}, {"seq": 2, "code": "092", "name": "อ้ายหมวด ชัชวาล  นวลจันทร์", "house": "185/1", "soi": "1", "prev": 7412, "curr": 7412, "units": 0, "total": 0}, {"seq": 3, "code": "091", "name": "คุณประภัทร กาญจนวราห์", "house": "185/59", "soi": "1", "prev": 101, "curr": 101, "units": 0, "total": 0}, {"seq": 4, "code": "111", "name": "คุณ นิตยา  บุญหล้า", "house": "185/4", "soi": "1", "prev": 3447, "curr": 3472, "units": 25, "total": 150}, {"seq": 5, "code": "-", "name": "คุณ เจริญ ฟองคำ", "house": "185/6", "soi": "1", "prev": 2405, "curr": 2430, "units": 25, "total": 150}, {"seq": 6, "code": "-", "name": "คุณ ทิพวรรณ ชัยมงคล", "house": "185/7", "soi": "1", "prev": 765, "curr": 765, "units": 0, "total": 0}, {"seq": 7, "code": "093", "name": "คุณ สมคิด  นันทะปิน", "house": "185/9", "soi": "1", "prev": 4048, "curr": 4071, "units": 23, "total": 138}, {"seq": 8, "code": "112", "name": "คุณ สมบัติ(ตี๋)  ชูวัฒนกุล", "house": "185/15", "soi": "1", "prev": 3992, "curr": 4021, "units": 29, "total": 174}, {"seq": 9, "code": "-", "name": "คุณ จินดา  ทับกล้า", "house": "185/17", "soi": "1", "prev": 1563, "curr": 1566, "units": 3, "total": 18}, {"seq": 10, "code": "-", "name": "คุณ แจ๊ด", "house": "185/19", "soi": "1", "prev": 279, "curr": 279, "units": 0, "total": 0}, {"seq": 11, "code": "095", "name": "คุณ ขวัญสุดา  บุญหลาย", "house": "185/23", "soi": "1", "prev": 566, "curr": 574, "units": 8, "total": 48}, {"seq": 12, "code": "120", "name": "คุณ รุ่งนิรันดร์   ศรีบรรจง", "house": "185/10", "soi": "2", "prev": 1324, "curr": 1335, "units": 11, "total": 66}, {"seq": 13, "code": "114", "name": "คุณ สงกรานต์  โกวัง", "house": "185/12", "soi": "2", "prev": 179, "curr": 189, "units": 10, "total": 60}, {"seq": 14, "code": "115", "name": "คุณ จำลอง  จิตวรรณา", "house": "185/14", "soi": "2", "prev": 3236, "curr": 3256, "units": 20, "total": 120}, {"seq": 15, "code": "-", "name": "คุณ สมคิด  คำสวรรณ์", "house": "185/22", "soi": "2", "prev": 1945, "curr": 1956, "units": 11, "total": 66}, {"seq": 16, "code": "096", "name": "คุณ สุเพชร​ วิวัฒนาไชย", "house": "185/24", "soi": "2", "prev": 2465, "curr": 2473, "units": 8, "total": 48}, {"seq": 17, "code": "121", "name": "คุณ นิวัต  ชูวงค์", "house": "185/26", "soi": "2", "prev": 2520, "curr": 2535, "units": 15, "total": 90}, {"seq": 18, "code": "116", "name": "คุณ กมลวรรณ  ศรชัย", "house": "185/28", "soi": "2", "prev": 886, "curr": 908, "units": 22, "total": 132}, {"seq": 19, "code": "137", "name": "คุณ ดวงดาว กันทะอินทร์", "house": "185/30", "soi": "2", "prev": 4875, "curr": 4911, "units": 36, "total": 216}, {"seq": 20, "code": "125", "name": "คุณ นที  ศรีบุตรทอง", "house": "185/32", "soi": "2", "prev": 2925, "curr": 2937, "units": 12, "total": 72}, {"seq": 21, "code": "099", "name": "คุณ นิคม  มันตะนา", "house": "185/34", "soi": "2", "prev": 55, "curr": 55, "units": 0, "total": 0}, {"seq": 22, "code": "128", "name": "คุณ เกศรินทร์  จุมปา", "house": "185/35", "soi": "2", "prev": 2683, "curr": 2696, "units": 13, "total": 78}, {"seq": 23, "code": "098", "name": "คุณ สมศรี กาบมาลา", "house": "185/36", "soi": "2", "prev": 3126, "curr": 3138, "units": 12, "total": 72}, {"seq": 24, "code": "097", "name": "คุณ พัฒนา  ใบนานา", "house": "185/38", "soi": "2", "prev": 4838, "curr": 4865, "units": 27, "total": 162}, {"seq": 25, "code": "136", "name": "คุณ กานดา  จุณจันทร์ขาว", "house": "185/29", "soi": "3", "prev": 1511, "curr": 1520, "units": 9, "total": 54}, {"seq": 26, "code": "126", "name": "คุณ วราการ เอกวงษา", "house": "185/33", "soi": "3", "prev": 1377, "curr": 1377, "units": 0, "total": 0}, {"seq": 27, "code": "-", "name": "นายเชาวโรจน์  ศักดิ์สิริบูรณ์", "house": "185/37", "soi": "3", "prev": 684, "curr": 684, "units": 0, "total": 0}, {"seq": 28, "code": "100", "name": "คุณ รัชดา เทวาพิทักษ์ (ปุ๊)", "house": "185/40", "soi": "3", "prev": 5325, "curr": 5325, "units": 0, "total": 0}, {"seq": 29, "code": "101", "name": "คุณ เนตรดาว พันธ์เกษม", "house": "185/39", "soi": "3", "prev": 7232, "curr": 7248, "units": 16, "total": 96}, {"seq": 30, "code": "124", "name": "คุณ มานพ  อุตบัววงค์", "house": "185/41", "soi": "3", "prev": 4192, "curr": 4192, "units": 0, "total": 0}, {"seq": 31, "code": "132", "name": "คุณ ณัช  ศิรินันท์", "house": "185/46", "soi": "3", "prev": 3416, "curr": 3432, "units": 16, "total": 96}, {"seq": 32, "code": "-", "name": "คุณ วราภรณ์  คำมา", "house": "185/50", "soi": "3", "prev": 2086, "curr": 2086, "units": 0, "total": 0}, {"seq": 33, "code": "-", "name": "คุณ รุ่งทิพย์  ดำรงค์", "house": "185/56", "soi": "3", "prev": 9, "curr": 9, "units": 0, "total": 0}, {"seq": 34, "code": "-", "name": "คุณ แอร์", "house": "185/43", "soi": "4", "prev": 348, "curr": 348, "units": 0, "total": 0}, {"seq": 35, "code": "138", "name": "คุณ แอน", "house": "185/47", "soi": "4", "prev": 774, "curr": 774, "units": 0, "total": 0}, {"seq": 36, "code": "129", "name": "คุณ ปฏิวัติ  อุตตาล", "house": "185/55", "soi": "4", "prev": 2940, "curr": 2959, "units": 19, "total": 114}, {"seq": 37, "code": "119", "name": "คุณ ประพันธ์ พรหมวงศ์", "house": "185/57", "soi": "4", "prev": 1655, "curr": 1674, "units": 19, "total": 114}, {"seq": 38, "code": "135", "name": "คุณ เสน่ห์  จำปาทอง", "house": "185/58", "soi": "4", "prev": 6494, "curr": 6554, "units": 60, "total": 360}, {"seq": 39, "code": "-", "name": "คุณ ปฐมชัย มาลัยทอง", "house": "185/53", "soi": "4", "prev": 3600, "curr": 3629, "units": 29, "total": 174}, {"seq": 40, "code": "133", "name": "คุณ วิไลพร  สิทธิลิขิตกุล", "house": "185/67", "soi": "4", "prev": 2291, "curr": 2307, "units": 16, "total": 96}, {"seq": 41, "code": "-", "name": "คุณ แป้น", "house": "185/69", "soi": "4", "prev": 2828, "curr": 2843, "units": 15, "total": 90}, {"seq": 42, "code": "117", "name": "คุณ อมร รัตนิล", "house": "185/71", "soi": "5", "prev": 3833, "curr": 3847, "units": 14, "total": 84}, {"seq": 43, "code": "118", "name": "คุณ กฤตยา ทิพย์เกษตร", "house": "185/72", "soi": "5", "prev": 2722, "curr": 2732, "units": 10, "total": 60}, {"seq": 44, "code": "127", "name": "คุณ ภัทราภรณ์ นิลทอง", "house": "185/73", "soi": "5", "prev": 3263, "curr": 3288, "units": 25, "total": 150}, {"seq": 45, "code": "134", "name": "คุณ ณัชภร จักรนรินทร์", "house": "185/74", "soi": "5", "prev": 2209, "curr": 2217, "units": 8, "total": 48}, {"seq": 46, "code": "122", "name": "คุณ ปภาวี  เคิร์กแลนด์", "house": "185/75", "soi": "5", "prev": 2537, "curr": 2554, "units": 17, "total": 102}, {"seq": 47, "code": "-", "name": "คุณ มณีรัตน์  พิมพ์ประเสริฐ", "house": "185/76", "soi": "5", "prev": 1609, "curr": 1609, "units": 0, "total": 0}, {"seq": 48, "code": "-", "name": "คุณ ฐานิษา  โยธาวัน", "house": "185/25", "soi": "2", "prev": 1495, "curr": 1523, "units": 28, "total": 168}, {"seq": 49, "code": "-", "name": "หมวดมน", "house": "185/65", "soi": "4", "prev": 2536, "curr": 2566, "units": 30, "total": 180}, {"seq": 50, "code": "-", "name": "คุณ หวาน", "house": "185/68", "soi": "4", "prev": 908, "curr": 908, "units": 0, "total": 0}, {"seq": 51, "code": "-", "name": "พิชชานันน์  แสงเจริญ", "house": "185/64", "soi": "4", "prev": 3328, "curr": 3338, "units": 10, "total": 60}, {"seq": 52, "code": "-", "name": "อินสอน  ชัยเลิศ", "house": "185/21", "soi": "1", "prev": 1766, "curr": 1774, "units": 8, "total": 48}, {"seq": 53, "code": "-", "name": "ป้าจันทร์", "house": "185/49", "soi": "4", "prev": 1417, "curr": 1428, "units": 11, "total": 66}, {"seq": 54, "code": "-", "name": "พวงผกา  ลาวตุม", "house": "185/66", "soi": "4", "prev": 4674, "curr": 4732, "units": 58, "total": 348}, {"seq": 55, "code": "-", "name": "สงกรานต์ กิตติพิทักษ์กุล", "house": "185/27", "soi": "4", "prev": 757, "curr": 771, "units": 14, "total": 84}, {"seq": 56, "code": "-", "name": "คุณ ขวัญสุดา  บุญหลาย", "house": "185/5", "soi": "4", "prev": 126, "curr": 130, "units": 4, "total": 24}, {"seq": 57, "code": "-", "name": "คุณ รัชฎาภรณ์ เรือนแก้ว", "house": "185/13", "soi": "1", "prev": 664, "curr": 664, "units": 0, "total": 0}];
+let members = JSON.parse(localStorage.getItem('water_members_2026-06') || 'null') || JSON.parse(JSON.stringify(JUNE_2026_DATA));
+if(!localStorage.getItem('water_members_2026-06')) localStorage.setItem('water_members_2026-06', JSON.stringify(members));
+let currentIdx = -1, editIdx = -1;
+
+// ===== MASTER MEMBER LIST (persists new members across months) =====
+function getMasterBase() {
+  const saved = localStorage.getItem('water_members_master');
+  return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(BASE_MEMBERS));
+}
+function syncMasterBase(list) {
+  // Only update master with members not already in master (by house number)
+  const master = getMasterBase();
+  const masterHouses = new Set(master.map(m => m.house));
+  const added = list.filter(m => !masterHouses.has(m.house));
+  if(added.length > 0) {
+    added.forEach(m => master.push({...m, curr: m.prev, units: 0, total: 0}));
+    localStorage.setItem('water_members_master', JSON.stringify(master));
+  }
+}
+
+function getPrevMonthKey(monthVal){
+  const [y, mo] = monthVal.split('-').map(Number);
+  const prevMo = mo === 1 ? 12 : mo - 1;
+  const prevY  = mo === 1 ? y - 1 : y;
+  return 'water_members_' + prevY + '-' + String(prevMo).padStart(2,'0');
+}
+
+function loadMonth(){
+  const key = getStorageKey();
+  const saved = localStorage.getItem(key);
+  if(saved) {
+    members = JSON.parse(saved);
+  } else {
+    const curVal = document.getElementById('s-month').value || '2026-06';
+    const prevKey = getPrevMonthKey(curVal);
+    const prevSaved = localStorage.getItem(prevKey);
+
+    let baseList;
+    if(prevSaved){
+      // ดึงมิเตอร์ "ใหม่" ของเดือนก่อนหน้า มาเป็นมิเตอร์ "เก่า" ของเดือนนี้ อัตโนมัติ
+      baseList = JSON.parse(prevSaved).map(m => ({...m, prev: m.curr, curr: m.curr, units: 0, total: 0}));
+    } else {
+      // ไม่มีข้อมูลเดือนก่อนหน้าเลย (เช่นเดือนแรกสุด) → ใช้ Master List แทน
+      const master = getMasterBase();
+      baseList = JSON.parse(JSON.stringify(master)).map(m => ({...m, curr: m.prev, units: 0, total: 0}));
+    }
+
+    // รวมสมาชิกใหม่ที่ถูกเพิ่มไว้ใน Master List แต่ยังไม่มีในเดือนก่อนหน้า (กันตกหล่น)
+    const master = getMasterBase();
+    const baseHouses = new Set(baseList.map(m => m.house));
+    master.forEach(m => {
+      if(!baseHouses.has(m.house)) baseList.push({...m, curr: m.prev, units: 0, total: 0});
+    });
+
+    members = baseList;
+    saveMembers(); // บันทึกทันทีกันข้อมูลหาย ถ้าปิดหน้าก่อนแก้ไข
+  }
+  renderTable();
+}
+
+function getMonth() {
+  const m=document.getElementById('s-month').value; if(!m) return '';
+  const [y,mo]=m.split('-');
+  const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  return months[parseInt(mo)-1]+' '+(parseInt(y)+543);
+}
+function getRate(){ return parseFloat(document.getElementById('s-rate').value)||6; }
+function getSigner(){ return document.getElementById('s-signer').value||'มานพ อุดบัววงค์'; }
+function saveMembers(){ localStorage.setItem(getStorageKey(), JSON.stringify(members)); }
+
+function getFiltered(){
+  const soi=document.getElementById('s-soi').value;
+  const status=document.getElementById('s-status').value;
+  let result = soi==='all' ? members : members.filter(m=>m.soi===soi);
+  if(status==='pending') result=result.filter(m=>m.curr===0||m.curr===m.prev);
+  if(status==='done') result=result.filter(m=>m.curr>m.prev);
+  return result;
+}
+
+function renderSummary(list){
+  const rate=getRate();
+  const total=members.length;
+  const pending=members.filter(m=>m.curr===0||m.curr===m.prev).length;
+  const done=members.filter(m=>m.curr>m.prev).length;
+  const totalBaht=members.reduce((s,m)=>s+(m.units*rate),0);
+  document.getElementById('summary').innerHTML=`
+    <div class="sum-box"><div class="sum-n blue">${total}</div><div class="sum-l">ครัวเรือนทั้งหมด</div></div>
+    <div class="sum-box"><div class="sum-n orange">${pending}</div><div class="sum-l">⏳ รอมิเตอร์</div></div>
+    <div class="sum-box"><div class="sum-n green">${done}</div><div class="sum-l">✅ มีข้อมูลแล้ว</div></div>
+    <div class="sum-box"><div class="sum-n red">${totalBaht.toLocaleString()}</div><div class="sum-l">ยอดรวม (บาท)</div></div>`;
+}
+
+function renderTable(){
+  const list=getFiltered(), rate=getRate();
+  renderSummary(list);
+  document.getElementById('tbl-body').innerHTML=list.map(m=>{
+    const idx=members.indexOf(m);
+    const total=m.units*rate;
+    const isPending=m.curr===0||m.curr===m.prev;
+    return `<tr class="${isPending?'pending':''}">
+      <td>${m.seq}</td>
+      <td><b>${m.code}</b></td>
+      <td>${m.name}${isPending?'<span class="pending-badge">รอมิเตอร์</span>':''}</td>
+      <td class="num">${m.house}</td>
+      <td>${m.soi}</td>
+      <td class="num">${m.prev.toLocaleString()}</td>
+      <td class="num ${isPending?'zero':''}">${isPending?'—':m.curr.toLocaleString()}</td>
+      <td class="num ${m.units>0?'':'zero'}">${m.units>0?m.units:'—'}</td>
+      <td class="num ${total>0?'red':'zero'}">${total>0?total.toLocaleString():' —'}</td>
+      <td>
+        <button class="edit-btn" onclick="openEdit(${idx})">✏️ แก้ไข</button>
+        ${!isPending?`<button class="gen-btn" onclick="generateBill(${idx})">🧾 บิล</button>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== EDIT =====
+function openEdit(idx){
+  editIdx=idx;
+  const m=members[idx];
+  document.getElementById('edit-modal-title').textContent=`✏️ แก้ไขมิเตอร์ — ${m.name}`;
+  document.getElementById('edit-name').textContent=m.name;
+  document.getElementById('edit-sub').textContent=`บ้านเลขที่ ${m.house} | ซอย ${m.soi} | รหัส ${m.code}`;
+  document.getElementById('edit-prev').value=m.prev;
+  document.getElementById('edit-curr').value=m.curr||'';
+  calcEdit();
+  document.getElementById('edit-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('edit-curr').focus(),300);
+}
+
+function calcEdit(){
+  const prev=parseInt(document.getElementById('edit-prev').value)||0;
+  const curr=parseInt(document.getElementById('edit-curr').value)||0;
+  const units=Math.max(0,curr-prev);
+  const total=units*getRate();
+  document.getElementById('edit-units').textContent=`${units} หน่วย`;
+  document.getElementById('edit-total').textContent=`${total.toLocaleString()} บาท`;
+}
+
+function saveEdit(){
+  const prev=parseInt(document.getElementById('edit-prev').value)||0;
+  const curr=parseInt(document.getElementById('edit-curr').value)||0;
+  if(curr<prev){ alert('มิเตอร์ใหม่ต้องมากกว่าหรือเท่ากับมิเตอร์เก่าครับ'); return; }
+  const units=Math.max(0,curr-prev);
+  const rate=getRate();
+  members[editIdx].prev=prev;
+  members[editIdx].curr=curr;
+  members[editIdx].units=units;
+  members[editIdx].total=units*rate;
+  saveMembers();
+  closeEdit();
+  renderTable();
+}
+
+async function saveAndBill(){
+  const prev=parseInt(document.getElementById('edit-prev').value)||0;
+  const curr=parseInt(document.getElementById('edit-curr').value)||0;
+  if(curr<prev){ alert('มิเตอร์ใหม่ต้องมากกว่าหรือเท่ากับมิเตอร์เก่าครับ'); return; }
+  const units=Math.max(0,curr-prev);
+  const rate=getRate();
+  members[editIdx].prev=prev;
+  members[editIdx].curr=curr;
+  members[editIdx].units=units;
+  members[editIdx].total=units*rate;
+  saveMembers();
+  closeEdit();
+  renderTable();
+  await generateBill(editIdx);
+}
+
+function closeEdit(){ document.getElementById('edit-overlay').classList.remove('show'); }
+function closeBill(){ document.getElementById('bill-overlay').classList.remove('show'); }
+
+// ===== GENERATE BILL =====
+async function generateBill(idx){
+  currentIdx=idx;
+  const m=members[idx], rate=getRate(), total=m.units*rate;
+  const canvas=document.getElementById('bill-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=720, H=1080;
+
+  // BG
+  const bgGrad=ctx.createLinearGradient(0,0,W,H);
+  bgGrad.addColorStop(0,'#e8f4ff'); bgGrad.addColorStop(0.5,'#f0f8ff'); bgGrad.addColorStop(1,'#e0f0fb');
+  ctx.fillStyle=bgGrad; ctx.fillRect(0,0,W,H);
+
+  // Ripple bg
+  for(let i=0;i<6;i++){
+    const cx=[100,600,360,80,640,360][i],cy=[100,80,300,700,650,880][i],r=[180,220,160,200,170,240][i];
+    const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+    g.addColorStop(0,'rgba(21,101,192,0.06)'); g.addColorStop(1,'rgba(21,101,192,0)');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  }
+  ctx.fillStyle='rgba(21,101,192,0.02)';
+  for(let x=50;x<W;x+=90) for(let y=50;y<H;y+=90){
+    ctx.beginPath(); ctx.arc(x,y-8,12,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x,y+8);ctx.quadraticCurveTo(x-10,y-4,x,y-22);ctx.quadraticCurveTo(x+10,y-4,x,y+8); ctx.fill();
+  }
+
+  // Card bg
+  ctx.shadowColor='rgba(21,101,192,0.15)'; ctx.shadowBlur=20;
+  ctx.fillStyle='rgba(255,255,255,0.72)';
+  roundRect(ctx,18,18,W-36,H-36,20); ctx.fill();
+  ctx.shadowBlur=0;
+
+  // Border
+  ctx.strokeStyle='#1565c0'; ctx.lineWidth=3;
+  roundRect(ctx,18,18,W-36,H-36,20); ctx.stroke();
+  ctx.strokeStyle='rgba(21,101,192,0.3)'; ctx.lineWidth=1;
+  roundRect(ctx,25,25,W-50,H-50,16); ctx.stroke();
+
+  // Header wave
+  const hGrad=ctx.createLinearGradient(0,0,W,0);
+  hGrad.addColorStop(0,'#0d47a1'); hGrad.addColorStop(0.5,'#1565c0'); hGrad.addColorStop(1,'#0288d1');
+  ctx.fillStyle=hGrad;
+  ctx.beginPath(); ctx.moveTo(20,20); ctx.lineTo(W-20,20);
+  ctx.quadraticCurveTo(W-18,20,W-18,38); ctx.lineTo(W-18,130);
+  ctx.quadraticCurveTo(W/2,170,20,130); ctx.lineTo(20,38);
+  ctx.quadraticCurveTo(20,20,38,20); ctx.closePath(); ctx.fill();
+
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  [60,200,500,660].forEach((x,i)=>{ctx.beginPath();ctx.arc(x,[40,70,50,80][i],[30,20,40,25][i],0,Math.PI*2);ctx.fill();});
+
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font='36px sans-serif'; ctx.textAlign='left'; ctx.fillText('💧',34,74);
+  ctx.fillStyle='white'; ctx.font='bold 36px "Noto Sans Thai",sans-serif'; ctx.textAlign='center';
+  ctx.shadowColor='rgba(0,0,0,0.2)'; ctx.shadowBlur=4;
+  ctx.fillText('ใบเสร็จรับเงินค่าน้ำ',W/2,75); ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='600 15px "Noto Sans Thai",sans-serif';
+  ctx.fillText('กลุ่มน้ำประปาบ้านสันป่าสักเหนือ หมู่ที่ 9 ต.หนองแฝก อ.สารภี จ.เชียงใหม่',W/2,106);
+
+  // Month badge
+  const mGrad=ctx.createLinearGradient(0,155,W,185);
+  mGrad.addColorStop(0,'rgba(255,235,238,0.95)'); mGrad.addColorStop(1,'rgba(255,243,224,0.95)');
+  ctx.fillStyle=mGrad; roundRect(ctx,80,148,W-160,55,28); ctx.fill();
+  ctx.strokeStyle='rgba(198,40,40,0.3)'; ctx.lineWidth=1.5;
+  roundRect(ctx,80,148,W-160,55,28); ctx.stroke();
+  ctx.fillStyle='#546e7a'; ctx.font='600 17px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='left'; ctx.fillText('ประจำเดือน',100,183);
+  ctx.fillStyle='#c62828'; ctx.font='bold 30px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='center'; ctx.fillText(getMonth(),W/2+60,183);
+
+  // Resident card
+  ctx.fillStyle='rgba(255,255,255,0.88)';
+  roundRect(ctx,28,220,W-56,265,16); ctx.fill();
+  ctx.strokeStyle='rgba(21,101,192,0.2)'; ctx.lineWidth=1;
+  roundRect(ctx,28,220,W-56,265,16); ctx.stroke();
+
+  ctx.fillStyle='rgba(21,101,192,0.08)';
+  roundRect(ctx,40,232,200,32,8); ctx.fill();
+  ctx.fillStyle='#1565c0'; ctx.font='bold 13px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='left'; ctx.fillText('ข้อมูลผู้ใช้น้ำ',52,254);
+
+  ctx.fillStyle='#1565c0';
+  roundRect(ctx,W-110,232,80,32,16); ctx.fill();
+  ctx.fillStyle='white'; ctx.font='bold 14px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='center'; ctx.fillText('ซอย '+m.soi,W-70,254);
+
+  ctx.fillStyle='#0d47a1'; ctx.font='bold 38px "Noto Sans Thai",sans-serif'; ctx.textAlign='center';
+  ctx.shadowColor='rgba(21,101,192,0.15)'; ctx.shadowBlur=6;
+  ctx.fillText(m.name,W/2,305); ctx.shadowBlur=0;
+
+  ctx.fillStyle='rgba(21,101,192,0.06)';
+  roundRect(ctx,50,318,260,108,10); ctx.fill();
+  ctx.fillStyle='#546e7a'; ctx.font='13px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='left'; ctx.fillText('บ้านเลขที่',62,338);
+  ctx.fillStyle='#c62828'; ctx.font='bold 72px "Sarabun",sans-serif';
+  ctx.textAlign='center'; ctx.fillText(m.house,180,406);
+
+  ctx.fillStyle='rgba(21,101,192,0.06)';
+  roundRect(ctx,330,318,260,108,10); ctx.fill();
+  ctx.fillStyle='#546e7a'; ctx.font='13px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='left'; ctx.fillText('รหัสผู้ใช้',342,338);
+  ctx.fillStyle='#1565c0'; ctx.font='bold 44px "Sarabun",sans-serif';
+  ctx.textAlign='center'; ctx.fillText(m.code,460,393);
+
+  ctx.strokeStyle='rgba(21,101,192,0.15)'; ctx.lineWidth=1; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(60,438); ctx.lineTo(W-60,438); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Meter section
+  ctx.fillStyle='rgba(255,255,255,0.88)';
+  roundRect(ctx,28,500,W-56,195,16); ctx.fill();
+  ctx.strokeStyle='rgba(21,101,192,0.2)'; ctx.lineWidth=1;
+  roundRect(ctx,28,500,W-56,195,16); ctx.stroke();
+
+  ctx.fillStyle='rgba(21,101,192,0.08)'; roundRect(ctx,40,512,220,32,8); ctx.fill();
+  ctx.fillStyle='#1565c0'; ctx.font='bold 13px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='left'; ctx.fillText('ข้อมูลมิเตอร์น้ำ',52,534);
+
+  const drawMBox=(x,lbl,val,color,bgc)=>{
+    ctx.fillStyle=bgc; roundRect(ctx,x,548,170,110,14); ctx.fill();
+    ctx.strokeStyle=color+'60'; ctx.lineWidth=1.5; roundRect(ctx,x,548,170,110,14); ctx.stroke();
+    ctx.fillStyle='#546e7a'; ctx.font='13px "Noto Sans Thai",sans-serif'; ctx.textAlign='center';
+    ctx.fillText(lbl,x+85,570);
+    ctx.fillStyle=color; ctx.font='bold 38px "Sarabun",sans-serif';
+    ctx.fillText(val.toLocaleString(),x+85,618);
+    ctx.fillStyle='#90a4ae'; ctx.font='12px "Noto Sans Thai",sans-serif';
+    ctx.fillText('หน่วย',x+85,640);
+  };
+  drawMBox(45,'มิเตอร์ครั้งก่อน',m.prev,'#546e7a','rgba(84,110,122,0.06)');
+  drawMBox(235,'มิเตอร์ครั้งหลัง',m.curr,'#1565c0','rgba(21,101,192,0.06)');
+  drawMBox(425,'หน่วยที่ใช้',m.units,'#e65100','rgba(230,81,0,0.07)');
+  ctx.fillStyle='rgba(21,101,192,0.3)'; ctx.font='22px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('→',220,608); ctx.fillText('→',410,608);
+
+  // Total
+  const totGrad=ctx.createLinearGradient(28,715,W-28,805);
+  totGrad.addColorStop(0,'#0d47a1'); totGrad.addColorStop(0.5,'#1565c0'); totGrad.addColorStop(1,'#0288d1');
+  ctx.fillStyle=totGrad; roundRect(ctx,28,715,W-56,120,18); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.06)';
+  ctx.beginPath(); ctx.ellipse(W/2,730,200,30,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.font='600 18px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='center'; ctx.fillText('ยอดที่ต้องชำระ',W/2,748);
+  ctx.fillStyle='white'; ctx.font='bold 72px "Sarabun",sans-serif';
+  ctx.shadowColor='rgba(0,0,0,0.2)'; ctx.shadowBlur=8;
+  ctx.fillText(total.toLocaleString(),W/2-30,816); ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.font='bold 24px "Noto Sans Thai",sans-serif';
+  ctx.fillText('บาท',W/2+110,816);
+
+  // Signature
+  ctx.fillStyle='rgba(255,255,255,0.88)';
+  roundRect(ctx,28,855,W-56,120,16); ctx.fill();
+  ctx.strokeStyle='rgba(21,101,192,0.2)'; ctx.lineWidth=1;
+  roundRect(ctx,28,855,W-56,120,16); ctx.stroke();
+  ctx.fillStyle='#37474f'; ctx.font='17px "Noto Sans Thai",sans-serif';
+  ctx.textAlign='left'; ctx.fillText('ลงชื่อ',52,897);
+  ctx.textAlign='center'; ctx.fillText('มานพ',260,897);
+  ctx.textAlign='left'; ctx.fillText('ผู้รับเงิน',480,897);
+  ctx.strokeStyle='#b0bec5'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(160,903); ctx.lineTo(460,903); ctx.stroke();
+  ctx.fillStyle='#546e7a'; ctx.font='16px "Noto Sans Thai",sans-serif'; ctx.textAlign='center';
+  ctx.fillText(`( ${getSigner()} )`,W/2,937);
+
+  // Footer
+  ctx.fillStyle='rgba(21,101,192,0.08)';
+  roundRect(ctx,28,989,W-56,58,12); ctx.fill();
+  ctx.fillStyle='#90a4ae'; ctx.font='15px "Noto Sans Thai",sans-serif'; ctx.textAlign='center';
+  ctx.fillText('💧  ขอบคุณที่ชำระค่าน้ำตรงเวลา  🙏',W/2,1025);
+
+  document.getElementById('preview-img').src=canvas.toDataURL('image/png');
+  document.getElementById('bill-overlay').classList.add('show');
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+function downloadBill(){
+  if(currentIdx<0) return;
+  const m=members[currentIdx], canvas=document.getElementById('bill-canvas');
+  const link=document.createElement('a');
+  link.download=`bill_${m.house.replace('/','_')}_${m.name.replace(/ /g,'_')}.png`;
+  link.href=canvas.toDataURL('image/png'); link.click();
+}
+
+async function generateAll(){
+  const list=getFiltered().filter(m=>m.units>0);
+  if(list.length===0){ alert('ไม่มีบ้านที่มียอดชำระครับ'); return; }
+  if(!confirm(`จะออกบิลทั้งหมด ${list.length} ใบ กดตกลงเพื่อเริ่มครับ`)) return;
+  for(let i=0;i<list.length;i++){
+    const idx=members.indexOf(list[i]);
+    await generateBill(idx);
+    await new Promise(r=>setTimeout(r,200));
+    downloadBill();
+    await new Promise(r=>setTimeout(r,300));
+  }
+  closeBill();
+  alert(`ออกบิลครบ ${list.length} ใบแล้วครับ! ✅`);
+}
+
+// ===== ROLL TO NEXT MONTH =====
+function rollToNextMonth(){
+  const monthInput = document.getElementById('s-month');
+  const curVal = monthInput.value || '2026-06';
+  const [y, mo] = curVal.split('-').map(Number);
+
+  // คำนวณเดือนถัดไป
+  const nextMo = mo === 12 ? 1 : mo + 1;
+  const nextY  = mo === 12 ? y + 1 : y;
+  const nextVal = `${nextY}-${String(nextMo).padStart(2,'0')}`;
+
+  // ตรวจสอบว่าเดือนถัดไปมีข้อมูลอยู่แล้วหรือไม่
+  const existKey = 'water_members_' + nextVal;
+  const exists = localStorage.getItem(existKey);
+  const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const nextLabel = months[nextMo-1] + ' ' + (nextY+543);
+
+  if(exists){
+    if(!confirm(`มีข้อมูลเดือน${nextLabel}อยู่แล้วครับ\nต้องการเขียนทับด้วยข้อมูลมิเตอร์เดือนนี้หรือไม่?`)) return;
+  } else {
+    if(!confirm(`จะสร้างข้อมูลเดือน${nextLabel}\nโดยนำมิเตอร์ใหม่เดือนนี้ → มิเตอร์เก่าเดือนถัดไป\n\nดำเนินการเลยไหมครับ?`)) return;
+  }
+
+  // สร้างข้อมูลเดือนถัดไป: curr เดือนนี้ → prev เดือนหน้า
+  const nextMembers = members.map(m => ({
+    ...m,
+    prev: m.curr,   // มิเตอร์ใหม่เดือนนี้ → มิเตอร์เก่าเดือนหน้า
+    curr: m.curr,   // รอกรอกมิเตอร์ใหม่ (pending state)
+    units: 0,
+    total: 0
+  }));
+
+  // บันทึกลง localStorage สำหรับเดือนถัดไป
+  localStorage.setItem(existKey, JSON.stringify(nextMembers));
+
+  // สลับ UI ไปเดือนถัดไปเลย
+  monthInput.value = nextVal;
+  members = nextMembers;
+  saveMembers();
+  renderTable();
+
+  alert(`✅ สร้างข้อมูลเดือน${nextLabel}เรียบร้อยแล้วครับ!\nมิเตอร์เก่าอัปเดตจากเดือนก่อนหน้าทั้ง ${members.length} หลังแล้ว`);
+}
+
+// ===== STATISTICS =====
+let sChart1 = null, sChart2 = null, sChart3 = null;
+
+function openStats() {
+  const curMonth = document.getElementById('s-month').value || '2026-06';
+  document.getElementById('stats-month-sel').value = curMonth;
+  document.getElementById('stats-year-sel').value = curMonth.split('-')[0];
+  document.getElementById('stats-overlay').classList.add('show');
+  renderStats();
+}
+
+function closeStats() {
+  document.getElementById('stats-overlay').classList.remove('show');
+  destroyCharts();
+}
+
+function destroyCharts() {
+  [sChart1, sChart2, sChart3].forEach(c => { if(c) c.destroy(); });
+  sChart1 = sChart2 = sChart3 = null;
+}
+
+function switchStatsView(view, el) {
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('stats-month-wrap').style.display = view === 'month' ? '' : 'none';
+  document.getElementById('stats-year-wrap').style.display = view === 'year' ? '' : 'none';
+}
+
+function getMonthData(monthKey) {
+  const saved = localStorage.getItem('water_members_' + monthKey);
+  if (saved) return JSON.parse(saved);
+  // Fallback: if it's the currently loaded month, use live members
+  const curMonth = document.getElementById('s-month').value;
+  if (curMonth === monthKey) return members;
+  return null;
+}
+
+function getMonthLabel(monthKey, short) {
+  const [y, mo] = monthKey.split('-').map(Number);
+  const long = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const sh   = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return (short ? sh[mo-1] : long[mo-1]) + ' ' + (y + 543);
+}
+
+function renderStats() {
+  destroyCharts();
+  const activeTab = document.querySelector('.stab.active');
+  const view = activeTab ? activeTab.dataset.view : 'month';
+  if (view === 'month') renderMonthStats();
+  else renderYearStats();
+}
+
+function renderMonthStats() {
+  const monthKey = document.getElementById('stats-month-sel').value;
+  if (!monthKey) { showStatsEmpty('กรุณาเลือกเดือนที่ต้องการดูรายงานครับ'); return; }
+  const rate = getRate();
+  const data = getMonthData(monthKey);
+  if (!data) { showStatsEmpty(`ไม่พบข้อมูลเดือน ${getMonthLabel(monthKey,false)}<br><small>กรุณาเลือกเดือนที่มีข้อมูลในระบบ หรือสร้างผ่านปุ่ม "สร้างเดือนถัดไป" ครับ</small>`); return; }
+
+  const rate_ = rate;
+  const done    = data.filter(m => m.curr > m.prev);
+  const pending = data.filter(m => m.curr === 0 || m.curr === m.prev);
+  const totalUnits = data.reduce((s,m) => s + m.units, 0);
+  const totalBaht  = totalUnits * rate_;
+  const avgUnits   = done.length > 0 ? (totalUnits / done.length).toFixed(1) : 0;
+  const avgBaht    = done.length > 0 ? Math.round(totalBaht / done.length) : 0;
+
+  const soiColors  = ['#1565c0','#00897b','#e65100','#6a1b9a','#c62828','#558b2f'];
+  const soisAll    = ['0','1','2','3','4','5'];
+  const soiData    = soisAll.map((s,i) => {
+    const list  = data.filter(m => m.soi === s);
+    if(!list.length) return null;
+    const doneS = list.filter(m => m.curr > m.prev);
+    const units = list.reduce((a,m) => a + m.units, 0);
+    return { soi:s, color:soiColors[i], count:list.length, done:doneS.length, pending:list.length-doneS.length, units, baht:units*rate_ };
+  }).filter(Boolean);
+
+  const topUsers = [...data].filter(m => m.units > 0).sort((a,b) => b.units-a.units).slice(0,10);
+
+  document.getElementById('stats-content').innerHTML = `
+    <div class="s-sec">ภาพรวมเดือน${getMonthLabel(monthKey,false)}</div>
+    <div class="scards">
+      <div class="scard sc-blue">
+        <div class="scard-icon">🏠</div>
+        <div class="scard-num">${data.length}</div>
+        <div class="scard-label">ครัวเรือนทั้งหมด</div>
+        <div class="scard-sub">✅ มีข้อมูล ${done.length} หลัง<br>⏳ รอมิเตอร์ ${pending.length} หลัง</div>
+      </div>
+      <div class="scard sc-teal">
+        <div class="scard-icon">💧</div>
+        <div class="scard-num">${totalUnits.toLocaleString()}</div>
+        <div class="scard-label">รวมหน่วยที่ใช้ (ลบ.ม.)</div>
+        <div class="scard-sub">เฉลี่ย ${avgUnits} หน่วย/หลัง<br>จากหลังที่มีข้อมูล ${done.length} หลัง</div>
+      </div>
+      <div class="scard sc-green">
+        <div class="scard-icon">💰</div>
+        <div class="scard-num">${totalBaht.toLocaleString()}</div>
+        <div class="scard-label">ยอดรวม (บาท)</div>
+        <div class="scard-sub">อัตรา ${rate_} บาท/หน่วย<br>สะสมจาก ${done.length} หลัง</div>
+      </div>
+      <div class="scard sc-orange">
+        <div class="scard-icon">📌</div>
+        <div class="scard-num">${avgBaht.toLocaleString()}</div>
+        <div class="scard-label">เฉลี่ยต่อหลัง (บาท)</div>
+        <div class="scard-sub">เฉลี่ยหน่วย ${avgUnits} หน่วย/หลัง<br>รอบเก็บเงิน ${getMonthLabel(monthKey,true)}</div>
+      </div>
+    </div>
+    <div class="scharts-row">
+      <div class="schart-box" style="flex:1">
+        <div class="schart-title">🥧 สัดส่วนการใช้น้ำแต่ละซอย (หน่วย)</div>
+        <canvas id="sc-donut"></canvas>
+      </div>
+      <div class="schart-box" style="flex:1.5">
+        <div class="schart-title">🏆 ผู้ใช้น้ำมากสุด 10 อันดับ (หน่วย)</div>
+        <canvas id="sc-top" height="240"></canvas>
+      </div>
+    </div>
+    <div class="s-sec" style="margin-top:22px;">สรุปตามซอย</div>
+    <div class="stbl-wrap">
+      <table class="stbl">
+        <thead><tr><th>ซอย</th><th>บ้าน(หลัง)</th><th>มีข้อมูล</th><th>รอมิเตอร์</th><th>รวมหน่วย</th><th>รวมยอด (฿)</th><th>เฉลี่ย/หลัง</th><th>%ของทั้งหมด</th></tr></thead>
+        <tbody>
+          ${soiData.map(s=>`<tr>
+            <td><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${s.color};margin-right:6px;vertical-align:middle;"></span><b>ซอย ${s.soi}</b></td>
+            <td>${s.count}</td>
+            <td class="tc-green">${s.done}</td>
+            <td class="tc-orange">${s.pending}</td>
+            <td class="tc-num">${s.units.toLocaleString()}</td>
+            <td class="tc-num tc-red">${s.baht.toLocaleString()}</td>
+            <td class="tc-num">${s.done>0?(s.units/s.done).toFixed(1):'—'}</td>
+            <td>${totalUnits>0?Math.round(s.units/totalUnits*100)+'%':'—'}</td>
+          </tr>`).join('')}
+          <tr class="tr-total">
+            <td><b>รวมทั้งหมด</b></td>
+            <td><b>${data.length}</b></td>
+            <td class="tc-green"><b>${done.length}</b></td>
+            <td class="tc-orange"><b>${pending.length}</b></td>
+            <td class="tc-num"><b>${totalUnits.toLocaleString()}</b></td>
+            <td class="tc-num tc-red"><b>${totalBaht.toLocaleString()}</b></td>
+            <td class="tc-num"><b>${avgUnits}</b></td>
+            <td><b>100%</b></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+
+  // Donut chart
+  requestAnimationFrame(() => {
+    const ctx1 = document.getElementById('sc-donut');
+    if(!ctx1) return;
+    sChart1 = new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: soiData.map(s=>'ซอย '+s.soi+' ('+s.units+' หน่วย)'),
+        datasets: [{ data: soiData.map(s=>s.units), backgroundColor: soiData.map(s=>s.color), borderWidth:3, borderColor:'#fff', hoverOffset:8 }]
+      },
+      options: {
+        responsive:true, cutout:'60%',
+        plugins: {
+          legend:{ position:'bottom', labels:{ font:{family:'Noto Sans Thai',size:12}, padding:14, boxWidth:14 } },
+          tooltip:{ callbacks:{ label:(c)=>` ${c.label.split(' ')[0]} ${c.label.split(' ')[1]}: ${Number(c.raw).toLocaleString()} หน่วย (${Math.round(c.raw/totalUnits*100)}%)` } }
+        }
+      }
+    });
+    // Top users bar
+    const ctx2 = document.getElementById('sc-top');
+    if(!ctx2) return;
+    sChart2 = new Chart(ctx2, {
+      type:'bar',
+      data: {
+        labels: topUsers.map(m=>m.name.replace(/^คุณ\s*/,'')),
+        datasets:[{ label:'หน่วย', data:topUsers.map(m=>m.units),
+          backgroundColor: topUsers.map((_,i)=>`rgba(21,101,192,${1-i*0.07})`),
+          borderRadius:6, borderSkipped:false }]
+      },
+      options:{
+        indexAxis:'y', responsive:true,
+        plugins:{ legend:{display:false}, tooltip:{callbacks:{label:(c)=>` ${Number(c.parsed.x).toLocaleString()} หน่วย (${(c.parsed.x*rate_).toLocaleString()} บาท)`}} },
+        scales:{
+          x:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{family:'Sarabun'}} },
+          y:{ ticks:{font:{family:'Noto Sans Thai',size:11}} }
+        }
+      }
+    });
+  });
+}
+
+function renderYearStats() {
+  const year = document.getElementById('stats-year-sel').value;
+  const rate_ = getRate();
+  const moLong = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const moShort= ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+  const yearData = Array.from({length:12},(_,i)=>{
+    const mo  = String(i+1).padStart(2,'0');
+    const key = `${year}-${mo}`;
+    const d   = getMonthData(key);
+    if(!d) return {label:moShort[i],labelLong:moLong[i],key,hasData:false,units:0,baht:0,done:0,pending:0,total:0};
+    const done= d.filter(m=>m.curr>m.prev);
+    const units=d.reduce((s,m)=>s+m.units,0);
+    return {label:moShort[i],labelLong:moLong[i],key,hasData:true,units,baht:units*rate_,done:done.length,pending:d.length-done.length,total:d.length};
+  });
+
+  const withData  = yearData.filter(d=>d.hasData);
+  const totUnits  = yearData.reduce((s,d)=>s+d.units,0);
+  const totBaht   = totUnits*rate_;
+  const avgMoUnit = withData.length>0?Math.round(totUnits/withData.length):0;
+  const peakMo    = withData.length>0?withData.reduce((a,b)=>b.units>a.units?b:a):null;
+  const minMo     = withData.length>0?withData.reduce((a,b)=>b.units<a.units?b:a):null;
+
+  if(withData.length===0){ showStatsEmpty(`ไม่พบข้อมูลปี ${parseInt(year)+543} ในระบบเลยครับ<br><small>กรุณาตรวจสอบว่าได้บันทึกข้อมูลไว้แล้ว</small>`); return; }
+
+  document.getElementById('stats-content').innerHTML = `
+    <div class="s-sec">ภาพรวมทั้งปี ${parseInt(year)+543} (พ.ศ.)</div>
+    <div class="scards">
+      <div class="scard sc-blue">
+        <div class="scard-icon">📅</div>
+        <div class="scard-num">${withData.length}<span style="font-size:18px;font-weight:600;color:#607d8b;"> /12</span></div>
+        <div class="scard-label">เดือนที่มีข้อมูล</div>
+        <div class="scard-sub">เหลือ ${12-withData.length} เดือนที่ยังไม่มีข้อมูล</div>
+      </div>
+      <div class="scard sc-teal">
+        <div class="scard-icon">💧</div>
+        <div class="scard-num">${totUnits.toLocaleString()}</div>
+        <div class="scard-label">รวมหน่วยทั้งปี (ลบ.ม.)</div>
+        <div class="scard-sub">เฉลี่ย ${avgMoUnit.toLocaleString()} หน่วย/เดือน</div>
+      </div>
+      <div class="scard sc-green">
+        <div class="scard-icon">💰</div>
+        <div class="scard-num">${totBaht.toLocaleString()}</div>
+        <div class="scard-label">รายได้รวมทั้งปี (บาท)</div>
+        <div class="scard-sub">เฉลี่ย ${withData.length>0?Math.round(totBaht/withData.length).toLocaleString():0} บาท/เดือน</div>
+      </div>
+      <div class="scard sc-orange">
+        <div class="scard-icon">📈</div>
+        <div class="scard-num">${peakMo?peakMo.units.toLocaleString():'—'}</div>
+        <div class="scard-label">หน่วยสูงสุดในปี</div>
+        <div class="scard-sub">เดือน${peakMo?peakMo.labelLong:'—'}<br>ต่ำสุด: ${minMo?minMo.units.toLocaleString():'—'} (${minMo?minMo.labelLong:'—'})</div>
+      </div>
+    </div>
+    <div class="scharts-row">
+      <div class="schart-box" style="flex:1">
+        <div class="schart-title">📉 แนวโน้มการใช้น้ำรายเดือน (หน่วย)</div>
+        <canvas id="sc-trend" height="180"></canvas>
+      </div>
+    </div>
+    <div class="scharts-row">
+      <div class="schart-box" style="flex:1">
+        <div class="schart-title">💵 รายได้ค่าน้ำรายเดือน (บาท)</div>
+        <canvas id="sc-revenue" height="160"></canvas>
+      </div>
+    </div>
+    <div class="s-sec" style="margin-top:22px;">ตารางสรุปรายเดือน ปี ${parseInt(year)+543}</div>
+    <div class="stbl-wrap">
+      <table class="stbl">
+        <thead><tr><th>เดือน</th><th>ครัวเรือน</th><th>มีข้อมูล</th><th>รอมิเตอร์</th><th>รวมหน่วย</th><th>รวมยอด (฿)</th><th>เฉลี่ย/หลัง</th><th>สถานะ</th></tr></thead>
+        <tbody>
+          ${yearData.map(d=>`<tr class="${!d.hasData?'tr-nodata':''}">
+            <td><b>${d.labelLong}</b></td>
+            <td>${d.hasData?d.total:'—'}</td>
+            <td class="tc-green">${d.hasData?d.done:'—'}</td>
+            <td class="tc-orange">${d.hasData?d.pending:'—'}</td>
+            <td class="tc-num">${d.hasData?d.units.toLocaleString():'—'}</td>
+            <td class="tc-num tc-red">${d.hasData?d.baht.toLocaleString():'—'}</td>
+            <td class="tc-num">${d.hasData&&d.done>0?(d.units/d.done).toFixed(1):'—'}</td>
+            <td>${d.hasData?(d.pending>0?'<span class="bdg bdg-pend">⏳ ไม่สมบูรณ์</span>':'<span class="bdg bdg-done">✅ สมบูรณ์</span>'):'<span class="bdg bdg-none">❌ ไม่มีข้อมูล</span>'}</td>
+          </tr>`).join('')}
+          <tr class="tr-total">
+            <td><b>รวม ${withData.length} เดือน</b></td>
+            <td>—</td><td>—</td><td>—</td>
+            <td class="tc-num"><b>${totUnits.toLocaleString()}</b></td>
+            <td class="tc-num tc-red"><b>${totBaht.toLocaleString()}</b></td>
+            <td class="tc-num"><b>${avgMoUnit.toLocaleString()}</b></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+
+  requestAnimationFrame(()=>{
+    // Trend line chart
+    const ctx1 = document.getElementById('sc-trend');
+    if(!ctx1) return;
+    const grad1 = ctx1.getContext('2d').createLinearGradient(0,0,0,180);
+    grad1.addColorStop(0,'rgba(21,101,192,0.25)'); grad1.addColorStop(1,'rgba(21,101,192,0)');
+    sChart1 = new Chart(ctx1,{
+      type:'line',
+      data:{
+        labels:yearData.map(d=>d.label),
+        datasets:[{
+          label:'หน่วย (ลบ.ม.)',
+          data:yearData.map(d=>d.hasData?d.units:null),
+          borderColor:'#1565c0',backgroundColor:grad1,
+          borderWidth:2.5,pointRadius:6,pointHoverRadius:8,
+          pointBackgroundColor:'#fff',pointBorderColor:'#1565c0',pointBorderWidth:2.5,
+          fill:true,tension:0.35,spanGaps:false
+        }]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:(c)=>c.raw!=null?` ${Number(c.raw).toLocaleString()} หน่วย (${(Number(c.raw)*rate_).toLocaleString()} บาท)`:' ไม่มีข้อมูล'}}
+        },
+        scales:{
+          y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Sarabun'}}},
+          x:{ticks:{font:{family:'Noto Sans Thai',size:12}}}
+        }
+      }
+    });
+
+    // Revenue bar chart
+    const ctx2 = document.getElementById('sc-revenue');
+    if(!ctx2) return;
+    sChart2 = new Chart(ctx2,{
+      type:'bar',
+      data:{
+        labels:yearData.map(d=>d.label),
+        datasets:[{
+          label:'บาท',
+          data:yearData.map(d=>d.hasData?d.baht:null),
+          backgroundColor:yearData.map(d=>d.hasData?'rgba(46,125,50,0.78)':'rgba(200,200,200,0.3)'),
+          borderRadius:7,borderSkipped:false
+        }]
+      },
+      options:{
+        responsive:true,
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:(c)=>c.raw!=null?` ${Number(c.raw).toLocaleString()} บาท`:' ไม่มีข้อมูล'}}
+        },
+        scales:{
+          y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{family:'Sarabun'}}},
+          x:{ticks:{font:{family:'Noto Sans Thai',size:12}}}
+        }
+      }
+    });
+  });
+}
+
+function showStatsEmpty(msg) {
+  document.getElementById('stats-content').innerHTML = `
+    <div class="stats-nodata">
+      <div class="stats-nodata-icon">📭</div>
+      <div class="stats-nodata-title">${msg}</div>
+    </div>`;
+}
+
+// ===== ADD MEMBER =====
+function openAddMember() {
+  const nextSeq = Math.max(0, ...members.map(m=>m.seq)) + 1;
+  document.getElementById('add-seq').value = nextSeq;
+  document.getElementById('add-code').value = '';
+  document.getElementById('add-name').value = '';
+  document.getElementById('add-house').value = '';
+  document.getElementById('add-soi').value = '1';
+  document.getElementById('add-prev').value = '';
+  document.getElementById('add-member-overlay').classList.add('show');
+}
+
+function closeAddMember() {
+  document.getElementById('add-member-overlay').classList.remove('show');
+}
+
+function saveAddMember() {
+  const name  = document.getElementById('add-name').value.trim();
+  const house = document.getElementById('add-house').value.trim();
+  const soi   = document.getElementById('add-soi').value;
+  const prevRaw = document.getElementById('add-prev').value;
+  const code  = document.getElementById('add-code').value.trim() || '-';
+  const seq   = parseInt(document.getElementById('add-seq').value) || (Math.max(0,...members.map(m=>m.seq))+1);
+
+  // ===== VALIDATION =====
+  if (!name)  { alert('⚠️ กรุณากรอกชื่อ-สกุลครับ'); document.getElementById('add-name').focus(); return; }
+  if (!house) { alert('⚠️ กรุณากรอกบ้านเลขที่ครับ'); document.getElementById('add-house').focus(); return; }
+  if (prevRaw === '' || isNaN(parseInt(prevRaw))) { alert('⚠️ กรุณากรอกเลขมิเตอร์เริ่มต้นครับ (ถ้าเป็น 0 ให้กรอก 0)'); document.getElementById('add-prev').focus(); return; }
+  const prev = parseInt(prevRaw);
+  if (prev < 0) { alert('⚠️ เลขมิเตอร์ต้องไม่ติดลบครับ'); return; }
+
+  // Check duplicate house
+  const dupHouse = members.find(m => m.house === house);
+  if (dupHouse) {
+    if (!confirm(`⚠️ มีบ้านเลขที่ "${house}" อยู่ในระบบแล้ว (${dupHouse.name})\nต้องการเพิ่มซ้ำหรือไม่?`)) return;
+  }
+
+  const newMember = { seq, code, name, house, soi, prev, curr: prev, units: 0, total: 0 };
+  members.push(newMember);
+
+  saveMembers();
+  syncMasterBase(members); // sync so future blank months include this member
+  renderTable();
+  closeAddMember();
+
+  const curMonth = document.getElementById('s-month').value || '2026-06';
+  alert(`✅ เพิ่มสมาชิกเรียบร้อยแล้วครับ!\n\nชื่อ: ${name}\nบ้านเลขที่: ${house} ซอย ${soi}\nมิเตอร์เริ่มต้น: ${prev.toLocaleString()} หน่วย\nเดือนที่เพิ่ม: ${getMonthLabel(curMonth,false)}\n\n✅ สมาชิกนี้จะถูกส่งต่อไปทุกเดือนถัดไปอัตโนมัติ`);
+}
+
+// ===== EXPORT EXCEL =====
+function exportExcel(){
+  const rate = getRate();
+  const monthLabel = getMonth();
+  const monthVal = document.getElementById('s-month').value || '2026-06';
+
+  const headers = ['#','รหัส','ชื่อ-สกุล','บ้านเลขที่','ซอย','มิเตอร์เก่า','มิเตอร์ใหม่','หน่วยที่ใช้',`ยอดชำระ (${rate} บ./หน่วย)`,'สถานะ'];
+  const rows = members.map(m => [
+    m.seq, m.code, m.name, m.house, 'ซอย '+m.soi,
+    m.prev, m.curr, m.units, m.units * rate,
+    (m.curr === 0 || m.curr === m.prev) ? 'รอมิเตอร์' : 'มีข้อมูลแล้ว'
+  ]);
+
+  const totalUnits = members.reduce((s,m)=>s+m.units,0);
+  const totalBaht  = members.reduce((s,m)=>s+(m.units*rate),0);
+  const doneCount  = members.filter(m=>m.curr>m.prev).length;
+  const pendCount  = members.filter(m=>m.curr===0||m.curr===m.prev).length;
+
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: รายละเอียดทั้งหมด
+  const ws1Data = [
+    [`ข้อมูลค่าน้ำประปา บ้านสันป่าสักเหนือ หมู่ที่ 9 ต.หนองแฝก อ.สารภี จ.เชียงใหม่`],
+    [`ประจำเดือน: ${monthLabel}`, '', '', `ราคา/หน่วย: ${rate} บาท`, '', '', `ผู้รับเงิน: ${getSigner()}`],
+    [],
+    headers,
+    ...rows,
+    [],
+    ['', '', '', '', '', 'รวมหน่วย', '', totalUnits, totalBaht, `ครัวเรือนทั้งหมด ${members.length} หลัง (มีข้อมูล ${doneCount} / รอมิเตอร์ ${pendCount})`]
+  ];
+  const ws1 = XLSX.utils.aoa_to_sheet(ws1Data);
+  ws1['!cols'] = [{wch:4},{wch:7},{wch:28},{wch:10},{wch:6},{wch:12},{wch:12},{wch:10},{wch:18},{wch:22}];
+  ws1['!merges'] = [{s:{r:0,c:0},e:{r:0,c:9}}];
+  XLSX.utils.book_append_sheet(wb, ws1, `รายละเอียด`);
+
+  // Sheet 2: สรุปตามซอย
+  const sois = ['0','1','2','3','4','5'];
+  const ws2Data = [
+    [`สรุปค่าน้ำแยกตามซอย — ประจำเดือน: ${monthLabel}`],
+    [],
+    ['ซอย','จำนวนบ้าน','รวมหน่วย','รวมยอด (บาท)','มีข้อมูลแล้ว','รอมิเตอร์']
+  ];
+  sois.forEach(s => {
+    const list = members.filter(m=>m.soi===s);
+    if(!list.length) return;
+    ws2Data.push([
+      `ซอย ${s}`, list.length,
+      list.reduce((a,m)=>a+m.units,0),
+      list.reduce((a,m)=>a+(m.units*rate),0),
+      list.filter(m=>m.curr>m.prev).length,
+      list.filter(m=>m.curr===0||m.curr===m.prev).length
+    ]);
+  });
+  ws2Data.push([]);
+  ws2Data.push(['รวมทั้งหมด', members.length, totalUnits, totalBaht, doneCount, pendCount]);
+  const ws2 = XLSX.utils.aoa_to_sheet(ws2Data);
+  ws2['!cols'] = [{wch:8},{wch:12},{wch:10},{wch:16},{wch:14},{wch:10}];
+  ws2['!merges'] = [{s:{r:0,c:0},e:{r:0,c:5}}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'สรุปตามซอย');
+
+  XLSX.writeFile(wb, `ค่าน้ำ_${monthVal}_สันป่าสักเหนือ.xlsx`);
+}
+
+renderTable();
+</script>
+</body>
+</html>
