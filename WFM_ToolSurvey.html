@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>แบบสำรวจเครื่องมือ - WFM RNO-CMI</title>
+<style>
+  :root {
+    --green: #1B5E20;
+    --green-dark: #12401A;
+    --green-light: #EAF4EB;
+    --orange: #E8601A;
+    --gray-border: #d5d5d5;
+    --text: #222;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+    background: #f2f4f2;
+    color: var(--text);
+    padding-bottom: 60px;
+  }
+  header.topbar {
+    background: var(--green);
+    color: #fff;
+    padding: 18px 16px 14px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  header.topbar h1 { margin: 0; font-size: 19px; font-weight: 700; }
+  header.topbar .sub {
+    background: var(--orange);
+    margin: 8px -16px -14px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .container { max-width: 640px; margin: 0 auto; padding: 14px; }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .field { margin-bottom: 12px; }
+  .field label { display:block; font-size: 13px; font-weight:600; color: var(--green-dark); margin-bottom: 4px; }
+  .field input[type=text], .field input[type=date], .field select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+  }
+  .row3 { display:flex; gap:8px; }
+  .row3 .field { flex:1; }
+
+  .section-title {
+    background: var(--green-dark);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 18px 0 10px;
+  }
+  .item {
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: #fff;
+  }
+  .item.has { border-left: 4px solid var(--green); }
+  .item.missing { border-left: 4px solid var(--orange); background:#fff8f4; }
+  .item-name { font-size: 14.5px; font-weight: 600; margin-bottom: 8px; }
+  .item-name .spec { font-weight: 400; color:#666; font-size: 12.5px; }
+  .toggle { display:flex; gap:8px; margin-bottom:8px; }
+  .toggle button {
+    flex:1;
+    padding: 9px 0;
+    border-radius: 8px;
+    border: 1px solid var(--gray-border);
+    background:#f7f7f7;
+    font-size: 14px;
+    font-weight:600;
+    color:#555;
+  }
+  .toggle button.active-yes { background: var(--green); color:#fff; border-color:var(--green); }
+  .toggle button.active-no { background: var(--orange); color:#fff; border-color:var(--orange); }
+  .extra-row { display:flex; gap:8px; }
+  .extra-row input { flex:1; padding:8px; border:1px solid var(--gray-border); border-radius:7px; font-size:13.5px; }
+  .extra-row input.qty { flex: 0 0 70px; }
+
+  .submit-bar {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 10px 14px 14px;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.08);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .btn {
+    width:100%;
+    padding: 14px;
+    border:none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight:700;
+    color:#fff;
+    background: var(--green);
+  }
+  .btn:active { opacity:0.85; }
+  .btn.saving { background:#888; }
+  .status {
+    text-align:center;
+    font-size: 12.5px;
+    margin-top: 6px;
+    color:#777;
+    min-height: 16px;
+  }
+  .status.err { color: var(--orange); font-weight:600; }
+  .status.ok { color: var(--green); font-weight:600; }
+  .progress {
+    font-size: 12px;
+    color:#fff;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>แบบสำรวจเครื่องมือ</h1>
+  <div class="progress" id="progressText">กรอกแล้ว 0 / 0 รายการ</div>
+  <div class="sub">แผนก WFM &nbsp;|&nbsp; RNO-CMI (AIS 3BB FIBRE)</div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <div class="field">
+      <label>ชื่อ-นามสกุล</label>
+      <select id="fullname" onchange="onNameChange()">
+        <option value="">-- เลือกชื่อ --</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>รหัสทีม (RON)</label>
+      <input type="text" id="roncode" readonly placeholder="ขึ้นอัตโนมัติเมื่อเลือกชื่อ" style="background:#f5f5f5;color:#555;">
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label>ทีม / โซน</label>
+        <select id="zone">
+          <option value="">เลือก</option>
+          <option>A</option><option>B</option><option>C</option><option>D</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>วันที่สำรวจ</label>
+        <input type="date" id="surveyDate">
+      </div>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="card">
+    <div class="field">
+      <label>หมายเหตุเพิ่มเติม</label>
+      <input type="text" id="generalNote" placeholder="หมายเหตุอื่นๆ (ถ้ามี)">
+    </div>
+  </div>
+
+</div>
+
+<div class="submit-bar">
+  <button class="btn" id="submitBtn" onclick="submitForm()">ส่งข้อมูล</button>
+  <div class="status" id="statusText"></div>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+// วาง URL ของ Google Apps Script Web App ที่ deploy แล้วตรงนี้
+const GAS_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const DRAFT_KEY = "toolsurvey_draft_v1";
+
+// ===================== DATA =====================
+const SECTIONS = [
+  { title: "1) เครื่องมือประจำตัว", items: [
+    ["คัตเตอร์","-"], ["ค้อนยาง","-"], ["ไขควงแฉก + แบน","4 นิ้ว"],
+    ["คีมปากแหลม","6 นิ้ว"], ["คีมตัดปากแบน","6 นิ้ว"], ["ไขควงเช็คไฟ","-"],
+    ["คีมปากนกแก้ว","6 นิ้ว"], ["ตลับเมตร","5-8 เมตร"], ["ไฟฉายคาดศีรษะ","-"],
+  ]},
+  { title: "2) เครื่องมือเสริม", items: [
+    ["ปากกา Marker เขียน Label","-"],
+    ["ปากกา Paint สีขาว (เขียนกล่อง closure, SPT)","-"],
+    ["ปากกา Paint สีดำ (เขียนตู้ ODF, Node)","-"],
+    ["ยากันยุง, สเปรย์กันยุง","-"],
+    ["สเปรย์อเนกประสงค์","-"],
+    ["ยาฆ่าแมลง","-"],
+    ["สีสเปรย์สีดำ (พ่นทับหน้ากล่อง SPT)","-"],
+    ["สีสเปรย์สีขาว (พ่น Plate ป้ายชื่อกล่อง SPT)","-"],
+    ["แผ่น Label เขียนป้าย Marking สาย","-"],
+    ["Cable Tie สีดำ (Outdoor)","4\", 6\", 8\""],
+  ]},
+  { title: "3) เครื่องมือประจำกองงาน", items: [
+    ["สว่าน","-"], ["เครื่องเป่าลม","-"],
+    ["ชุดประแจบล็อค หรือประแจปากตาย","-"],
+    ["ปากกาเขียนหน้ากล่อง SPT","-"], ["Note Book","-"],
+    ["Fusion Splicer (พร้อม Kevlar Scissor / Cleaver)","-"],
+    ["OTDR","-"], ["Power Meter (OFC)","-"], ["Meter (Clamp)","-"],
+    ["OFC Identifier","-"], ["ชุด Alcohol น้ำยาเช็ด OFC","-"],
+    ["มีดดายหญ้า, ตัดหญ้า","-"],
+  ]},
+];
+
+let state = {}; // key: "s{si}_i{ii}" -> {status:'has'|'missing', qty:'', note:''}
+
+// ===================== TEAM ROSTER =====================
+const NAMES = [
+  {"name": "ประสาร สุพรรณคง", "team": "RON-CMI201"},
+  {"name": "ธนกฤต ดอกดวง", "team": "RON-CMI201"},
+  {"name": "โพธิยา มหาชัย", "team": "RON-CMI202"},
+  {"name": "จักรพงษ์ บัวปะทะ", "team": "RON-CMI202"},
+  {"name": "อภิรักษ์ จันทร์คำ", "team": "RON-CMI203"},
+  {"name": "นิธิพันธ์ ศิริโปทา", "team": "RON-CMI203"},
+  {"name": "ฐกลวิทย์ กิตติกุลสุวรรณ", "team": "RON-CMI104"},
+  {"name": "ทักษิณ ลาดกำแพง", "team": "RON-CMI104"},
+  {"name": "ปิยะวัฒน์ ปงกันทา", "team": "RON-CMI002"},
+  {"name": "นพดล เมืองชัย", "team": "RON-CMI002"},
+  {"name": "อัมพวัฒน์ พัชรพัฒนชัย", "team": "RON-CMI105"},
+  {"name": "เมธาศิษฐ์ เศรษฐ์วุฒิภัทร", "team": "RON-CMI105"},
+  {"name": "วรชัย นุ่มตูม", "team": "RON-CMI004"},
+  {"name": "พัทธนันท์ ปันเขียว", "team": "RON-CMI004"},
+  {"name": "สัจจะ ดวงชื่น", "team": "RON-CMI301"},
+  {"name": "วิชัย ทำนุศาสตร์", "team": "RON-CMI301"},
+  {"name": "อภิสิทธิ์ ศิริกิจ", "team": "RON-CMI302"},
+  {"name": "ไกรสิทธิ์ เชื้อสมเกียรติ", "team": "RON-CMI302"},
+  {"name": "กรภัทร จีนอนันต์", "team": "RON-CMI303"},
+  {"name": "คมกริช สายวงศ์เปียง", "team": "RON-CMI303"},
+  {"name": "เอกรินทร์ โสภา", "team": "RON-CMI401"},
+  {"name": "วัชริศ ปินใจ", "team": "RON-CMI401"},
+  {"name": "ณัฐพล พัชรพัฒนชัย", "team": "RON-CMI402"},
+  {"name": "คมกริช ทาแกง", "team": "RON-CMI402"},
+  {"name": "สรศักดิ์ ผิวขาว", "team": "RON-CMI403"},
+  {"name": "ศรายุทธ สมพงษ์", "team": "RON-CMI403"},
+  {"name": "พุฒิพงษ์ บดินทร์ชัยการ", "team": "RON-CMI103"},
+  {"name": "วีรยุทธ อินทจักร", "team": "RON-CMI103"},
+  {"name": "ภาสกร ญาติฝูง", "team": "RON-CMI106"},
+  {"name": "มงคล ไทยประเทศ", "team": "RON-CMI106"},
+  {"name": "นพดนัย  อมรวิโรจน์รัตน์", "team": "RON-CMI108"},
+  {"name": "มานิตย์ ทิวาประดับดาว", "team": "RON-CMI108"},
+  {"name": "อภิวัฒน์ ไชยสุรินทร์", "team": "RON-CMI109"},
+  {"name": "ณัฏฐพล พิศพันธุ์", "team": "RON-CMI109"},
+  {"name": "นิเวศ ตาแม่ก๋ง", "team": "RON-LPN101"},
+  {"name": "จิรวัฒน์ พรธนานิธินันท์", "team": "RON-LPN101"},
+  {"name": "วิทยา แสนเกรียง", "team": "RON-LPN102"},
+  {"name": "จิรพงศ์ ใจจิต", "team": "RON-LPN102"},
+  {"name": "พงษ์นคร กองมี", "team": "RON-LPN102"},
+  {"name": "ณัฐนนท์ สุวรรณ์", "team": "RON-LPN103"},
+  {"name": "ธนาพันธ์ อินทะจันทร์", "team": "RON-LPN103"},
+  {"name": "อนุชิต คำเขียว", "team": "RON-CMI101"},
+  {"name": "วรเชษฐ์ จันต๊ะคาด", "team": "RON-CMI101"},
+  {"name": "สุทธิพงศ์ ปาลี", "team": "RON-CMI107"},
+  {"name": "นวพล ธรรมขันแก้ว", "team": "RON-CMI107"},
+  {"name": "เจษฎา จิโน", "team": "RON-CMI006"},
+  {"name": "บดินทร์ อาษากิจ", "team": "RON-CMI006"},
+  {"name": "ปรัตถกร คุ้มประคอง", "team": "RON-CMI501"},
+  {"name": "อลงกรณ์ โปธิ", "team": "RON-CMI501"},
+  {"name": "นำโชค คงอิ่ม", "team": "RON-CMI502"},
+  {"name": "ธงชัย มณีสิงหราช", "team": "RON-CMI502"},
+  {"name": "เอกลักษณ์ ดอกสม", "team": "RON-CMI503"},
+  {"name": "สุรศักดิ์ ใหม่ป้อ", "team": "RON-CMI503"},
+  {"name": "สมเพชร ก้อยมาเลิศ", "team": "RON-MSN101"},
+  {"name": "สรายุทธ กรนทีกาญจน์", "team": "RON-MSN101"},
+  {"name": "ธนิน ถึงสุข", "team": "RON-MSN102"},
+  {"name": "นนทพัทธ์ ใฝ่หาวิทย์", "team": "RON-MSN102"},
+  {"name": "ชัชชัย ก้อยมาเลิศ", "team": "RON-MSN103"},
+  {"name": "บรรจง ติ๊เนาะ", "team": "RON-MSN103"},
+];
+
+function populateNameDropdown() {
+  const sel = document.getElementById("fullname");
+  NAMES.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.name;
+    opt.textContent = p.name;
+    opt.dataset.team = p.team;
+    sel.appendChild(opt);
+  });
+}
+
+function onNameChange() {
+  const sel = document.getElementById("fullname");
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById("roncode").value = (opt && opt.dataset.team) ? opt.dataset.team : "";
+  saveDraft();
+}
+
+// ===================== BUILD UI =====================
+function itemKey(si, ii) { return "s" + si + "_i" + ii; }
+
+function render() {
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
+  SECTIONS.forEach((sec, si) => {
+    const secTitle = document.createElement("div");
+    secTitle.className = "section-title";
+    secTitle.textContent = sec.title;
+    container.appendChild(secTitle);
+
+    sec.items.forEach((item, ii) => {
+      const key = itemKey(si, ii);
+      if (!state[key]) state[key] = { status: "", qty: "", note: "" };
+      const s = state[key];
+
+      const div = document.createElement("div");
+      div.className = "item" + (s.status === "has" ? " has" : s.status === "missing" ? " missing" : "");
+      div.id = "item_" + key;
+
+      const specHtml = item[1] && item[1] !== "-" ? ` <span class="spec">(${item[1]})</span>` : "";
+      div.innerHTML = `
+        <div class="item-name">${item[0]}${specHtml}</div>
+        <div class="toggle">
+          <button type="button" class="${s.status==='has'?'active-yes':''}" onclick="setStatus('${key}','has')">✓ มี</button>
+          <button type="button" class="${s.status==='missing'?'active-no':''}" onclick="setStatus('${key}','missing')">✕ ไม่มี</button>
+        </div>
+        <div class="extra-row">
+          <input type="number" min="0" class="qty" placeholder="จำนวน" value="${s.qty}" oninput="updateField('${key}','qty',this.value)">
+          <input type="text" placeholder="หมายเหตุ" value="${s.note}" oninput="updateField('${key}','note',this.value)">
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  });
+  updateProgress();
+}
+
+function setStatus(key, status) {
+  state[key].status = state[key].status === status ? "" : status;
+  saveDraft();
+  render();
+  restoreScroll();
+}
+
+function updateField(key, field, value) {
+  state[key][field] = value;
+  saveDraft();
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = Object.keys(state).length;
+  const done = Object.values(state).filter(s => s.status).length;
+  document.getElementById("progressText").textContent = `กรอกแล้ว ${done} / ${total} รายการ`;
+}
+
+let lastScroll = 0;
+function restoreScroll() { window.scrollTo(0, lastScroll); }
+window.addEventListener("scroll", () => { lastScroll = window.scrollY; });
+
+// ===================== DRAFT SAVE (localStorage) =====================
+function saveDraft() {
+  const draft = {
+    fullname: document.getElementById("fullname").value,
+    roncode: document.getElementById("roncode").value,
+    zone: document.getElementById("zone").value,
+    surveyDate: document.getElementById("surveyDate").value,
+    generalNote: document.getElementById("generalNote").value,
+    state,
+  };
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch (e) {}
+}
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const draft = JSON.parse(raw);
+    document.getElementById("fullname").value = draft.fullname || "";
+    document.getElementById("roncode").value = draft.roncode || "";
+    document.getElementById("zone").value = draft.zone || "";
+    document.getElementById("surveyDate").value = draft.surveyDate || "";
+    document.getElementById("generalNote").value = draft.generalNote || "";
+    if (draft.state) state = draft.state;
+  } catch (e) {}
+}
+
+// ===================== SUBMIT =====================
+async function submitForm() {
+  const statusEl = document.getElementById("statusText");
+  const btn = document.getElementById("submitBtn");
+
+  const fullname = document.getElementById("fullname").value.trim();
+  if (!fullname) {
+    statusEl.className = "status err";
+    statusEl.textContent = "กรุณาเลือกชื่อ-นามสกุลก่อนส่งข้อมูล";
+    document.getElementById("fullname").focus();
+    return;
+  }
+
+  const rows = [];
+  SECTIONS.forEach((sec, si) => {
+    sec.items.forEach((item, ii) => {
+      const s = state[itemKey(si, ii)];
+      rows.push({
+        section: sec.title,
+        item: item[0],
+        spec: item[1],
+        status: s.status || "",
+        qty: s.qty || "",
+        note: s.note || "",
+      });
+    });
+  });
+
+  const payload = {
+    fullname,
+    roncode: document.getElementById("roncode").value,
+    zone: document.getElementById("zone").value,
+    surveyDate: document.getElementById("surveyDate").value,
+    generalNote: document.getElementById("generalNote").value,
+    submittedAt: new Date().toISOString(),
+    rows,
+  };
+
+  btn.classList.add("saving");
+  btn.textContent = "กำลังส่งข้อมูล...";
+  statusEl.className = "status";
+  statusEl.textContent = "";
+
+  try {
+    if (!GAS_URL || GAS_URL.startsWith("PASTE_")) throw new Error("no-url");
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors", // Apps Script web apps ไม่ตอบ CORS header ปกติ ใช้ no-cors เพื่อยิงข้อมูลได้
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    });
+    localStorage.removeItem(DRAFT_KEY);
+    statusEl.className = "status ok";
+    statusEl.textContent = "✓ ส่งข้อมูลสำเร็จ ขอบคุณครับ";
+  } catch (err) {
+    // เก็บ payload ไว้เผื่อไม่มีสัญญาณ ลองส่งใหม่ภายหลังได้
+    localStorage.setItem("toolsurvey_pending_" + Date.now(), JSON.stringify(payload));
+    statusEl.className = "status err";
+    statusEl.textContent = "ไม่มีสัญญาณอินเทอร์เน็ต ข้อมูลถูกบันทึกไว้ในเครื่องแล้ว กด 'ส่งข้อมูล' อีกครั้งเมื่อมีสัญญาณ";
+  }
+
+  btn.classList.remove("saving");
+  btn.textContent = "ส่งข้อมูล";
+}
+
+// ===================== RETRY PENDING SUBMISSIONS =====================
+async function retryPending() {
+  if (!GAS_URL || GAS_URL.startsWith("PASTE_")) return;
+  const keys = Object.keys(localStorage).filter(k => k.startsWith("toolsurvey_pending_"));
+  for (const k of keys) {
+    try {
+      const payload = localStorage.getItem(k);
+      await fetch(GAS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: payload,
+      });
+      localStorage.removeItem(k);
+    } catch (e) { /* still offline, keep it */ }
+  }
+}
+
+// ===================== INIT =====================
+window.addEventListener("load", () => {
+  populateNameDropdown();
+  if (!document.getElementById("surveyDate").value) {
+    document.getElementById("surveyDate").value = new Date().toISOString().slice(0,10);
+  }
+  loadDraft();
+  render();
+  retryPending();
+});
+</script>
+</body>
+</html>
