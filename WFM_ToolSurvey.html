@@ -57,7 +57,6 @@
     font-size: 15px;
     background: #fff;
   }
-  .row3 { display:flex; gap:8px; }
   .row3 .field { flex:1; }
 
   .section-title {
@@ -156,18 +155,9 @@
       <label>รหัสทีม (RON)</label>
       <input type="text" id="roncode" readonly placeholder="ขึ้นอัตโนมัติเมื่อเลือกชื่อ" style="background:#f5f5f5;color:#555;">
     </div>
-    <div class="row3">
-      <div class="field">
-        <label>ทีม / โซน</label>
-        <select id="zone">
-          <option value="">เลือก</option>
-          <option>A</option><option>B</option><option>C</option><option>D</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>วันที่สำรวจ</label>
-        <input type="date" id="surveyDate">
-      </div>
+    <div class="field">
+      <label>วันที่สำรวจ</label>
+      <input type="date" id="surveyDate">
     </div>
   </div>
 
@@ -373,7 +363,6 @@ function saveDraft() {
   const draft = {
     fullname: document.getElementById("fullname").value,
     roncode: document.getElementById("roncode").value,
-    zone: document.getElementById("zone").value,
     surveyDate: document.getElementById("surveyDate").value,
     generalNote: document.getElementById("generalNote").value,
     state,
@@ -388,7 +377,6 @@ function loadDraft() {
     const draft = JSON.parse(raw);
     document.getElementById("fullname").value = draft.fullname || "";
     document.getElementById("roncode").value = draft.roncode || "";
-    document.getElementById("zone").value = draft.zone || "";
     document.getElementById("surveyDate").value = draft.surveyDate || "";
     document.getElementById("generalNote").value = draft.generalNote || "";
     if (draft.state) state = draft.state;
@@ -426,7 +414,6 @@ async function submitForm() {
   const payload = {
     fullname,
     roncode: document.getElementById("roncode").value,
-    zone: document.getElementById("zone").value,
     surveyDate: document.getElementById("surveyDate").value,
     generalNote: document.getElementById("generalNote").value,
     submittedAt: new Date().toISOString(),
