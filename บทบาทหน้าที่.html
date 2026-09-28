@@ -14,7 +14,7 @@ body{font-family:'Sarabun','Leelawadee UI','Noto Sans Thai','Segoe UI',sans-seri
 header{background:#fff;border-bottom:1px solid var(--line);padding:13px 20px;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 header h1{font-size:17px;font-weight:700}
 .tag{font-size:11.5px;background:var(--soft);color:var(--brand);padding:3px 10px;border-radius:999px;font-weight:600}
-.wrap{max-width:1180px;margin:0 auto;padding:18px;display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:18px;align-items:start}
+.wrap{max-width:1240px;margin:0 auto;padding:18px;display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:18px;align-items:start}
 @media(max-width:920px){.wrap{grid-template-columns:1fr}}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
 .panel h2{font-size:14.5px;font-weight:700;margin-bottom:13px;color:#1e293b}
@@ -105,13 +105,13 @@ const STAFF = [
  {id:2 ,s:1,name:'สมมาศ ผกามาศ'      ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514072'},
  {id:3 ,s:1,name:'วิเชียร ชื่นอารมณ์'  ,pos:'Technical Officer'           ,dept:'Network Operation - LPG'      ,phone:'089-9692262'},
  {id:4 ,s:1,name:'มวลชน วงศ์คำปัน'    ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'081-9003250'},
- {id:5 ,s:1,name:'พิเชษฐ์ บำเพ็งพันธุ์',pos:'Network Operation Specialist',dept:'Network Maintenance - PLK'    ,phone:'089-8565560'},
- {id:6 ,s:1,name:'นพรัตน์ เมฆทัพ'     ,pos:'Technician'                  ,dept:'Network Maintenance - PLK'    ,phone:'089-8565575'},
- {id:7 ,s:1,name:'สำเนา เผือกสีมา'    ,pos:'Senior Technical Officer'    ,dept:'Network Operation - NSN'      ,phone:'089-8565600'},
- {id:8 ,s:2,name:'พินิจ ธำรงศิริ'      ,pos:'Technical Officer'           ,dept:'Network Maintenance - CRI'    ,phone:'089-8514153'},
- {id:9 ,s:2,name:'สุรสิทธิ์ ทะนันชัย'  ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514115'},
- {id:10,s:2,name:'พิเชษฐ์ เพ็งสมบูรณ์',pos:'Technical Officer'           ,dept:'Network Engineering and Planning',phone:'089-8514078'},
- {id:11,s:2,name:'มานพ อุตบัววงค์'    ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514074'},
+ {id:8 ,s:1,name:'พินิจ ธำรงศิริ'      ,pos:'Technical Officer'           ,dept:'Network Maintenance - CRI'    ,phone:'089-8514153'},
+ {id:9 ,s:1,name:'สุรสิทธิ์ ทะนันชัย'  ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514115'},
+ {id:10,s:1,name:'พิเชษฐ์ เพ็งสมบูรณ์',pos:'Technical Officer'           ,dept:'Network Engineering and Planning - LPG',phone:'089-8514078'},
+ {id:11,s:1,name:'มานพ อุตบัววงค์'    ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514074'},
+ {id:5 ,s:2,name:'พิเชษฐ์ บำเพ็งพันธุ์',pos:'Network Operation Specialist',dept:'Network Maintenance - PLK'    ,phone:'089-8565560'},
+ {id:6 ,s:2,name:'นพรัตน์ เมฆทัพ'     ,pos:'Technician'                  ,dept:'Network Maintenance - PLK'    ,phone:'089-8565575'},
+ {id:7 ,s:2,name:'สำเนา เผือกสีมา'    ,pos:'Senior Technical Officer'    ,dept:'Network Operation - NSN'      ,phone:'089-8565600'},
  {id:12,s:2,name:'ชัยทัต ปั่นสุภา'     ,pos:'Technician'                  ,dept:'Network Maintenance - PLK'    ,phone:'089-8565518'},
  {id:13,s:2,name:'จรูญวิชญ์ สิริสวัสดิ์',pos:'Network Operation Specialist',dept:'Network Maintenance - PLK'   ,phone:'062-6051031'},
  {id:14,s:2,name:'พิษณุ พรตรีสัตย์'   ,pos:'Senior Technical Officer'    ,dept:'Network Operation - NSN'      ,phone:'062-6051048'},
@@ -120,11 +120,11 @@ const STAFF = [
 
 const ROLES = [
  {key:'escalation',label:'Escalation & Incident',
-  desc:'ทำ ISI ติดตามงาน ควบคุม ประเมินหน้างานและเหตุเสีย เหตุการณ์ที่คาดว่าจะเกินเวลา และตามทีมเพื่ออัพเดทหน้า Escalate (1 คน ทั้ง 3 RNO)'},
+  desc:'ทำ ISI ติดตามงาน ควบคุม ประเมินหน้างานและเหตุเสีย เหตุการณ์ที่คาดว่าจะเกินเวลา และตามทีมเพื่ออัพเดทหน้า Escalate (1 คน)'},
  {key:'over24',label:'Job over 24h / over SLA',
-  desc:'ตามงานเกิน 24 ชม. และกำหนดแนวทางแก้ไข (1 คน ทั้ง 3 RNO)'},
+  desc:'ตามงานเกิน 24 ชม. และกำหนดแนวทางแก้ไข (1 คน)'},
  {key:'osma',label:'OS MA & OPT',
-  desc:'ตามงาน MA / OPT ประสานงานจ่ายงาน MA (1 คน ทั้ง 3 RNO)'}
+  desc:'ตามงาน MA / OPT ประสานงานจ่ายงาน MA (1 คน)'}
 ];
 
 const SHIFTS = ['08:00 - 12:30 น.','13:00 - 17:30 น.','17:30 - 22:00 น.','22:00 - 08:00 น.'];
@@ -136,7 +136,7 @@ const THEMES = [
  {n:'เทาเข้ม' ,a:'#334155',t:'#f8fafc',b:'#e2e8f0'}
 ];
 
-const KEY='wfm_duty_card_v4';
+const KEY='***_****_****_**';
 let state={area:'เหนือบน',shift:'13:00 - 17:30 น.',showDate:false,date:'',theme:0,escalation:'',over24:'',osma:''};
 try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}};
@@ -148,10 +148,7 @@ SHIFTS.forEach(s=>$('#shiftList').insertAdjacentHTML('beforeend',`<option value=
 $('#roles').innerHTML = ROLES.map(r=>`
   <div class="role">
     <div class="rl">${r.label}</div>
-    <select id="sel_${r.key}">
-      <option value="">— เลือกผู้รับผิดชอบ —</option>
-      ${STAFF.map(s=>`<option value="${s.id}">${s.name} — ${s.dept}</option>`).join('')}
-    </select>
+    <select id="sel_${r.key}"></select>
     <div class="rd">${r.desc}</div>
   </div>`).join('');
 
@@ -161,14 +158,37 @@ $('#themes').innerHTML = THEMES.map((t,i)=>
 $('#area').value=state.area; $('#shift').value=state.shift;
 $('#showDate').checked=state.showDate;
 $('#dateVal').value=state.date||new Date().toISOString().slice(0,10);
-ROLES.forEach(r=>$('#sel_'+r.key).value=state[r.key]||'');
 
-$('#area').onchange=e=>{state.area=e.target.value;update();};
+function updateStaffOptions(){
+  const targetS = state.area === 'เหนือบน' ? 1 : 2;
+  const filtered = STAFF.filter(s => s.s === targetS);
+  ROLES.forEach(r=>{
+    const sel = $('#sel_'+r.key);
+    const curVal = state[r.key];
+    sel.innerHTML = `<option value="">— เลือกผู้รับผิดชอบ —</option>` +
+      filtered.map(s=>`<option value="${s.id}">${s.name} — ${s.dept}</option>`).join('');
+    if(filtered.some(s=>String(s.id)===String(curVal))){
+      sel.value = curVal;
+    } else {
+      state[r.key] = '';
+      sel.value = '';
+    }
+  });
+}
+
+$('#area').onchange=e=>{
+  state.area=e.target.value;
+  updateStaffOptions();
+  update();
+};
 $('#shift').oninput=e=>{state.shift=e.target.value;update();};
 $('#showDate').onchange=e=>{state.showDate=e.target.checked;update();};
 $('#dateVal').onchange =e=>{state.date=e.target.value;update();};
 ROLES.forEach(r=>$('#sel_'+r.key).onchange=e=>{state[r.key]=e.target.value;update();});
 document.querySelectorAll('#themes button').forEach(b=>b.onclick=()=>{state.theme=+b.dataset.i;update();});
+
+updateStaffOptions();
+ROLES.forEach(r=>$('#sel_'+r.key).value=state[r.key]||'');
 
 function model(){
   const th=THEMES[state.theme]||THEMES[0];
@@ -185,7 +205,7 @@ function model(){
   };
 }
 
-const CV=$('#card'), W=760;
+const CV=$('#card'), W=1100;
 const mc=document.createElement('canvas').getContext('2d');
 const FF="'Sarabun','Leelawadee UI','Noto Sans Thai','Segoe UI',sans-serif";
 const F=(w,s)=>`${w} ${s}px ${FF}`;
@@ -215,51 +235,51 @@ function rr(g,x,y,w,h,r){
   g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();
 }
 
-const M=26, CW=W-M*2, P=32, IW=CW-P*2, X=M+P;
+const M=40, CW=W-M*2, P=48, IW=CW-P*2, X=M+P;
 
 function paint(g,m,D,H){
   if(D){
     g.fillStyle=m.theme.t; g.fillRect(0,0,W,H);
-    rr(g,M,M,CW,H-M*2,18); g.fillStyle='#ffffff'; g.fill();
-    g.save(); rr(g,M,M,CW,H-M*2,18); g.clip();
-    g.fillStyle=m.theme.a; g.fillRect(M,M,CW,10); g.restore();
+    rr(g,M,M,CW,H-M*2,28); g.fillStyle='#ffffff'; g.fill();
+    g.save(); rr(g,M,M,CW,H-M*2,28); g.clip();
+    g.fillStyle=m.theme.a; g.fillRect(M,M,CW,16); g.restore();
   }
-  let y=M+10;
+  let y=M+16;
 
-  const tl=wrap(m.title,IW,F(700,28));
-  y+=34;
-  tl.forEach((l,i)=>{ if(D){g.font=F(700,28);g.fillStyle='#0f172a';g.fillText(l,X,y+i*38);} });
-  y+=(tl.length-1)*38+16;
+  const tl=wrap(m.title,IW,F(700,42));
+  y+=48;
+  tl.forEach((l,i)=>{ if(D){g.font=F(700,42);g.fillStyle='#0f172a';g.fillText(l,X,y+i*54);} });
+  y+=(tl.length-1)*54+22;
 
   const pt='รอบปฏิบัติงาน:  ( '+m.shift+' )';
-  mc.font=F(600,18); const pw=mc.measureText(pt).width+34;
-  if(D){ rr(g,X,y,Math.min(pw,IW),38,19); g.fillStyle=m.theme.b; g.fill();
-         g.font=F(600,18); g.fillStyle=m.theme.a; g.fillText(pt,X+17,y+25); }
-  y+=38;
+  mc.font=F(600,26); const pw=mc.measureText(pt).width+52;
+  if(D){ rr(g,X,y,Math.min(pw,IW),54,27); g.fillStyle=m.theme.b; g.fill();
+         g.font=F(600,26); g.fillStyle=m.theme.a; g.fillText(pt,X+26,y+36); }
+  y+=54;
 
-  if(m.dateText){ y+=26; if(D){g.font=F(400,16);g.fillStyle='#64748b';g.fillText(m.dateText,X,y);} }
+  if(m.dateText){ y+=34; if(D){g.font=F(400,24);g.fillStyle='#64748b';g.fillText(m.dateText,X,y);} }
 
-  y+=24; if(D){g.fillStyle='#e2e8f0';g.fillRect(X,y,IW,1);} y+=22;
+  y+=34; if(D){g.fillStyle='#e2e8f0';g.fillRect(X,y,IW,2);} y+=32;
 
   m.items.forEach(it=>{
     const nm = it.person? it.person.name : '— ยังไม่ได้เลือกผู้รับผิดชอบ —';
-    const nl = wrap(nm,IW-40,F(600,24));
-    const bh = 34 + nl.length*32 + 28 + 14;
+    const nl = wrap(nm,IW-56,F(600,36));
+    const bh = 48 + nl.length*42 + 40 + 22;
     if(D){
-      rr(g,X,y,IW,bh,12); g.fillStyle=m.theme.t; g.fill();
-      rr(g,X,y,5,bh,3);   g.fillStyle=m.theme.a; g.fill();
+      rr(g,X,y,IW,bh,18); g.fillStyle=m.theme.t; g.fill();
+      rr(g,X,y,8,bh,4);   g.fillStyle=m.theme.a; g.fill();
     }
-    let ty=y+32;
-    if(D){g.font=F(700,18);g.fillStyle=m.theme.a;g.fillText(it.label,X+20,ty);}
-    nl.forEach(l=>{ ty+=32; if(D){g.font=F(600,24);g.fillStyle=it.person?'#0f172a':'#94a3b8';g.fillText(l,X+20,ty);} });
-    ty+=28;
-    if(D){g.font=F(600,18);g.fillStyle='#475569';g.fillText(it.person?'โทร. '+it.person.phone:'—',X+20,ty);}
-    y+=bh+13;
+    let ty=y+44;
+    if(D){g.font=F(700,25);g.fillStyle=m.theme.a;g.fillText(it.label,X+28,ty);}
+    nl.forEach(l=>{ ty+=42; if(D){g.font=F(600,36);g.fillStyle=it.person?'#0f172a':'#94a3b8';g.fillText(l,X+28,ty);} });
+    ty+=40;
+    if(D){g.font=F(600,25);g.fillStyle='#475569';g.fillText(it.person?'โทร. '+it.person.phone:'—',X+28,ty);}
+    y+=bh+22;
   });
 
-  y+=8; if(D){g.fillStyle='#e2e8f0';g.fillRect(X,y,IW,1);} y+=24;
-  if(D){g.font=F(400,14);g.fillStyle='#94a3b8';g.fillText('By NOPBIGMAN',X,y);}
-  return y+18+M;
+  y+=12; if(D){g.fillStyle='#e2e8f0';g.fillRect(X,y,IW,2);} y+=34;
+  if(D){g.font=F(400,18);g.fillStyle='#94a3b8';g.fillText('By NOPBIGMAN',X,y);}
+  return y+26+M;
 }
 
 function draw(scale){
@@ -292,7 +312,7 @@ function flexJSON(){
   m.items.forEach(it=>{
     body.push({type:'box',layout:'vertical',margin:'lg',spacing:'xs',contents:[
       {type:'text',text:it.label,size:'sm',weight:'bold',color:m.theme.a,wrap:true},
-      {type:'text',text:it.person? it.person.name:'- ยังไม่ได้เลือก -',size:'lg',weight:'bold',color:'#0F172A',wrap:true},
+      {type:'text',text:it.person? it.person.name:'-ยังไม่ได้เลือก-',size:'lg',weight:'bold',color:'#0F172A',wrap:true},
       {type:'text',text:it.person? 'โทร. '+it.person.phone:'-',size:'sm',color:'#475569'}
     ]});
   });
