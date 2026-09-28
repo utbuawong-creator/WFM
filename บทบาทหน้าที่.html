@@ -2,158 +2,369 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>WFM Duty Card Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0f172a;
-  --panel: rgba(255, 255, 255, 0.95);
-  --text: #1e293b;
-  --muted: #64748b;
-  --brand: #059669;
-  --brand-light: #d1fae5;
-  --gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
-}
-body {
-  font-family: 'Sarabun', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
-}
-.card-preview {
-  width: 100%;
-  max-width: 640px;
-  background: var(--panel);
-  border-radius: 28px;
-  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
-  overflow: hidden;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-.card-header-bar {
-  height: 14px;
-  background: var(--gradient);
-}
-.card-content {
-  padding: 40px 36px;
-}
-h1 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 16px;
-  letter-spacing: -0.5px;
-}
-.badge-shift {
-  display: inline-flex;
-  align-items: center;
-  background: var(--brand-light);
-  color: var(--brand);
-  padding: 8px 18px;
-  border-radius: 99px;
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-.date-text {
-  font-size: 16px;
-  color: var(--muted);
-  font-weight: 500;
-  margin-bottom: 32px;
-}
-.duty-list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.duty-item {
-  background: #f8fafc;
-  border-left: 6px solid var(--brand);
-  padding: 20px 24px;
-  border-radius: 0 16px 16px 0;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-  transition: transform 0.2s;
-}
-.duty-item:hover {
-  transform: translateX(4px);
-  background: #f1f5f9;
-}
-.duty-role {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--brand);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-.duty-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 4px;
-}
-.duty-tel {
-  font-size: 15px;
-  color: var(--muted);
-  font-weight: 500;
-}
-.card-footer {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  color: var(--muted);
-}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#eef2f6;--panel:#fff;--line:#e2e8f0;--text:#0f172a;--muted:#64748b;--brand:#0f766e;--soft:#ccfbf1}
+body{font-family:'Sarabun','Leelawadee UI','Noto Sans Thai','Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-text-size-adjust:100%}
+header{background:#fff;border-bottom:1px solid var(--line);padding:13px 20px;position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1{font-size:17px;font-weight:700}
+.tag{font-size:11.5px;background:var(--soft);color:var(--brand);padding:3px 10px;border-radius:999px;font-weight:600}
+.wrap{max-width:1180px;margin:0 auto;padding:18px;display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:920px){.wrap{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel h2{font-size:14.5px;font-weight:700;margin-bottom:13px;color:#1e293b}
+.panel h2 .n{display:inline-flex;width:20px;height:20px;background:var(--brand);color:#fff;border-radius:50%;font-size:12px;align-items:center;justify-content:center;margin-right:7px}
+.field{margin-bottom:13px}
+label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:#334155}
+.hint{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+select,input[type=text],input[type=date]{width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;font-family:inherit;background:#fff;color:var(--text)}
+select:focus,input:focus{outline:2px solid var(--brand);outline-offset:-1px}
+.role{border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:10px;padding:12px;margin-bottom:11px;background:#fbfdfd}
+.role .rl{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:7px}
+.role .rd{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.chk{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#334155;margin-bottom:6px;cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+button{font-family:inherit;font-size:13.5px;font-weight:600;padding:10px 15px;border-radius:9px;border:1px solid transparent;cursor:pointer;transition:.15s}
+.b1{background:var(--brand);color:#fff}
+.b1:hover{filter:brightness(1.12)}
+.b2{background:#fff;border-color:#cbd5e1;color:#334155}
+.b2:hover{background:#f8fafc}
+#stage{display:flex;justify-content:center;background:#dde5ed;border-radius:12px;padding:14px}
+canvas{max-width:100%;height:auto;border-radius:14px;box-shadow:0 8px 28px rgba(15,23,42,.16)}
+.alert{font-size:12.5px;padding:9px 11px;border-radius:8px;margin-bottom:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;display:none}
+.alert.on{display:block}
+.sw{display:flex;gap:9px;flex-wrap:wrap}
+.sw button{width:30px;height:30px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1}
+.sw button[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--brand)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(90px);background:#0f172a;color:#fff;padding:11px 20px;border-radius:10px;font-size:13.5px;opacity:0;transition:.25s;z-index:99;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 
-<div class="card-preview">
-  <div class="card-header-bar"></div>
-  <div class="card-content">
-    <h1>รายงานการจัดกะและพื้นที่รับผิดชอบ (เหนือล่าง)</h1>
-    <div class="badge-shift">รอบปฏิบัติงาน: ( 13:00 - 17:30 น. )</div>
-    <div class="date-text">วันที่ 27 ก.ย. 2569</div>
-    
-    <div class="duty-list">
-      <div class="duty-item">
-        <div class="duty-role">Escalation & Incident</div>
-        <div class="duty-name">จรูญวิชญ์ สิริสวัสดิ์</div>
-        <div class="duty-tel">โทร. 062-6051031</div>
-      </div>
-      
-      <div class="duty-item">
-        <div class="duty-role">Job over 24h / over SLA</div>
-        <div class="duty-name">ชัยทัต ปั่นสุภา</div>
-        <div class="duty-tel">โทร. 089-8565518</div>
-      </div>
-      
-      <div class="duty-item">
-        <div class="duty-role">OS MA & OPT</div>
-        <div class="duty-name">ไพบูลย์ สิทธิ</div>
-        <div class="duty-tel">โทร. 089-8565542</div>
-      </div>
+<header>
+  <h1>WFM Duty Card Generator</h1>
+  <span class="tag">v0.4 &middot; By NOPBIGMAN</span>
+</header>
+
+<div class="wrap">
+  <section class="panel">
+    <h2><span class="n">1</span>ข้อมูลรอบปฏิบัติงาน</h2>
+    <div class="field">
+      <label for="area">พื้นที่รับผิดชอบ</label>
+      <select id="area">
+        <option value="เหนือบน">เหนือบน</option>
+        <option value="เหนือล่าง">เหนือล่าง</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="shift">รอบปฏิบัติงาน</label>
+      <input type="text" id="shift" list="shiftList" placeholder="13:00 - 17:30 น.">
+      <datalist id="shiftList"></datalist>
+    </div>
+    <div class="field">
+      <label class="chk"><input type="checkbox" id="showDate"> แสดงวันที่บนการ์ด</label>
+      <input type="date" id="dateVal">
     </div>
 
-    <div class="card-footer">
-      <span>WFM Operations</span>
-      <span>By NOPBIGMAN</span>
+    <h2 style="margin-top:20px"><span class="n">2</span>ผู้รับผิดชอบแต่ละงาน</h2>
+    <div id="dupAlert" class="alert"></div>
+    <div id="roles"></div>
+
+    <h2 style="margin-top:6px"><span class="n">3</span>ธีมสี</h2>
+    <div class="sw" id="themes"></div>
+  </section>
+
+  <section class="panel">
+    <h2>ตัวอย่างการ์ด &mdash; นี่คือรูปที่จะได้จริง</h2>
+    <div id="stage"><canvas id="card"></canvas></div>
+    <div class="btns">
+      <button class="b1" id="bImg">คัดลอกรูปการ์ด</button>
+      <button class="b2" id="bDl">ดาวน์โหลด PNG</button>
+      <button class="b2" id="bTxt">คัดลอกเป็นข้อความ</button>
+      <button class="b2" id="bFlex">คัดลอก LINE Flex JSON</button>
+      <button class="b2" id="bClr">ล้างค่า</button>
     </div>
-  </div>
+    <p class="hint">
+      <b>คัดลอกรูป</b> &rarr; วางในแชทได้เลย (Ctrl+V / Cmd+V) &nbsp;|&nbsp;
+      <b>ดาวน์โหลด</b> &rarr; ใช้บนมือถือหรือเมื่อวางไม่ติด
+    </p>
+  </section>
 </div>
 
+<div class="toast" id="toast"></div>
+
+<script>
+const STAFF = [
+ {id:1 ,s:1,name:'นพดล ชัยธรรม'      ,pos:'Network Operation Specialist',dept:'Network Operation - CRI'      ,phone:'089-8513774'},
+ {id:2 ,s:1,name:'สมมาศ ผกามาศ'      ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514072'},
+ {id:3 ,s:1,name:'วิเชียร ชื่นอารมณ์'  ,pos:'Technical Officer'           ,dept:'Network Operation - LPG'      ,phone:'089-9692262'},
+ {id:4 ,s:1,name:'มวลชน วงศ์คำปัน'    ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'081-9003250'},
+ {id:5 ,s:1,name:'พิเชษฐ์ บำเพ็งพันธุ์',pos:'Network Operation Specialist',dept:'Network Maintenance - PLK'    ,phone:'089-8565560'},
+ {id:6 ,s:1,name:'นพรัตน์ เมฆทัพ'     ,pos:'Technician'                  ,dept:'Network Maintenance - PLK'    ,phone:'089-8565575'},
+ {id:7 ,s:1,name:'สำเนา เผือกสีมา'    ,pos:'Senior Technical Officer'    ,dept:'Network Operation - NSN'      ,phone:'089-8565600'},
+ {id:8 ,s:2,name:'พินิจ ธำรงศิริ'      ,pos:'Technical Officer'           ,dept:'Network Maintenance - CRI'    ,phone:'089-8514153'},
+ {id:9 ,s:2,name:'สุรสิทธิ์ ทะนันชัย'  ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514115'},
+ {id:10,s:2,name:'พิเชษฐ์ เพ็งสมบูรณ์',pos:'Technical Officer'           ,dept:'Network Engineering and Planning',phone:'089-8514078'},
+ {id:11,s:2,name:'มานพ อุตบัววงค์'    ,pos:'Technical Officer'           ,dept:'Network Maintenance - CMI'    ,phone:'089-8514074'},
+ {id:12,s:2,name:'ชัยทัต ปั่นสุภา'     ,pos:'Technician'                  ,dept:'Network Maintenance - PLK'    ,phone:'089-8565518'},
+ {id:13,s:2,name:'จรูญวิชญ์ สิริสวัสดิ์',pos:'Network Operation Specialist',dept:'Network Maintenance - PLK'   ,phone:'062-6051031'},
+ {id:14,s:2,name:'พิษณุ พรตรีสัตย์'   ,pos:'Senior Technical Officer'    ,dept:'Network Operation - NSN'      ,phone:'062-6051048'},
+ {id:15,s:2,name:'ไพบูลย์ สิทธิ'      ,pos:'Senior Technical Officer'    ,dept:'Network Operation - NSN'      ,phone:'089-8565542'}
+];
+
+const ROLES = [
+ {key:'escalation',label:'Escalation & Incident',
+  desc:'ทำ ISI ติดตามงาน ควบคุม ประเมินหน้างานและเหตุเสีย เหตุการณ์ที่คาดว่าจะเกินเวลา และตามทีมเพื่ออัพเดทหน้า Escalate (1 คน ทั้ง 3 RNO)'},
+ {key:'over24',label:'Job over 24h / over SLA',
+  desc:'ตามงานเกิน 24 ชม. และกำหนดแนวทางแก้ไข (1 คน ทั้ง 3 RNO)'},
+ {key:'osma',label:'OS MA & OPT',
+  desc:'ตามงาน MA / OPT ประสานงานจ่ายงาน MA (1 คน ทั้ง 3 RNO)'}
+];
+
+const SHIFTS = ['08:00 - 12:30 น.','13:00 - 17:30 น.','17:30 - 22:00 น.','22:00 - 08:00 น.'];
+const THEMES = [
+ {n:'เขียว'   ,a:'#0f766e',t:'#ecfdf5',b:'#d1fae5'},
+ {n:'น้ำเงิน' ,a:'#1d4ed8',t:'#eff6ff',b:'#dbeafe'},
+ {n:'ส้ม'     ,a:'#c2410c',t:'#fff7ed',b:'#ffedd5'},
+ {n:'ม่วง'    ,a:'#6d28d9',t:'#f5f3ff',b:'#ede9fe'},
+ {n:'เทาเข้ม' ,a:'#334155',t:'#f8fafc',b:'#e2e8f0'}
+];
+
+const KEY='wfm_duty_card_v4';
+let state={area:'เหนือบน',shift:'13:00 - 17:30 น.',showDate:false,date:'',theme:0,escalation:'',over24:'',osma:''};
+try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}};
+const byId=id=>STAFF.find(s=>String(s.id)===String(id))||null;
+
+const $=q=>document.querySelector(q);
+SHIFTS.forEach(s=>$('#shiftList').insertAdjacentHTML('beforeend',`<option value="${s}">`));
+
+$('#roles').innerHTML = ROLES.map(r=>`
+  <div class="role">
+    <div class="rl">${r.label}</div>
+    <select id="sel_${r.key}">
+      <option value="">— เลือกผู้รับผิดชอบ —</option>
+      ${STAFF.map(s=>`<option value="${s.id}">${s.name} — ${s.dept}</option>`).join('')}
+    </select>
+    <div class="rd">${r.desc}</div>
+  </div>`).join('');
+
+$('#themes').innerHTML = THEMES.map((t,i)=>
+  `<button data-i="${i}" title="${t.n}" aria-pressed="false" style="background:${t.a}"></button>`).join('');
+
+$('#area').value=state.area; $('#shift').value=state.shift;
+$('#showDate').checked=state.showDate;
+$('#dateVal').value=state.date||new Date().toISOString().slice(0,10);
+ROLES.forEach(r=>$('#sel_'+r.key).value=state[r.key]||'');
+
+$('#area').onchange=e=>{state.area=e.target.value;update();};
+$('#shift').oninput=e=>{state.shift=e.target.value;update();};
+$('#showDate').onchange=e=>{state.showDate=e.target.checked;update();};
+$('#dateVal').onchange =e=>{state.date=e.target.value;update();};
+ROLES.forEach(r=>$('#sel_'+r.key).onchange=e=>{state[r.key]=e.target.value;update();});
+document.querySelectorAll('#themes button').forEach(b=>b.onclick=()=>{state.theme=+b.dataset.i;update();});
+
+function model(){
+  const th=THEMES[state.theme]||THEMES[0];
+  let dateText='';
+  if(state.showDate && $('#dateVal').value){
+    const d=new Date($('#dateVal').value+'T00:00:00');
+    const M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    dateText=`วันที่ ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()+543}`;
+  }
+  return{
+    title:`รายงานการจัดกะและพื้นที่รับผิดชอบ${state.area?' ('+state.area+')':''}`,
+    shift:state.shift||'-', dateText, theme:th,
+    items:ROLES.map(r=>({label:r.label,person:byId(state[r.key])}))
+  };
+}
+
+const CV=$('#card'), W=760;
+const mc=document.createElement('canvas').getContext('2d');
+const FF="'Sarabun','Leelawadee UI','Noto Sans Thai','Segoe UI',sans-serif";
+const F=(w,s)=>`${w} ${s}px ${FF}`;
+
+function wrap(text,maxW,font){
+  mc.font=font; const out=[];
+  String(text).split('\n').forEach(p=>{
+    if(mc.measureText(p).width<=maxW){out.push(p);return;}
+    let cur='',lastSp=-1;
+    for(const ch of p){
+      if(ch===' ')lastSp=cur.length;
+      const t=cur+ch;
+      if(mc.measureText(t).width>maxW&&cur){
+        if(lastSp>0){out.push(cur.slice(0,lastSp));cur=cur.slice(lastSp+1)+ch;}
+        else{out.push(cur);cur=ch;}
+        lastSp=-1;
+      }else cur=t;
+    }
+    if(cur)out.push(cur);
+  });
+  return out;
+}
+function rr(g,x,y,w,h,r){
+  g.beginPath();
+  if(g.roundRect){g.roundRect(x,y,w,h,r);return;}
+  g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();
+}
+
+const M=26, CW=W-M*2, P=32, IW=CW-P*2, X=M+P;
+
+function paint(g,m,D,H){
+  if(D){
+    g.fillStyle=m.theme.t; g.fillRect(0,0,W,H);
+    rr(g,M,M,CW,H-M*2,18); g.fillStyle='#ffffff'; g.fill();
+    g.save(); rr(g,M,M,CW,H-M*2,18); g.clip();
+    g.fillStyle=m.theme.a; g.fillRect(M,M,CW,10); g.restore();
+  }
+  let y=M+10;
+
+  const tl=wrap(m.title,IW,F(700,28));
+  y+=34;
+  tl.forEach((l,i)=>{ if(D){g.font=F(700,28);g.fillStyle='#0f172a';g.fillText(l,X,y+i*38);} });
+  y+=(tl.length-1)*38+16;
+
+  const pt='รอบปฏิบัติงาน:  ( '+m.shift+' )';
+  mc.font=F(600,18); const pw=mc.measureText(pt).width+34;
+  if(D){ rr(g,X,y,Math.min(pw,IW),38,19); g.fillStyle=m.theme.b; g.fill();
+         g.font=F(600,18); g.fillStyle=m.theme.a; g.fillText(pt,X+17,y+25); }
+  y+=38;
+
+  if(m.dateText){ y+=26; if(D){g.font=F(400,16);g.fillStyle='#64748b';g.fillText(m.dateText,X,y);} }
+
+  y+=24; if(D){g.fillStyle='#e2e8f0';g.fillRect(X,y,IW,1);} y+=22;
+
+  m.items.forEach(it=>{
+    const nm = it.person? it.person.name : '— ยังไม่ได้เลือกผู้รับผิดชอบ —';
+    const nl = wrap(nm,IW-40,F(600,24));
+    const bh = 34 + nl.length*32 + 28 + 14;
+    if(D){
+      rr(g,X,y,IW,bh,12); g.fillStyle=m.theme.t; g.fill();
+      rr(g,X,y,5,bh,3);   g.fillStyle=m.theme.a; g.fill();
+    }
+    let ty=y+32;
+    if(D){g.font=F(700,18);g.fillStyle=m.theme.a;g.fillText(it.label,X+20,ty);}
+    nl.forEach(l=>{ ty+=32; if(D){g.font=F(600,24);g.fillStyle=it.person?'#0f172a':'#94a3b8';g.fillText(l,X+20,ty);} });
+    ty+=28;
+    if(D){g.font=F(600,18);g.fillStyle='#475569';g.fillText(it.person?'โทร. '+it.person.phone:'—',X+20,ty);}
+    y+=bh+13;
+  });
+
+  y+=8; if(D){g.fillStyle='#e2e8f0';g.fillRect(X,y,IW,1);} y+=24;
+  if(D){g.font=F(400,14);g.fillStyle='#94a3b8';g.fillText('By NOPBIGMAN',X,y);}
+  return y+18+M;
+}
+
+function draw(scale){
+  const m=model(), sc=scale||2;
+  const H=paint(mc,m,false,0);
+  CV.width=Math.round(W*sc); CV.height=Math.round(H*sc);
+  const g=CV.getContext('2d');
+  g.setTransform(sc,0,0,sc,0,0);
+  g.textBaseline='alphabetic';
+  paint(g,m,true,H);
+  return {w:W,h:H};
+}
+
+function plainText(){
+  const m=model();
+  let s=m.title+'\n'+'รอบปฏิบัติงาน: ( '+m.shift+' )';
+  if(m.dateText)s+='\n'+m.dateText;
+  m.items.forEach(it=>{
+    s+='\n\n'+it.label+'\n'+(it.person? it.person.name+'\n'+it.person.phone : '- ยังไม่ได้เลือก -');
+  });
+  return s;
+}
+function flexJSON(){
+  const m=model(), body=[
+    {type:'text',text:m.title,weight:'bold',size:'lg',wrap:true,color:'#0F172A'},
+    {type:'text',text:'รอบปฏิบัติงาน: ( '+m.shift+' )',size:'sm',color:m.theme.a,weight:'bold',margin:'sm',wrap:true}
+  ];
+  if(m.dateText)body.push({type:'text',text:m.dateText,size:'xs',color:'#94A3B8',margin:'xs'});
+  body.push({type:'separator',margin:'lg'});
+  m.items.forEach(it=>{
+    body.push({type:'box',layout:'vertical',margin:'lg',spacing:'xs',contents:[
+      {type:'text',text:it.label,size:'sm',weight:'bold',color:m.theme.a,wrap:true},
+      {type:'text',text:it.person? it.person.name:'- ยังไม่ได้เลือก -',size:'lg',weight:'bold',color:'#0F172A',wrap:true},
+      {type:'text',text:it.person? 'โทร. '+it.person.phone:'-',size:'sm',color:'#475569'}
+    ]});
+  });
+  return JSON.stringify({type:'flex',altText:m.title+' '+m.shift,
+    contents:{type:'bubble',body:{type:'box',layout:'vertical',contents:body}}},null,2);
+}
+
+let T;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(T);T=setTimeout(()=>t.classList.remove('show'),2200);}
+function copyText(txt,ok){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(()=>toast(ok)).catch(()=>fb());
+  }else fb();
+  function fb(){
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast(ok);}catch(e){toast('คัดลอกไม่สำเร็จ — กรุณาใช้ปุ่มดาวน์โหลดแทน');}
+    document.body.removeChild(ta);
+  }
+}
+function fileName(){
+  const m=model(), d=new Date();
+  const p=n=>String(n).padStart(2,'0');
+  return `duty-card_${state.area||'area'}_${p(d.getDate())}${p(d.getMonth()+1)}${d.getFullYear()}_${p(d.getHours())}${p(d.getMinutes())}.png`;
+}
+
+$('#bImg').onclick=async()=>{
+  try{ await document.fonts.ready; }catch(e){}
+  draw(2);
+  if(!navigator.clipboard||!window.ClipboardItem){ toast('เบราว์เซอร์นี้วางรูปไม่ได้ — ใช้ปุ่มดาวน์โหลดแทน'); return; }
+  CV.toBlob(async b=>{
+    try{ await navigator.clipboard.write([new ClipboardItem({'image/png':b})]); toast('คัดลอกรูปแล้ว — วางในแชทได้เลย'); }
+    catch(e){ toast('คัดลอกรูปไม่สำเร็จ — ใช้ปุ่มดาวน์โหลดแทนครับ'); }
+  },'image/png');
+};
+$('#bDl').onclick=async()=>{
+  try{ await document.fonts.ready; }catch(e){}
+  draw(2);
+  CV.toBlob(b=>{
+    const u=URL.createObjectURL(b),a=document.createElement('a');
+    a.href=u;a.download=fileName();a.click();
+    setTimeout(()=>URL.revokeObjectURL(u),1500);
+    toast('ดาวน์โหลดแล้ว');
+  },'image/png');
+};
+$('#bTxt').onclick =()=>copyText(plainText(),'คัดลอกข้อความแล้ว');
+$('#bFlex').onclick=()=>copyText(flexJSON(),'คัดลอก LINE Flex JSON แล้ว');
+$('#bClr').onclick =()=>{
+  if(!confirm('ล้างผู้รับผิดชอบทั้ง 3 ช่อง?'))return;
+  ROLES.forEach(r=>{state[r.key]='';$('#sel_'+r.key).value='';});
+  update(); toast('ล้างค่าแล้ว');
+};
+
+function update(){
+  document.querySelectorAll('#themes button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===state.theme));
+  document.documentElement.style.setProperty('--brand',THEMES[state.theme].a);
+  document.documentElement.style.setProperty('--soft',THEMES[state.theme].b);
+
+  const picked=ROLES.map(r=>state[r.key]).filter(Boolean);
+  const dup=picked.filter((v,i)=>picked.indexOf(v)!==i);
+  const al=$('#dupAlert');
+  if(dup.length){
+    const p=byId(dup[0]);
+    al.textContent='⚠️ '+(p?p.name:'บางคน')+' ถูกเลือกมากกว่า 1 หน้าที่ — ตรวจสอบอีกครั้งว่าตั้งใจหรือไม่';
+    al.classList.add('on');
+  }else al.classList.remove('on');
+
+  $('#dateVal').disabled=!state.showDate;
+  save(); draw(2);
+}
+document.fonts && document.fonts.ready.then(()=>draw(2));
+update();
+</script>
 </body>
 </html>
