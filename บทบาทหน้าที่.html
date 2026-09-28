@@ -282,8 +282,22 @@ function paint(g,m,D,H){
   return y+26+M;
 }
 
+function generateHighResBlob(callback){
+  const m=model();
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  const H = paint(tempCtx, m, false, 0);
+  tempCanvas.width = Math.round(W * 2);
+  tempCanvas.height = Math.round(H * 2);
+  const g = tempCanvas.getContext('2d');
+  g.setTransform(2, 0, 0, 2, 0, 0);
+  g.textBaseline = 'alphabetic';
+  paint(g, m, true, H);
+  tempCanvas.toBlob(callback, 'image/png');
+}
+
 function draw(scale){
-  const m=model(), sc=scale||2;
+  const m=model(), sc=scale||1;
   const H=paint(mc,m,false,0);
   CV.width=Math.round(W*sc); CV.height=Math.round(H*sc);
   const g=CV.getContext('2d');
@@ -341,23 +355,27 @@ function fileName(){
 
 $('#bImg').onclick=async()=>{
   try{ await document.fonts.ready; }catch(e){}
-  draw(2);
   if(!navigator.clipboard||!window.ClipboardItem){ toast('เบราว์เซอร์นี้วางรูปไม่ได้ — ใช้ปุ่มดาวน์โหลดแทน'); return; }
-  CV.toBlob(async b=>{
-    try{ await navigator.clipboard.write([new ClipboardItem({'image/png':b})]); toast('คัดลอกรูปแล้ว — วางในแชทได้เลย'); }
-    catch(e){ toast('คัดลอกรูปไม่สำเร็จ — ใช้ปุ่มดาวน์โหลดแทนครับ'); }
-  },'image/png');
+  generateHighResBlob(async b=>{
+    try{
+      await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);
+      toast('คัดลอกรูปขนาดใหญ่แล้ว — วางใน Teams ได้เลย');
+    }catch(e){
+      toast('คัดลอกรูปไม่สำเร็จ — ใช้ปุ่มดาวน์โหลดแทนครับ');
+    }
+  });
 };
+
 $('#bDl').onclick=async()=>{
   try{ await document.fonts.ready; }catch(e){}
-  draw(2);
-  CV.toBlob(b=>{
+  generateHighResBlob(b=>{
     const u=URL.createObjectURL(b),a=document.createElement('a');
     a.href=u;a.download=fileName();a.click();
     setTimeout(()=>URL.revokeObjectURL(u),1500);
     toast('ดาวน์โหลดแล้ว');
-  },'image/png');
+  });
 };
+
 $('#bTxt').onclick =()=>copyText(plainText(),'คัดลอกข้อความแล้ว');
 $('#bFlex').onclick=()=>copyText(flexJSON(),'คัดลอก LINE Flex JSON แล้ว');
 $('#bClr').onclick =()=>{
@@ -381,9 +399,9 @@ function update(){
   }else al.classList.remove('on');
 
   $('#dateVal').disabled=!state.showDate;
-  save(); draw(2);
+  save(); draw(1);
 }
-document.fonts && document.fonts.ready.then(()=>draw(2));
+document.fonts && document.fonts.ready.then(()=>draw(1));
 update();
 </script>
 </body>
