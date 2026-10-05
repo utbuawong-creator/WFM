@@ -449,7 +449,7 @@ select.form-control {
 <!-- APPS SCRIPT URL -->
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
-const ZONES = ['CMI Zone 1','CMI Zone 2','CMI Zone 3','CMI Zone 4','CMI Zone 5','Zone LPN','Zone MSN','Zone Fang'];
+const ZONES = ['CMI Zone AB','CMI Zone CD','LPN Zone','MSN Zone'];
 const SLA_HOURS = { Critical: 3, Major: 10, Minor: 24, Other: 24 };
 
 const TEAM_MEMBERS = {
@@ -564,14 +564,10 @@ let pendingJoinJob = null;
           <label class="form-label">LB Zone</label>
           <select class="form-control" id="nj-zone">
             <option value="">เลือก Zone</option>
-            <option value="CMI Zone 1">CMI Zone 1</option>
-            <option value="CMI Zone 2">CMI Zone 2</option>
-            <option value="CMI Zone 3">CMI Zone 3</option>
-            <option value="CMI Zone 4">CMI Zone 4</option>
-            <option value="CMI Zone 5">CMI Zone 5</option>
-            <option value="Zone LPN">Zone LPN</option>
-            <option value="Zone MSN">Zone MSN</option>
-            <option value="Zone Fang">Zone Fang</option>
+            <option value="CMI Zone AB">CMI Zone AB</option>
+            <option value="CMI Zone CD">CMI Zone CD</option>
+            <option value="LPN Zone">LPN Zone</option>
+            <option value="MSN Zone">MSN Zone</option>
           </select>
         </div>
         <div class="form-group full">
@@ -699,15 +695,11 @@ let pendingJoinJob = null;
     <div class="report-filters">
       <select class="filter-select" id="r-zone" onchange="filterReport()">
         <option value="">ทุก Zone</option>
-        <option value="CMI Zone 1">CMI Zone 1</option>
-        <option value="CMI Zone 2">CMI Zone 2</option>
-        <option value="CMI Zone 3">CMI Zone 3</option>
-        <option value="CMI Zone 4">CMI Zone 4</option>
-        <option value="CMI Zone 5">CMI Zone 5</option>
-        <option value="Zone LPN">Zone LPN</option>
-        <option value="Zone MSN">Zone MSN</option>
-        <option value="Zone Fang">Zone Fang</option>
-      </select>
+        <option value="CMI Zone AB">CMI Zone AB</option>
+        <option value="CMI Zone CD">CMI Zone CD</option>
+        <option value="LPN Zone">LPN Zone</option>
+        <option value="MSN Zone">MSN Zone</option>
+                                                                      </select>
       <select class="filter-select" id="r-priority" onchange="filterReport()">
         <option value="">ทุก Priority</option>
         <option value="Critical">Critical</option>
