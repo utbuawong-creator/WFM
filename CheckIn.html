@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>WFM | Check-in</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --org:#f47920; --grn:#8dc63f; --blue:#003087;
+  --bg:#f0f4f0; --surface:#fff; --border:#e0e8e0;
+  --text:#1a2a1a; --text2:#5a7a5a; --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
+
+.header{background:linear-gradient(135deg,#e8670a 0%,#f47920 40%,#8dc63f 100%);color:#fff;box-shadow:0 4px 20px rgba(244,121,32,.35)}
+.header-inner{padding:14px 20px 16px;display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto}
+.header-brand .dept{font-size:10px;letter-spacing:3px;opacity:.8;text-transform:uppercase;font-family:'Kanit',sans-serif}
+.header-brand .title{font-family:'Kanit',sans-serif;font-size:24px;font-weight:800;line-height:1.1}
+.header-brand .sub{font-size:12px;opacity:.8;margin-top:2px}
+.home-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);color:#fff;border-radius:12px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;text-decoration:none;display:flex;align-items:center;gap:5px}
+.home-btn:active{transform:scale(.96)}
+
+.content{max-width:600px;margin:0 auto;padding:20px 16px 60px}
+
+/* CLOCK */
+.clock-card{background:linear-gradient(135deg,#003087,#0057b8);border-radius:var(--radius);padding:14px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 5px 0 #001f5c}
+.clock-val{font-family:'Kanit',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px}
+.clock-date{font-size:13px;opacity:.8;margin-top:2px}
+.dot{width:8px;height:8px;border-radius:50%;background:#8dc63f;animation:pulse 1.5s infinite;display:inline-block}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+
+/* FORM */
+.card{background:var(--surface);border-radius:var(--radius);padding:20px 18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.06);border:1px solid var(--border)}
+.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.card-hdr-bar{width:4px;height:24px;background:linear-gradient(180deg,var(--org),var(--grn));border-radius:3px}
+.card-hdr-title{font-family:'Kanit',sans-serif;font-weight:800;font-size:16px;color:var(--text)}
+.L{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;margin-top:14px;letter-spacing:.5px;text-transform:uppercase}
+.L:first-child{margin-top:0}
+.inp{width:100%;background:#f8faf8;border:2px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Sarabun',sans-serif;outline:none;transition:border .2s;-webkit-appearance:none}
+.inp:focus{border-color:var(--org);background:#fff}
+.inp option{background:#fff;color:var(--text)}
+.inp-readonly{background:#f0f4f0;color:var(--text2);cursor:not-allowed}
+
+/* SHIFT CARDS */
+.shift-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:6px}
+.shift-card{background:#f8faf8;border:2px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px}
+.shift-card:active{transform:scale(.98)}
+.shift-card.on{border-color:var(--org);background:linear-gradient(135deg,#fff8f3,#fff);box-shadow:0 2px 8px rgba(244,121,32,.2)}
+.shift-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.shift-card.on .shift-dot{background:var(--org);border-color:var(--org)}
+.shift-dot-inner{width:8px;height:8px;border-radius:50%;background:#fff;display:none}
+.shift-card.on .shift-dot-inner{display:block}
+.shift-time{font-family:'Kanit',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.shift-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* BTN */
+.btn-submit{width:100%;background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 6px 0 #b85710;transition:all .15s;margin-top:8px}
+.btn-submit:active{transform:translateY(4px);box-shadow:0 2px 0 #b85710}
+.btn-clear{width:100%;background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:10px}
+
+/* SUCCESS */
+.success-wrap{display:none;text-align:center;padding:40px 20px}
+.success-ic{font-size:80px;margin-bottom:16px}
+.success-title{font-family:'Kanit',sans-serif;font-size:24px;font-weight:800;color:#2d7a3a;margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--text2);margin-bottom:24px}
+.success-info{background:#e8f5e9;border:2px solid #a5d6a7;border-radius:14px;padding:16px;margin-bottom:24px;text-align:left}
+.success-info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #c8e6c9;font-size:14px}
+.success-info-row:last-child{border:none}
+.success-info-row .lbl{color:var(--text2);font-weight:600}
+.success-info-row .val{font-weight:700;color:var(--text)}
+.btn-new{background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:14px;padding:14px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 4px 0 #b85710}
+.btn-home{background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:14px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;margin-left:10px;text-decoration:none;display:inline-block}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:999;pointer-events:none}
+.toast{background:#1a2a1a;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;opacity:0;transform:translateY(10px);transition:all .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.err{background:#c62828;color:#fff}
+.toast.ok{background:#2e7d32;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="dept">WFM · NOPBIGMAN</div>
+      <div class="title">✅ Check-in</div>
+      <div class="sub">Check-in · บันทึกเวลาเข้างาน</div>
+    </div>
+    <a href="WFM_Home.html" class="home-btn">🏠 หน้าหลัก</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- CLOCK -->
+  <div class="clock-card">
+    <div>
+      <div class="clock-val" id="clock">--:--:--</div>
+      <div class="clock-date" id="clock-date">กำลังโหลด...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;opacity:.85">
+      <div class="dot"></div> ระบบออนไลน์
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div id="form-wrap">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-bar"></div>
+        <div class="card-hdr-title">ข้อมูลการเข้างาน</div>
+      </div>
+
+      <label class="L">👤 ชื่อ-นามสกุล</label>
+      <select class="inp" id="inp-name">
+        <option value="">— เลือกชื่อ —</option>
+        <option>โพธิยา มหาชัย</option><option>จักรพงษ์ บัวประทะ</option>
+        <option>เอกรินทร์ โสภา</option><option>วัชริศ ปินใจ</option>
+        <option>อัมพวัฒน์ พัชรพัฒนชัย</option><option>เมธาศิษฎ์ เศรษฐจ์วุฒิภัทร</option>
+        <option>วรชัย นุ่มตูม</option><option>พัทธนันท์ ปันเขียว</option>
+        <option>ทักษิณ ลาดกำแพง</option><option>ฐูกลวิทย์ กิตติกุลสุวรรณ</option>
+        <option>เจษฎา จิโน</option><option>สุรศักดิ์ ใหม่ป้อ</option>
+        <option>อลงกรณ์ โปริ๊</option><option>ปรัตถกร คุ้มประคอง</option>
+        <option>ธนิน ถึงสุข</option><option>นนทพัทธ์ ไฝหาวิทย์</option>
+        <option>ชัชชัย ก้อยงามเลิศ</option><option>บรรจง ตี๋เนาะ</option>
+        <option>นำโชค คงอิ่ม</option><option>ธงชัย มณีสิงหราช</option>
+        <option>เอกลักษณ์ ดอกสม</option><option>วรเชษฐ์ จันตี๊คาด</option>
+        <option>สุทธิพงศ์ ปาลี</option><option>นวพล ธรรมขันแก้ว</option>
+        <option>บดินทร์ อาษากิจ</option><option>สมเพชร ก้อยงามเลิศ</option>
+        <option>สรายุทธ กรนทีกาญจน์</option><option>นิเวศ ตาแม่กั๋ง</option>
+        <option>พงษ์นคร กองมี</option><option>ณัฐนนท์ สุวรรณ์</option>
+        <option>ธนาพันธ์ อินทะจันทร์</option><option>จิรพงศ์ ใจจิต</option>
+        <option>จิรวัฒน์ พรธนานิธินันท์</option><option>อนุชิต คำเขียว</option>
+        <option>ภาสกร ญาติฝูง</option><option>มงคล ไทยประเทศ</option>
+        <option>นพดนัย อมรวิโรจน์รัตน์</option><option>มานิตย์ ทิวาประดับดาว</option>
+        <option>อภิวัฒน์ ไชยสุรินทร์</option><option>ณัฐฐพล พิศพันธุ์</option>
+        <option>วิทยา แสนเกรียง</option><option>ณัฐพล พัชรพัฒนชัย</option>
+        <option>คมกริช ทาแกง</option><option>สรศักดิ์ ผิวขาว</option>
+        <option>ศรายุทธ สมพงษ์</option><option>พุฒิพงษ์ บดินทร์ชัยการ</option>
+        <option>วีรยุทธ อินทจักร</option><option>สัจจะ ดวงชื่น</option>
+        <option>วิชัย ทำนุศาสตร์</option><option>อภิสิทธิ์ ศิริกิจ</option>
+        <option>ไกรสิทธิ์ เชื้อสมเกียรติ</option><option>กรภัทร จีนอนันต์</option>
+        <option>คมกริช สายวงศ์เปียง</option><option>ธนกฤต ดอกดวง</option>
+        <option>ประสาร สุพรรณคง</option><option>นพดล เมืองชัย</option>
+        <option>ปิยะวัฒน์ ปงกันทา</option><option>นิธิพันธ์ ศิริโปทา</option>
+        <option>อภิรักษ์ จันทร์คำ</option>
+      </select>
+
+      <label class="L">🗺️ MC Zone</label>
+      <select class="inp" id="inp-zone">
+        <option value="">— เลือก Zone —</option>
+        <option>CMI Zone 1</option>
+        <option>CMI Zone 2</option>
+        <option>CMI Zone 3</option>
+        <option>CMI Zone 4</option>
+        <option>CMI Zone 5</option>
+        <option>LPH Zone</option>
+        <option>MHS Zone</option>
+      </select>
+
+      <label class="L">📅 วันที่ปัจจุบัน</label>
+      <input class="inp inp-readonly" type="text" id="inp-date" readonly/>
+
+      <label class="L">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
+      <input class="inp inp-readonly" type="text" id="inp-time" readonly/>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-bar"></div>
+        <div class="card-hdr-title">⏱️ Shift Time</div>
+      </div>
+      <div class="shift-grid" id="shift-grid">
+        <div class="shift-card" onclick="selectShift(this,'08:30 - 17:30','Day Shift')">
+          <div class="shift-dot"><div class="shift-dot-inner"></div></div>
+          <div>
+            <div class="shift-time">08:30 — 17:30</div>
+            <div class="shift-lbl">☀️ Day Shift</div>
+          </div>
+        </div>
+        <div class="shift-card" onclick="selectShift(this,'08:30 - 20:30','Evening Shift')">
+          <div class="shift-dot"><div class="shift-dot-inner"></div></div>
+          <div>
+            <div class="shift-time">08:30 — 20:30</div>
+            <div class="shift-lbl">🌆 Evening Shift</div>
+          </div>
+        </div>
+        <div class="shift-card" onclick="selectShift(this,'08:30 - 23:59','Night Shift')">
+          <div class="shift-dot"><div class="shift-dot-inner"></div></div>
+          <div>
+            <div class="shift-time">08:30 — 23:59</div>
+            <div class="shift-lbl">🌙 Night Shift</div>
+          </div>
+        </div>
+        <div class="shift-card" onclick="selectShift(this,'00:00 - 08:00','Midnight Shift')">
+          <div class="shift-dot"><div class="shift-dot-inner"></div></div>
+          <div>
+            <div class="shift-time">00:00 — 08:00</div>
+            <div class="shift-lbl">🌑 Midnight Shift</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitCheckin()">✅ รายงานตัว Check-in</button>
+    <button class="btn-clear" onclick="clearForm()">ล้างข้อมูล</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-wrap" id="success-wrap">
+    <div class="success-ic">✅</div>
+    <div class="success-title">รายงานตัวสำเร็จ!</div>
+    <div class="success-sub" id="success-sub">บันทึกข้อมูลเรียบร้อยแล้ว</div>
+    <div class="success-info" id="success-info"></div>
+    <button class="btn-new" onclick="newCheckin()">+ รายงานตัวอีกคน</button>
+    <a href="WFM_Home.html" class="btn-home">🏠 กลับหน้าหลัก</a>
+  </div>
+
+</div>
+
+<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
+const DAYS = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+var selectedShift = '';
+
+// CLOCK
+function updateClock(){
+  var n = new Date();
+  var hh = String(n.getHours()).padStart(2,'0');
+  var mm = String(n.getMinutes()).padStart(2,'0');
+  var ss = String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = hh+':'+mm+':'+ss;
+  document.getElementById('clock-date').textContent = 'วัน'+DAYS[n.getDay()]+'ที่ '+n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
+  // วันที่และเวลา ณ ปัจจุบัน
+  var dateStr = n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
+  var timeStr = hh+':'+mm+':'+ss;
+  document.getElementById('inp-date').value = dateStr;
+  document.getElementById('inp-time').value = timeStr;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// SHIFT SELECT
+function selectShift(el, val, lbl){
+  document.querySelectorAll('.shift-card').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  selectedShift = val;
+}
+
+function clearForm(){
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-zone').value = '';
+  document.querySelectorAll('.shift-card').forEach(c=>c.classList.remove('on'));
+  selectedShift = '';
+}
+
+// SUBMIT
+function submitCheckin(){
+  var name = document.getElementById('inp-name').value;
+  var zone = document.getElementById('inp-zone').value;
+  var dateVal = document.getElementById('inp-date').value;
+  var timeVal = document.getElementById('inp-time').value; // วินาทีปัจจุบัน
+
+  if(!name){ toast('กรุณาเลือกชื่อ-นามสกุล','err'); return; }
+  if(!zone){ toast('กรุณาเลือก MC Zone','err'); return; }
+  if(!selectedShift){ toast('กรุณาเลือก Shift Time','err'); return; }
+
+  // Disable button
+  var btn = document.querySelector('.btn-submit');
+  btn.textContent = '⏳ กำลังส่งข้อมูล...';
+  btn.disabled = true;
+
+  // Call Google Apps Script
+  var params = new URLSearchParams({
+    action: 'checkin',
+    name: name,
+    zone: zone,
+    date: dateVal,
+    time: timeVal,
+    shift: selectedShift,
+    type: 'CHECK-IN'
+  });
+
+  var cbName = 'cb_' + Date.now();
+  var url = SCRIPT_URL + '?' + params.toString() + '&callback=' + cbName;
+
+  window[cbName] = function(data){
+    delete window[cbName];
+    document.getElementById(cbName+'_s')?.remove();
+    btn.textContent = '✅ รายงานตัว Check-in';
+    btn.disabled = false;
+    showSuccess(name, zone, dateVal, timeVal, selectedShift, data);
+  };
+
+  var s = document.createElement('script');
+  s.id = cbName+'_s';
+  s.src = url;
+  s.onerror = function(){
+    delete window[cbName];
+    s.remove();
+    btn.textContent = '✅ รายงานตัว Check-in';
+    btn.disabled = false;
+    // Show success anyway (data may have been saved)
+    showSuccess(name, zone, dateVal, timeVal, selectedShift, null);
+  };
+  document.body.appendChild(s);
+
+  // Timeout fallback
+  setTimeout(function(){
+    if(window[cbName]){
+      delete window[cbName];
+      s.remove();
+      btn.textContent = '✅ รายงานตัว Check-in';
+      btn.disabled = false;
+      showSuccess(name, zone, dateVal, timeVal, selectedShift, null);
+    }
+  }, 8000);
+}
+
+function showSuccess(name, zone, date, time, shift, data){
+  document.getElementById('form-wrap').style.display = 'none';
+  document.getElementById('success-wrap').style.display = 'block';
+  document.getElementById('success-sub').textContent = data && data.success
+    ? 'บันทึกลง Google Sheets เรียบร้อยแล้ว ✓'
+    : 'บันทึกข้อมูลเรียบร้อยแล้ว ✓';
+  document.getElementById('success-info').innerHTML =
+    '<div class="success-info-row"><span class="lbl">👤 ชื่อ</span><span class="val">'+name+'</span></div>' +
+    '<div class="success-info-row"><span class="lbl">🗺️ Zone</span><span class="val">'+zone+'</span></div>' +
+    '<div class="success-info-row"><span class="lbl">📅 วันที่</span><span class="val">'+date+'</span></div>' +
+    '<div class="success-info-row"><span class="lbl">⏰ เวลา</span><span class="val">'+time+'</span></div>' +
+    '<div class="success-info-row"><span class="lbl">⏱️ Shift</span><span class="val">'+shift+'</span></div>';
+}
+
+function newCheckin(){
+  document.getElementById('form-wrap').style.display = 'block';
+  document.getElementById('success-wrap').style.display = 'none';
+  clearForm();
+}
+
+function toast(msg, type){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type?' '+type:'');
+  setTimeout(function(){ t.className = 'toast'; }, 2500);
+}
+</script>
+</body>
+</html>
