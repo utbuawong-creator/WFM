@@ -2,219 +2,124 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>WFM Dashboard | NOPBIGMAN</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root {
-  --ais-orange: #f47920;
-  --ais-green: #8dc63f;
-  --3bb-blue: #003087;
-  --critical: #e8001d;
-  --major: #f47920;
-  --minor: #0057b8;
-  --ok: #00a651;
-  --bg: #f0f4f0;
-  --surface: #fff;
-  --border: #e0e8e0;
-  --text: #1a2a1a;
-  --text2: #5a7a5a;
-  --shadow: 0 4px 20px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
+:root{
+  --org:#f47920;--grn:#8dc63f;--blue:#003087;--red:#e8001d;
+  --ok:#00a651;--bg:#f0f4f0;--surface:#fff;--border:#e0e8e0;
+  --text:#1a2a1a;--text2:#5a7a5a;--radius:14px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
 
 /* HEADER */
-.header {
-  background: linear-gradient(135deg, #e8670a 0%, #f47920 40%, #8dc63f 100%);
-  color: #fff; padding: 0;
-  box-shadow: 0 4px 20px rgba(244,121,32,0.35);
-  position: sticky; top: 0; z-index: 100;
-}
-.header-inner {
-  max-width: 1400px; margin: 0 auto;
-  padding: 16px 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-}
-.header-brand .dept { font-size: 11px; letter-spacing: 3px; opacity: 0.8; text-transform: uppercase; }
-.header-brand .title { font-family: 'Kanit', sans-serif; font-size: 26px; font-weight: 800; }
-.header-brand .sub { font-size: 13px; opacity: 0.75; margin-top: 2px; }
-.header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.clock-badge {
-  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35);
-  border-radius: 24px; padding: 8px 18px;
-  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 1px;
-}
-.btn-refresh-main {
-  background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.5);
-  color: #fff; border-radius: 24px; padding: 8px 20px;
-  font-family: 'Kanit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-refresh-main:hover { background: rgba(255,255,255,0.35); }
+.header{background:linear-gradient(135deg,#e8670a 0%,#f47920 40%,#8dc63f 100%);color:#fff;box-shadow:0 4px 20px rgba(244,121,32,.35);position:sticky;top:0;z-index:100}
+.header-inner{max-width:1400px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.header-brand .dept{font-size:10px;letter-spacing:3px;opacity:.8;text-transform:uppercase}
+.header-brand .title{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800}
+.header-brand .sub{font-size:12px;opacity:.75;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.clock-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:24px;padding:7px 16px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px}
+.btn-hdr{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);color:#fff;border-radius:20px;padding:7px 16px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .2s}
+.btn-hdr:hover{background:rgba(255,255,255,.3)}
+
+/* TABS */
+.tab-wrap{background:var(--surface);border-bottom:2px solid var(--border);position:sticky;top:64px;z-index:90;overflow-x:auto}
+.tab-inner{max-width:1400px;margin:0 auto;display:flex;padding:0 16px}
+.tab-btn{padding:14px 20px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{color:var(--org)}
+.tab-btn.on{color:var(--org);border-bottom-color:var(--org)}
 
 /* CONTENT */
-.content { max-width: 1400px; margin: 0 auto; padding: 24px 20px 48px; }
+.content{max-width:1400px;margin:0 auto;padding:20px 16px 60px}
+.tab-pane{display:none}
+.tab-pane.on{display:block}
 
-/* FILTER BAR */
-.filter-bar {
-  background: var(--surface); border-radius: 14px; border: 1px solid var(--border);
-  padding: 16px 20px; margin-bottom: 20px;
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  box-shadow: var(--shadow);
-}
-.filter-label { font-family: 'Kanit', sans-serif; font-size: 13px; font-weight: 700; color: var(--text2); white-space: nowrap; }
-.filter-select {
-  padding: 8px 32px 8px 12px; border: 2px solid var(--border);
-  border-radius: 8px; font-size: 14px; font-family: 'Sarabun', sans-serif;
-  background: var(--bg); color: var(--text); cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a7a5a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center;
-}
-.filter-select:focus { outline: none; border-color: var(--ais-orange); }
-.btn-load {
-  padding: 9px 22px; background: linear-gradient(135deg, var(--ais-orange), var(--ais-green));
-  color: #fff; border: none; border-radius: 8px;
-  font-family: 'Kanit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
-  box-shadow: 0 4px 0 #b85710; transition: transform 0.1s, box-shadow 0.1s;
-}
-.btn-load:active { transform: translateY(3px); box-shadow: 0 1px 0 #b85710; }
-.btn-export {
-  padding: 9px 22px; background: linear-gradient(135deg, #003087, #0057b8);
-  color: #fff; border: none; border-radius: 8px;
-  font-family: 'Kanit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
-  box-shadow: 0 4px 0 #001f5c; transition: transform 0.1s, box-shadow 0.1s;
-}
-.btn-export:active { transform: translateY(3px); box-shadow: 0 1px 0 #001f5c; }
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border-radius:var(--radius);padding:16px;border:2px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.kpi-card.orange::before{background:var(--org)}
+.kpi-card.green::before{background:var(--grn)}
+.kpi-card.red::before{background:var(--red)}
+.kpi-card.blue::before{background:var(--blue)}
+.kpi-card.teal::before{background:var(--ok)}
+.kpi-card.purple::before{background:#7c3aed}
+.kpi-num{font-family:'Kanit',sans-serif;font-size:38px;font-weight:800;line-height:1;margin-bottom:5px}
+.kpi-card.orange .kpi-num{color:var(--org)}.kpi-card.green .kpi-num{color:var(--grn)}
+.kpi-card.red .kpi-num{color:var(--red)}.kpi-card.blue .kpi-num{color:var(--blue)}
+.kpi-card.teal .kpi-num{color:var(--ok)}.kpi-card.purple .kpi-num{color:#7c3aed}
+.kpi-lbl{font-size:12px;font-weight:600;color:var(--text2)}
+.kpi-sub{font-size:11px;color:var(--text2);margin-top:3px}
 
-/* KPI CARDS */
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px; margin-bottom: 20px;
-}
-.kpi-card {
-  background: var(--surface); border-radius: 14px; padding: 18px;
-  border: 2px solid var(--border); box-shadow: var(--shadow);
-  position: relative; overflow: hidden;
-}
-.kpi-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-}
-.kpi-card.orange::before { background: var(--ais-orange); }
-.kpi-card.green::before { background: var(--ais-green); }
-.kpi-card.red::before { background: var(--critical); }
-.kpi-card.blue::before { background: var(--3bb-blue); }
-.kpi-card.teal::before { background: var(--ok); }
-.kpi-num {
-  font-family: 'Kanit', sans-serif; font-size: 42px; font-weight: 800; line-height: 1;
-  margin-bottom: 6px;
-}
-.kpi-card.orange .kpi-num { color: var(--ais-orange); }
-.kpi-card.green .kpi-num { color: var(--ais-green); }
-.kpi-card.red .kpi-num { color: var(--critical); }
-.kpi-card.blue .kpi-num { color: var(--3bb-blue); }
-.kpi-card.teal .kpi-num { color: var(--ok); }
-.kpi-lbl { font-size: 13px; font-weight: 600; color: var(--text2); }
-.kpi-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
-
-/* CHARTS GRID */
-.charts-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-  gap: 20px; margin-bottom: 20px;
-}
-@media (max-width: 600px) { .charts-grid { grid-template-columns: 1fr; } }
-.chart-card {
-  background: var(--surface); border-radius: 14px; padding: 20px;
-  border: 1px solid var(--border); box-shadow: var(--shadow);
-}
-.chart-title {
-  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 700;
-  color: var(--text); margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px;
-}
-.chart-wrap { position: relative; height: 260px; }
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:16px;margin-bottom:20px}
+@media(max-width:600px){.charts-grid{grid-template-columns:1fr}}
+.chart-card{background:var(--surface);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.chart-title{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.chart-wrap{position:relative;height:240px}
 
 /* TABLE */
-.table-card {
-  background: var(--surface); border-radius: 14px; padding: 20px;
-  border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px;
-}
-.table-title {
-  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 700;
-  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
-}
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th {
-  background: var(--bg); padding: 10px 14px;
-  font-family: 'Kanit', sans-serif; font-size: 12px; font-weight: 700;
-  color: var(--text2); text-align: left; border-bottom: 2px solid var(--border);
-  white-space: nowrap;
-}
-.data-table td {
-  padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px;
-}
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--bg); }
-.pill {
-  display: inline-block; padding: 3px 10px; border-radius: 20px;
-  font-family: 'Kanit', sans-serif; font-size: 11px; font-weight: 700;
-}
-.pill-critical { background: #ffe0e3; color: var(--critical); }
-.pill-major { background: #fff3e8; color: var(--major); }
-.pill-minor { background: #e8f0ff; color: var(--minor); }
-.pill-other { background: #f0f0f0; color: #666; }
-.pill-ok { background: #e8f8ef; color: var(--ok); }
-.pill-breach { background: #ffe0e3; color: var(--critical); }
-.pill-active { background: #fff3e8; color: var(--ais-orange); }
+.table-card{background:var(--surface);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.06);margin-bottom:16px}
+.table-title{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{background:var(--bg);padding:9px 12px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:var(--text2);text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700}
+.pill-red{background:#ffe0e3;color:var(--red)}
+.pill-org{background:#fff3e8;color:var(--org)}
+.pill-grn{background:#e8f8ef;color:var(--ok)}
+.pill-blue{background:#e8f0ff;color:var(--blue)}
+.pill-gray{background:#f0f0f0;color:#666}
+
+/* SECTION HEADER */
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+.sec-hdr-bar{width:4px;height:24px;border-radius:3px}
+.sec-hdr-title{font-family:'Kanit',sans-serif;font-size:16px;font-weight:800}
+
+/* FILTER ROW */
+.filter-row{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filter-sel{padding:7px 28px 7px 10px;border:2px solid var(--border);border-radius:8px;font-size:13px;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);cursor:pointer;-webkit-appearance:none}
+.filter-sel:focus{outline:none;border-color:var(--org)}
+.btn-load{padding:8px 18px;background:linear-gradient(135deg,var(--org),var(--grn));color:#fff;border:none;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 0 #b85710}
+.btn-load:active{transform:translateY(2px);box-shadow:0 1px 0 #b85710}
+.btn-export{padding:8px 18px;background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 0 #001f5c}
 
 /* LOADING */
-.loading-overlay {
-  position: fixed; inset: 0; background: rgba(255,255,255,0.85);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 999; flex-direction: column; gap: 16px;
-}
-.loading-spinner {
-  width: 48px; height: 48px; border: 5px solid var(--border);
-  border-top-color: var(--ais-orange); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-family: 'Kanit', sans-serif; font-size: 16px; color: var(--text2); }
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+.spinner{width:44px;height:44px;border:5px solid var(--border);border-top-color:var(--org);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Kanit',sans-serif;font-size:15px;color:var(--text2)}
+.empty-state{text-align:center;padding:40px;color:var(--text2);font-family:'Kanit',sans-serif;font-size:14px}
 
-/* EMPTY */
-.empty-state {
-  text-align: center; padding: 48px; color: var(--text2);
-  font-family: 'Kanit', sans-serif; font-size: 16px;
-}
+/* OVERVIEW GRID */
+.app-overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+.app-overview-card{background:var(--surface);border-radius:var(--radius);padding:18px;border:2px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.06);cursor:pointer;transition:all .2s}
+.app-overview-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.app-ov-hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.app-ov-ic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.app-ov-title{font-family:'Kanit',sans-serif;font-size:15px;font-weight:800}
+.app-ov-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.app-ov-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.app-ov-stat{text-align:center;background:var(--bg);border-radius:8px;padding:8px}
+.app-ov-stat-num{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800}
+.app-ov-stat-lbl{font-size:11px;color:var(--text2)}
 
-/* BADGE SLA */
-.sla-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 6px; }
-.sla-bar-fill { height: 100%; border-radius: 4px; }
-
-  /* BACK BUTTON */
-  .back-btn {
-    position: fixed; bottom: 24px; right: 16px; z-index: 200;
-    background: linear-gradient(135deg, #f47920, #8dc63f);
-    color: #fff; border: none; border-radius: 50px;
-    padding: 12px 20px; font-family: 'Kanit', sans-serif;
-    font-size: 14px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 5px 0 #b85710, 0 8px 20px rgba(244,121,32,0.4);
-    display: flex; align-items: center; gap: 8px;
-    transition: transform 0.1s, box-shadow 0.1s;
-    text-decoration: none;
-  }
-  .back-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b85710; }
-
+/* SLA BAR */
+.sla-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px}
+.sla-bar-fill{height:100%;border-radius:3px}
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">
-  <div class="loading-spinner"></div>
-  <div class="loading-text">กำลังโหลดข้อมูล...</div>
+<div class="loading" id="loading" style="display:none">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">กำลังโหลดข้อมูล...</div>
 </div>
 
 <!-- HEADER -->
@@ -222,430 +127,531 @@ body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--t
   <div class="header-inner">
     <div class="header-brand">
       <div class="dept">WFM · NOPBIGMAN</div>
-      <div class="title">📊 Dashboard รายงาน</div>
-      <div class="sub">ติดตามผลงานทีม WFM ทั้งหมด</div>
+      <div class="title">📊 Dashboard ศูนย์รวม</div>
+      <div class="sub">รายงานทุก App ในที่เดียว</div>
     </div>
     <div class="header-right">
       <div class="clock-badge" id="clock">--:--:--</div>
-      <button class="btn-refresh-main" onclick="loadData()">🔄 รีเฟรช</button>
+      <button class="btn-hdr" onclick="loadAll()">🔄 รีเฟรช</button>
+      <a class="btn-hdr" href="WFM_Home.html">🏠 หน้าหลัก</a>
     </div>
   </div>
 </div>
 
-<!-- CONTENT -->
+<!-- TABS -->
+<div class="tab-wrap">
+  <div class="tab-inner">
+    <button class="tab-btn on" onclick="switchTab('overview')" id="tab-overview">🏠 ภาพรวม</button>
+    <button class="tab-btn" onclick="switchTab('checkin')" id="tab-checkin">✅ Check-in</button>
+    <button class="tab-btn" onclick="switchTab('error')" id="tab-error">⚠️ Work Error Log</button>
+    <button class="tab-btn" onclick="switchTab('job')" id="tab-job">🔧 Job Tracker</button>
+    <button class="tab-btn" onclick="switchTab('cable')" id="tab-cable">🔌 Cable Optic</button>
+  </div>
+</div>
+
 <div class="content">
 
-  <!-- FILTER -->
-  <div class="filter-bar">
-    <span class="filter-label">📅 ช่วงเวลา:</span>
-    <select class="filter-select" id="f-period" onchange="applyFilters()">
-      <option value="today">วันนี้</option>
-      <option value="week">7 วันล่าสุด</option>
-      <option value="month" selected>30 วันล่าสุด</option>
-      <option value="all">ทั้งหมด</option>
-    </select>
-    <select class="filter-select" id="f-zone" onchange="applyFilters()">
-      <option value="">ทุก Zone</option>
-      <option value="CMI Zone 1">CMI Zone 1</option>
-      <option value="CMI Zone 2">CMI Zone 2</option>
-      <option value="CMI Zone 3">CMI Zone 3</option>
-      <option value="CMI Zone 4">CMI Zone 4</option>
-      <option value="CMI Zone 5">CMI Zone 5</option>
-      <option value="Zone LPN">Zone LPN</option>
-      <option value="Zone MSN">Zone MSN</option>
-      <option value="Zone Fang">Zone Fang</option>
-    </select>
-    <select class="filter-select" id="f-priority" onchange="applyFilters()">
-      <option value="">ทุก Priority</option>
-      <option value="Critical">Critical</option>
-      <option value="Major">Major</option>
-      <option value="Minor">Minor</option>
-      <option value="Other">Other</option>
-    </select>
-    <button class="btn-load" onclick="loadData()">🔄 โหลดข้อมูล</button>
-    <button class="btn-export" onclick="exportExcel()">📥 Export Excel</button>
-  </div>
-
-  <!-- KPI -->
-  <div class="kpi-grid" id="kpi-grid">
-    <div class="kpi-card orange">
-      <div class="kpi-num" id="k-total">-</div>
-      <div class="kpi-lbl">Job ทั้งหมด</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-num" id="k-active">-</div>
-      <div class="kpi-lbl">กำลังทำ 🔧</div>
-    </div>
-    <div class="kpi-card teal">
-      <div class="kpi-num" id="k-done">-</div>
-      <div class="kpi-lbl">เสร็จแล้ว ✅</div>
-    </div>
-    <div class="kpi-card red">
-      <div class="kpi-num" id="k-breach">-</div>
-      <div class="kpi-lbl">เกิน SLA 🚨</div>
-      <div class="kpi-sub" id="k-breach-pct">-</div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-num" id="k-avgtime">-</div>
-      <div class="kpi-lbl">เวลาเฉลี่ย (นาที)</div>
-      <div class="kpi-sub">ต่อ Job ที่เสร็จ</div>
+  <!-- ══ OVERVIEW ══ -->
+  <div class="tab-pane on" id="pane-overview">
+    <div class="app-overview-grid">
+      <div class="app-overview-card" onclick="switchTab('checkin')" style="border-color:var(--org)">
+        <div class="app-ov-hdr">
+          <div class="app-ov-ic" style="background:linear-gradient(135deg,#f47920,#e8670a)">✅</div>
+          <div><div class="app-ov-title">Check-in</div><div class="app-ov-sub">รายงานตัวเข้างาน</div></div>
+        </div>
+        <div class="app-ov-stats">
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--org)" id="ov-ci-today">-</div><div class="app-ov-stat-lbl">วันนี้</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--text2)" id="ov-ci-total">-</div><div class="app-ov-stat-lbl">ทั้งหมด</div></div>
+        </div>
+      </div>
+      <div class="app-overview-card" onclick="switchTab('error')" style="border-color:var(--red)">
+        <div class="app-ov-hdr">
+          <div class="app-ov-ic" style="background:linear-gradient(135deg,#e8001d,#f47920)">⚠️</div>
+          <div><div class="app-ov-title">Work Error Log</div><div class="app-ov-sub">บันทึกงานผิดพลาด</div></div>
+        </div>
+        <div class="app-ov-stats">
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--red)" id="ov-err-today">-</div><div class="app-ov-stat-lbl">วันนี้</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--text2)" id="ov-err-total">-</div><div class="app-ov-stat-lbl">ทั้งหมด</div></div>
+        </div>
+      </div>
+      <div class="app-overview-card" onclick="switchTab('job')" style="border-color:var(--blue)">
+        <div class="app-ov-hdr">
+          <div class="app-ov-ic" style="background:linear-gradient(135deg,#003087,#0057b8)">🔧</div>
+          <div><div class="app-ov-title">Job Tracker</div><div class="app-ov-sub">ติดตาม Job · SLA</div></div>
+        </div>
+        <div class="app-ov-stats">
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--org)" id="ov-job-active">-</div><div class="app-ov-stat-lbl">กำลังทำ</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--red)" id="ov-job-breach">-</div><div class="app-ov-stat-lbl">เกิน SLA</div></div>
+        </div>
+      </div>
+      <div class="app-overview-card" onclick="switchTab('cable')" style="border-color:#0891b2">
+        <div class="app-ov-hdr">
+          <div class="app-ov-ic" style="background:linear-gradient(135deg,#0891b2,#0369a1)">🔌</div>
+          <div><div class="app-ov-title">Cable Optic</div><div class="app-ov-sub">เบิกสายเคเบิล</div></div>
+        </div>
+        <div class="app-ov-stats">
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:#0891b2" id="ov-cab-today">-</div><div class="app-ov-stat-lbl">วันนี้</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--text2)" id="ov-cab-meter">-</div><div class="app-ov-stat-lbl">เมตรรวม</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- CHARTS ROW 1 -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-title">🏆 Job แต่ละทีม (Top 15)</div>
-      <div class="chart-wrap"><canvas id="chart-team"></canvas></div>
+  <!-- ══ CHECK-IN ══ -->
+  <div class="tab-pane" id="pane-checkin">
+    <div class="filter-row">
+      <span style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2)">📅 ช่วงเวลา:</span>
+      <select class="filter-sel" id="ci-period">
+        <option value="today">วันนี้</option>
+        <option value="week">7 วันล่าสุด</option>
+        <option value="month" selected>30 วันล่าสุด</option>
+        <option value="all">ทั้งหมด</option>
+      </select>
+      <select class="filter-sel" id="ci-zone">
+        <option value="">ทุก Zone</option>
+        <option>CMI Zone AB</option><option>CMI Zone CD</option>
+        <option>LPN Zone</option><option>MSN Zone</option>
+      </select>
+      <button class="btn-load" onclick="renderCheckin()">🔄 โหลด</button>
+      <button class="btn-export" onclick="exportCheckin()">📥 Export</button>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">🎯 Priority Breakdown</div>
-      <div class="chart-wrap"><canvas id="chart-priority"></canvas></div>
+    <div class="kpi-grid" id="ci-kpi"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">📅 Check-in รายวัน</div><div class="chart-wrap"><canvas id="ci-chart-daily"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">🗺️ แยกตาม Zone</div><div class="chart-wrap"><canvas id="ci-chart-zone"></canvas></div></div>
     </div>
-  </div>
-
-  <!-- CHARTS ROW 2 -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-title">🗺️ Job แต่ละ Zone</div>
-      <div class="chart-wrap"><canvas id="chart-zone"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">🚨 SLA Status (เกิน vs ปกติ)</div>
-      <div class="chart-wrap"><canvas id="chart-sla"></canvas></div>
-    </div>
-  </div>
-
-  <!-- TABLE: ผลงานรายทีม -->
-  <div class="table-card">
-    <div class="table-title">📋 ผลงานรายทีม</div>
-    <div style="overflow-x:auto;">
-      <table class="data-table" id="team-table">
-        <thead>
-          <tr>
-            <th>ทีม</th>
-            <th>Zone</th>
-            <th>Job ทั้งหมด</th>
-            <th>เสร็จแล้ว</th>
-            <th>กำลังทำ</th>
-            <th>เกิน SLA</th>
-            <th>SLA Rate</th>
-            <th>เวลาเฉลี่ย</th>
-          </tr>
-        </thead>
-        <tbody id="team-tbody">
-          <tr><td colspan="8" class="empty-state">กำลังโหลด...</td></tr>
-        </tbody>
-      </table>
+    <div class="chart-card" style="margin-bottom:16px"><div class="chart-title">⏱️ แยกตาม Shift</div><div class="chart-wrap" style="height:200px"><canvas id="ci-chart-shift"></canvas></div></div>
+    <div class="table-card">
+      <div class="table-title"><span>📋 รายการ Check-in</span><span style="font-size:12px;color:var(--text2)" id="ci-count"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>วันที่</th><th>เวลา Check-in</th><th>Zone</th><th>Shift</th></tr></thead>
+          <tbody id="ci-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- TABLE: Job ทั้งหมด -->
-  <div class="table-card">
-    <div class="table-title">📄 รายการ Job ทั้งหมด</div>
-    <div style="overflow-x:auto;">
-      <table class="data-table" id="job-table">
-        <thead>
-          <tr>
-            <th>Job Number</th>
-            <th>ทีม</th>
-            <th>ชื่อ</th>
-            <th>Zone</th>
-            <th>Priority</th>
-            <th>เวลาเริ่ม</th>
-            <th>ใช้เวลา</th>
-            <th>ปัญหา</th>
-            <th>OT</th>
-            <th>สถานะ</th>
-            <th>SLA</th>
-          </tr>
-        </thead>
-        <tbody id="job-tbody">
-          <tr><td colspan="11" class="empty-state">กำลังโหลด...</td></tr>
-        </tbody>
-      </table>
+  <!-- ══ WORK ERROR LOG ══ -->
+  <div class="tab-pane" id="pane-error">
+    <div class="filter-row">
+      <span style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2)">📅 ช่วงเวลา:</span>
+      <select class="filter-sel" id="err-period">
+        <option value="today">วันนี้</option>
+        <option value="week">7 วันล่าสุด</option>
+        <option value="month" selected>30 วันล่าสุด</option>
+        <option value="all">ทั้งหมด</option>
+      </select>
+      <button class="btn-load" onclick="renderError()">🔄 โหลด</button>
+      <button class="btn-export" onclick="exportError()">📥 Export</button>
+    </div>
+    <div class="kpi-grid" id="err-kpi"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">⚠️ สาเหตุที่พบบ่อย</div><div class="chart-wrap"><canvas id="err-chart-cause"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">👤 Top ผู้บันทึก</div><div class="chart-wrap"><canvas id="err-chart-staff"></canvas></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-title"><span>📋 รายการงานผิดพลาด</span><span style="font-size:12px;color:var(--text2)" id="err-count"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Job ID</th><th>วันที่-เวลา</th><th>ผู้บันทึก</th><th>สิ่งที่พบ</th><th>รายละเอียด</th><th>Remark</th><th>รูป</th></tr></thead>
+          <tbody id="err-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ JOB TRACKER ══ -->
+  <div class="tab-pane" id="pane-job">
+    <div class="filter-row">
+      <span style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2)">📅 ช่วงเวลา:</span>
+      <select class="filter-sel" id="job-period" onchange="renderJob()">
+        <option value="today">วันนี้</option>
+        <option value="week">7 วันล่าสุด</option>
+        <option value="month" selected>30 วันล่าสุด</option>
+        <option value="all">ทั้งหมด</option>
+      </select>
+      <select class="filter-sel" id="job-priority" onchange="renderJob()">
+        <option value="">ทุก Priority</option>
+        <option>Critical</option><option>Major</option><option>Minor</option><option>Other</option>
+      </select>
+      <button class="btn-load" onclick="renderJob()">🔄 โหลด</button>
+      <button class="btn-export" onclick="exportJob()">📥 Export</button>
+    </div>
+    <div class="kpi-grid" id="job-kpi"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">🏆 Job แต่ละทีม</div><div class="chart-wrap"><canvas id="job-chart-team"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">🚨 SLA Status</div><div class="chart-wrap"><canvas id="job-chart-sla"></canvas></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-title"><span>📋 รายการ Job</span><span style="font-size:12px;color:var(--text2)" id="job-count"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Job No.</th><th>ทีม</th><th>ชื่อ</th><th>Zone</th><th>Priority</th><th>เริ่ม</th><th>ใช้เวลา</th><th>สถานะ</th><th>SLA</th></tr></thead>
+          <tbody id="job-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CABLE OPTIC ══ -->
+  <div class="tab-pane" id="pane-cable">
+    <div class="filter-row">
+      <span style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2)">📅 ช่วงเวลา:</span>
+      <select class="filter-sel" id="cab-period" onchange="renderCable()">
+        <option value="today">วันนี้</option>
+        <option value="week">7 วันล่าสุด</option>
+        <option value="month" selected>30 วันล่าสุด</option>
+        <option value="all">ทั้งหมด</option>
+      </select>
+      <button class="btn-load" onclick="renderCable()">🔄 โหลด</button>
+      <button class="btn-export" onclick="exportCable()">📥 Export</button>
+    </div>
+    <div class="kpi-grid" id="cab-kpi"></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">🏆 Top ผู้เบิก (เมตร)</div><div class="chart-wrap"><canvas id="cab-chart-staff"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">🥁 ดั้มที่ใช้งาน</div><div class="chart-wrap"><canvas id="cab-chart-drum"></canvas></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-title"><span>📋 รายการเบิก Cable</span><span style="font-size:12px;color:var(--text2)" id="cab-count"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>ชื่อผู้เบิก</th><th>วันที่-เวลา</th><th>เลขดั้ม</th><th>LM เริ่ม</th><th>LM สิ้นสุด</th><th>ระยะ (ม.)</th></tr></thead>
+          <tbody id="cab-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
-const SLA_HOURS = { Critical: 3, Major: 10, Minor: 24, Other: 24 };
+// ── CONFIG ────────────────────────────────────────────────
+const GS_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
+const FB_DB  = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+const SLA_H  = {Critical:3,Major:10,Minor:24,Other:24};
 
-let allJobs = [];
-let filteredJobs = [];
-let charts = {};
+// ── DATA STORES ───────────────────────────────────────────
+var ciData=[], errData=[], jobData=[], cabData=[];
+var charts={};
 
-// CLOCK
-function updateClock() {
-  const n = new Date();
-  const h = String(n.getHours()).padStart(2,'0');
-  const m = String(n.getMinutes()).padStart(2,'0');
-  const s = String(n.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+// ── CLOCK ────────────────────────────────────────────────
+const MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function updateClock(){
+  var n=new Date();
+  document.getElementById('clock').textContent=
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
 }
-setInterval(updateClock, 1000); updateClock();
+setInterval(updateClock,1000); updateClock();
 
-// LOAD DATA
-function callAPI(params, callback) {
-  const url = new URL(SCRIPT_URL);
-  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
-  const cb = 'cb_' + Date.now();
-  url.searchParams.set('callback', cb);
-  window[cb] = (data) => { delete window[cb]; document.getElementById(cb+'_s')?.remove(); callback(null, data); };
-  const s = document.createElement('script');
-  s.id = cb+'_s'; s.src = url.toString();
-  s.onerror = () => callback(new Error('Network error'));
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  document.getElementById('pane-'+id).classList.add('on');
+}
+
+// ── LOADING ───────────────────────────────────────────────
+function showLoad(msg){document.getElementById('loading').style.display='flex';document.getElementById('loading-text').textContent=msg||'กำลังโหลด...';}
+function hideLoad(){document.getElementById('loading').style.display='none';}
+
+// ── DATE HELPERS ──────────────────────────────────────────
+function today(){return new Date().toISOString().slice(0,10);}
+function filterByPeriod(list,dtFn,period){
+  var now=new Date(),cut;
+  if(period==='today') cut=new Date(now.toDateString());
+  else if(period==='week'){cut=new Date(now);cut.setDate(cut.getDate()-7);}
+  else if(period==='month'){cut=new Date(now);cut.setDate(cut.getDate()-30);}
+  else return list;
+  return list.filter(r=>{var d=dtFn(r);return d&&new Date(d)>=cut;});
+}
+function fmtDT(dt){
+  if(!dt)return'-';
+  var d=new Date(dt);
+  return d.getDate()+' '+MONTHS[d.getMonth()]+' '+(d.getFullYear()+543)+' '+
+    String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function fmtMin(m){if(!m)return'-';var h=Math.floor(m/60);var mm=m%60;return h?h+' ชม. '+mm+' น.':mm+' น.';}
+
+// ── GOOGLE SHEETS API ─────────────────────────────────────
+function callGS(params,cb){
+  var url=new URL(GS_URL);
+  Object.keys(params).forEach(k=>url.searchParams.set(k,params[k]));
+  var cbN='cb_'+Date.now();
+  url.searchParams.set('callback',cbN);
+  window[cbN]=function(data){delete window[cbN];document.getElementById(cbN+'_s')?.remove();cb(null,data);};
+  var s=document.createElement('script');s.id=cbN+'_s';s.src=url.toString();
+  s.onerror=function(){cb(new Error('error'));};
   document.body.appendChild(s);
-  setTimeout(() => { if(window[cb]) { delete window[cb]; s.remove(); callback(new Error('Timeout')); } }, 20000);
+  setTimeout(function(){if(window[cbN]){delete window[cbN];s.remove();cb(new Error('timeout'));}},15000);
 }
 
-function loadData() {
-  document.getElementById('loading').style.display = 'flex';
-  callAPI({ action: 'getJobs' }, (err, data) => {
-    document.getElementById('loading').style.display = 'none';
-    if (err || !data.success) { alert('โหลดข้อมูลไม่ได้ครับ: ' + (err?.message || data?.message)); return; }
-    allJobs = (data.jobs || []).map(j => ({
-      ...j,
-      startTime: j.startTime ? new Date(j.startTime) : null,
-      endTime: j.endTime ? new Date(j.endTime) : null,
-      elapsedMin: j.elapsedMin || 0
-    }));
-    applyFilters();
+// ── FIREBASE API ──────────────────────────────────────────
+function fetchFB(path,cb){
+  fetch(FB_DB+path+'.json')
+    .then(function(r){return r.json();})
+    .then(function(d){cb(null,d);})
+    .catch(function(e){cb(e,null);});
+}
+
+// ── LOAD ALL ──────────────────────────────────────────────
+function loadAll(){
+  showLoad('กำลังโหลดข้อมูลทุก App...');
+  var done=0;
+  function check(){done++;if(done>=3)hideLoad();}
+
+  // Check-in (Google Sheets)
+  callGS({action:'getCheckin'},function(err,data){
+    if(!err&&data&&data.checkins) ciData=data.checkins;
+    else ciData=[];
+    renderCheckin(); updateOverview(); check();
+  });
+
+  // Work Error Log + Cable (Firebase)
+  fetchFB('/errors',function(err,data){
+    errData=data&&!data.error?Object.values(data):[];
+    renderError(); check();
+  });
+  fetchFB('/records',function(err,data){
+    cabData=data&&!data.error?Object.values(data).map(function(r){return{...r,f:parseFloat(r.f)||0,t:parseFloat(r.t)||0,m:parseFloat(r.m)||0};}):[];
+    renderCable(); check();
+  });
+
+  // Job Tracker (Google Sheets)
+  callGS({action:'getJobs'},function(err,data){
+    if(!err&&data&&data.success) jobData=(data.jobs||[]).map(function(j){return{...j,startTime:j.startTime?new Date(j.startTime):null,endTime:j.endTime?new Date(j.endTime):null};});
+    else jobData=[];
+    renderJob(); updateOverview();
   });
 }
 
-function applyFilters() {
-  const period = document.getElementById('f-period').value;
-  const zone = document.getElementById('f-zone').value;
-  const priority = document.getElementById('f-priority').value;
-  const now = new Date();
+// ── OVERVIEW ──────────────────────────────────────────────
+function updateOverview(){
+  var t=today();
+  document.getElementById('ov-ci-today').textContent=ciData.filter(function(r){return r.date&&r.date.includes&&r.date.includes(t.slice(0,10));}).length||'-';
+  document.getElementById('ov-ci-total').textContent=ciData.length||'-';
+  document.getElementById('ov-err-today').textContent=errData.filter(function(r){return r.dt&&r.dt.startsWith(t);}).length;
+  document.getElementById('ov-err-total').textContent=errData.length;
+  var active=jobData.filter(function(j){return j.status==='active';}).length;
+  var breach=jobData.filter(function(j){return isBreach(j);}).length;
+  document.getElementById('ov-job-active').textContent=active||'-';
+  document.getElementById('ov-job-breach').textContent=breach||'-';
+  var cabToday=cabData.filter(function(r){return r.dt&&r.dt.startsWith(t);});
+  document.getElementById('ov-cab-today').textContent=cabToday.length;
+  document.getElementById('ov-cab-meter').textContent=cabData.reduce(function(s,r){return s+r.m;},0).toLocaleString('th');
+}
 
-  filteredJobs = allJobs.filter(j => {
-    if (!j.startTime) return false;
-    const diffDays = (now - j.startTime) / 86400000;
-    if (period === 'today' && diffDays > 1) return false;
-    if (period === 'week' && diffDays > 7) return false;
-    if (period === 'month' && diffDays > 30) return false;
-    if (zone && j.zone !== zone) return false;
-    if (priority && j.priority !== priority) return false;
+// ── CHART HELPER ──────────────────────────────────────────
+function mkChart(id,type,labels,datasets,opts){
+  if(charts[id]){charts[id].destroy();}
+  var ctx=document.getElementById(id);
+  if(!ctx)return;
+  charts[id]=new Chart(ctx,{type:type,data:{labels:labels,datasets:datasets},options:Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type!=='bar'}}},opts||{})});
+}
+
+// ── CHECK-IN ──────────────────────────────────────────────
+function renderCheckin(){
+  var period=document.getElementById('ci-period')?.value||'month';
+  var zone=document.getElementById('ci-zone')?.value||'';
+  var list=filterByPeriod(ciData,function(r){return r.date;},period);
+  if(zone) list=list.filter(function(r){return r.zone===zone;});
+
+  // KPI
+  var t=today();
+  var todayCt=list.filter(function(r){return r.date&&r.date.includes(t.slice(8,10));}).length;
+  document.getElementById('ci-kpi').innerHTML=
+    kpiBox('orange',list.length,'Check-in ทั้งหมด','')+
+    kpiBox('teal',todayCt,'วันนี้','')+
+    kpiBox('blue',[...new Set(list.map(function(r){return r.zone;}))].length,'Zone','')+
+    kpiBox('green',[...new Set(list.map(function(r){return r.name;}))].length,'คนทั้งหมด','');
+
+  // Daily chart
+  var daily={};
+  list.forEach(function(r){var d=(r.date||'').slice(0,10);daily[d]=(daily[d]||0)+1;});
+  var days=Object.keys(daily).sort().slice(-14);
+  mkChart('ci-chart-daily','bar',days,[{label:'Check-in',data:days.map(function(d){return daily[d];}),backgroundColor:'#f47920',borderRadius:5}]);
+
+  // Zone chart
+  var zoneMap={};
+  list.forEach(function(r){var z=r.zone||'ไม่ระบุ';zoneMap[z]=(zoneMap[z]||0)+1;});
+  mkChart('ci-chart-zone','doughnut',Object.keys(zoneMap),[{data:Object.values(zoneMap),backgroundColor:['#f47920','#8dc63f','#003087','#0891b2','#7c3aed'],borderWidth:3,borderColor:'#fff'}]);
+
+  // Shift chart
+  var shiftMap={};
+  list.forEach(function(r){var s=r.shift||'ไม่ระบุ';shiftMap[s]=(shiftMap[s]||0)+1;});
+  mkChart('ci-chart-shift','bar',Object.keys(shiftMap),[{label:'คน',data:Object.values(shiftMap),backgroundColor:['#003087','#f47920','#e8001d','#0891b2'],borderRadius:5}],{plugins:{legend:{display:false}}});
+
+  // Table
+  document.getElementById('ci-count').textContent='พบ '+list.length+' รายการ';
+  var sorted=[...list].sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  document.getElementById('ci-tbody').innerHTML=sorted.length?sorted.map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td><td style="font-weight:700">'+esc(r.name||'-')+'</td><td>'+esc(r.date||'-')+'</td><td>'+esc(r.time||'-')+'</td><td>'+esc(r.zone||'-')+'</td><td>'+esc(r.shift||'-')+'</td></tr>';
+  }).join(''):'<tr><td colspan="6" class="empty-state">ไม่มีข้อมูล</td></tr>';
+}
+
+// ── WORK ERROR LOG ────────────────────────────────────────
+function renderError(){
+  var period=document.getElementById('err-period')?.value||'month';
+  var list=filterByPeriod(errData,function(r){return r.dt;},period);
+  var t=today();
+  var todayCt=list.filter(function(r){return r.dt&&r.dt.startsWith(t);}).length;
+
+  document.getElementById('err-kpi').innerHTML=
+    kpiBox('red',list.length,'รายการทั้งหมด','')+
+    kpiBox('orange',todayCt,'วันนี้','')+
+    kpiBox('blue',[...new Set(list.map(function(r){return r.n;}))].length,'ผู้บันทึก','')+
+    kpiBox('purple',[...new Set(list.map(function(r){return r.jobid;}))].length,'Job ID','');
+
+  // Cause chart
+  var causeMap={};
+  list.forEach(function(r){(r.findings||[]).forEach(function(f){var k=f.startsWith('อื่นๆ:')?'อื่นๆ':f;causeMap[k]=(causeMap[k]||0)+1;});});
+  var causeKeys=Object.keys(causeMap).sort(function(a,b){return causeMap[b]-causeMap[a];});
+  mkChart('err-chart-cause','bar',causeKeys.map(function(k){return k.replace(/^\d+\.\s*/,'');}),
+    [{label:'ครั้ง',data:causeKeys.map(function(k){return causeMap[k];}),backgroundColor:'#e8001d',borderRadius:5}],
+    {plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{ticks:{font:{size:11}}}}});
+
+  // Staff chart
+  var staffMap={};
+  list.forEach(function(r){var n=r.n||'ไม่ระบุ';staffMap[n]=(staffMap[n]||0)+1;});
+  var staffKeys=Object.keys(staffMap).sort(function(a,b){return staffMap[b]-staffMap[a];}).slice(0,10);
+  mkChart('err-chart-staff','bar',staffKeys,
+    [{label:'รายการ',data:staffKeys.map(function(k){return staffMap[k];}),backgroundColor:'#f47920',borderRadius:5}],
+    {plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}});
+
+  document.getElementById('err-count').textContent='พบ '+list.length+' รายการ';
+  var sorted=[...list].sort(function(a,b){return(b.ca||0)-(a.ca||0);});
+  document.getElementById('err-tbody').innerHTML=sorted.length?sorted.map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td>'+
+      '<td style="font-family:Kanit,sans-serif;font-weight:800;color:var(--red)">'+esc(r.jobid||'-')+'</td>'+
+      '<td>'+esc(fmtDT(r.dt))+'</td>'+
+      '<td>'+esc(r.n||'-')+'</td>'+
+      '<td style="font-size:11px">'+(r.findings||[]).map(function(f){return '<span class="pill pill-red">'+esc(f)+'</span>';}).join(' ')+'</td>'+
+      '<td style="font-size:11px">'+esc((r.detail||'').slice(0,60))+'</td>'+
+      '<td style="font-size:11px;color:var(--text2)">'+esc(r.remark||'-')+'</td>'+
+      '<td>'+(r.photos&&r.photos.length?'📷 '+r.photos.length:'-')+'</td>'+
+      '</tr>';
+  }).join(''):'<tr><td colspan="8" class="empty-state">ไม่มีข้อมูล</td></tr>';
+}
+
+// ── JOB TRACKER ───────────────────────────────────────────
+function isBreach(j){var m=j.elapsedMin||(j.status==='active'&&j.startTime?Math.round((Date.now()-j.startTime)/60000):0);return m>(SLA_H[j.priority]||24)*60;}
+function renderJob(){
+  var period=document.getElementById('job-period')?.value||'month';
+  var prio=document.getElementById('job-priority')?.value||'';
+  var now=new Date(),cut;
+  if(period==='today') cut=new Date(now.toDateString());
+  else if(period==='week'){cut=new Date(now);cut.setDate(cut.getDate()-7);}
+  else if(period==='month'){cut=new Date(now);cut.setDate(cut.getDate()-30);}
+  var list=jobData.filter(function(j){
+    if(cut&&j.startTime&&j.startTime<cut)return false;
+    if(prio&&j.priority!==prio)return false;
     return true;
   });
+  var active=list.filter(function(j){return j.status==='active';}).length;
+  var done=list.filter(function(j){return j.status==='done';}).length;
+  var breach=list.filter(function(j){return isBreach(j);}).length;
 
-  renderAll();
+  document.getElementById('job-kpi').innerHTML=
+    kpiBox('orange',list.length,'Job ทั้งหมด','')+
+    kpiBox('green',active,'กำลังทำ','')+
+    kpiBox('teal',done,'เสร็จแล้ว','')+
+    kpiBox('red',breach,'เกิน SLA','');
+
+  var teamMap={};
+  list.forEach(function(j){var t=j.team||'ไม่ระบุ';teamMap[t]=(teamMap[t]||0)+1;});
+  var teams=Object.keys(teamMap).sort(function(a,b){return teamMap[b]-teamMap[a];}).slice(0,10);
+  mkChart('job-chart-team','bar',teams,[{label:'Job',data:teams.map(function(t){return teamMap[t];}),backgroundColor:'#003087',borderRadius:5}],{plugins:{legend:{display:false}}});
+  mkChart('job-chart-sla','pie',['✅ ปกติ','🚨 เกิน SLA'],
+    [{data:[list.length-breach,breach],backgroundColor:['#00a651','#e8001d'],borderWidth:3,borderColor:'#fff'}]);
+
+  document.getElementById('job-count').textContent='พบ '+list.length+' รายการ';
+  var sorted=[...list].sort(function(a,b){return(b.startTime||0)-(a.startTime||0);});
+  document.getElementById('job-tbody').innerHTML=sorted.length?sorted.map(function(j,i){
+    var m=j.elapsedMin||(j.status==='active'&&j.startTime?Math.round((Date.now()-j.startTime)/60000):0);
+    var br=isBreach(j);
+    var pc=j.priority==='Critical'?'pill-red':j.priority==='Major'?'pill-org':j.priority==='Minor'?'pill-blue':'pill-gray';
+    return '<tr><td>'+(i+1)+'</td><td style="font-family:Kanit,sans-serif;font-weight:700">'+esc(j.jobNum||'-')+'</td>'+
+      '<td>'+esc(j.team||'-')+'</td><td>'+esc(j.name||'-')+'</td><td>'+esc(j.zone||'-')+'</td>'+
+      '<td><span class="pill '+pc+'">'+esc(j.priority||'-')+'</span></td>'+
+      '<td style="font-size:11px">'+fmtDT(j.startTime)+'</td>'+
+      '<td style="color:'+(br?'var(--red)':'inherit')+';font-weight:'+(br?'700':'400')+'">'+fmtMin(m)+'</td>'+
+      '<td>'+(j.status==='active'?'<span class="pill pill-org">🔧 ทำอยู่</span>':'<span class="pill pill-grn">✅ เสร็จ</span>')+'</td>'+
+      '<td>'+(br?'<span class="pill pill-red">🚨 เกิน</span>':'<span class="pill pill-grn">✅ ปกติ</span>')+'</td></tr>';
+  }).join(''):'<tr><td colspan="10" class="empty-state">ไม่มีข้อมูล</td></tr>';
 }
 
-function getElapsedMin(j) {
-  if (j.elapsedMin > 0) return j.elapsedMin;
-  if (j.startTime && j.status === 'active') return Math.round((Date.now() - j.startTime) / 60000);
-  return 0;
+// ── CABLE OPTIC ───────────────────────────────────────────
+function renderCable(){
+  var period=document.getElementById('cab-period')?.value||'month';
+  var list=filterByPeriod(cabData,function(r){return r.dt;},period);
+  var tot=list.reduce(function(s,r){return s+r.m;},0);
+  var t=today();
+  var todayCt=list.filter(function(r){return r.dt&&r.dt.startsWith(t);}).length;
+
+  document.getElementById('cab-kpi').innerHTML=
+    kpiBox('teal',list.length,'รายการทั้งหมด','')+
+    kpiBox('blue',todayCt,'วันนี้','')+
+    kpiBox('orange',tot.toLocaleString('th'),'เมตรรวม','ม.')+
+    kpiBox('green',[...new Set(list.map(function(r){return r.d;}))].length,'ดั้มที่ใช้','');
+
+  var staffMap={};
+  list.forEach(function(r){var n=r.n||'ไม่ระบุ';staffMap[n]=(staffMap[n]||0)+r.m;});
+  var staffKeys=Object.keys(staffMap).sort(function(a,b){return staffMap[b]-staffMap[a];}).slice(0,8);
+  mkChart('cab-chart-staff','bar',staffKeys,[{label:'เมตร',data:staffKeys.map(function(k){return staffMap[k];}),backgroundColor:'#0891b2',borderRadius:5}],{plugins:{legend:{display:false}}});
+
+  var drumMap={};
+  list.forEach(function(r){var d=r.d||'ไม่ระบุ';drumMap[d]=(drumMap[d]||0)+r.m;});
+  var drumKeys=Object.keys(drumMap).sort(function(a,b){return drumMap[b]-drumMap[a];}).slice(0,8);
+  mkChart('cab-chart-drum','bar',drumKeys,[{label:'เมตร',data:drumKeys.map(function(k){return drumMap[k];}),backgroundColor:'#7c3aed',borderRadius:5}],{plugins:{legend:{display:false}}});
+
+  document.getElementById('cab-count').textContent='พบ '+list.length+' รายการ · รวม '+tot.toLocaleString('th')+' ม.';
+  var sorted=[...list].sort(function(a,b){return new Date(b.dt)-new Date(a.dt);});
+  document.getElementById('cab-tbody').innerHTML=sorted.length?sorted.map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.n||'-')+'</td><td>'+esc(fmtDT(r.dt))+'</td>'+
+      '<td style="font-family:Kanit,sans-serif;font-weight:700">'+esc(r.d||'-')+'</td>'+
+      '<td>'+r.f.toLocaleString('th')+'</td><td>'+r.t.toLocaleString('th')+'</td>'+
+      '<td style="font-weight:700;color:#0891b2">'+r.m.toLocaleString('th')+'</td></tr>';
+  }).join(''):'<tr><td colspan="7" class="empty-state">ไม่มีข้อมูล</td></tr>';
 }
 
-function isBreach(j) {
-  const min = getElapsedMin(j);
-  return min > (SLA_HOURS[j.priority] || 24) * 60;
+// ── KPI BOX HELPER ────────────────────────────────────────
+function kpiBox(color,num,lbl,sub){
+  return '<div class="kpi-card '+color+'"><div class="kpi-num">'+num+'</div><div class="kpi-lbl">'+lbl+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>';
 }
 
-function fmtMin(min) {
-  if (!min) return '-';
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return h > 0 ? `${h} ชม. ${m} น.` : `${m} น.`;
+// ── ESCAPE ────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── EXPORTS ───────────────────────────────────────────────
+function csvDown(rows,fname){
+  var csv='\uFEFF'+rows.map(function(r){return r.map(function(v){var s=String(v==null?'':v);return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\r\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download=fname;a.click();
+}
+function exportCheckin(){
+  var rows=[['#','ชื่อ','วันที่','เวลา','Zone','Shift']];
+  ciData.forEach(function(r,i){rows.push([i+1,r.name,r.date,r.time,r.zone,r.shift]);});
+  csvDown(rows,'CheckIn_'+today()+'.csv');
+}
+function exportError(){
+  var rows=[['#','Job ID','วันที่-เวลา','ผู้บันทึก','สิ่งที่พบ','รายละเอียด','Remark']];
+  errData.forEach(function(r,i){rows.push([i+1,r.jobid,fmtDT(r.dt),r.n,(r.findings||[]).join(' | '),r.detail,r.remark||'']);});
+  csvDown(rows,'WorkErrorLog_'+today()+'.csv');
+}
+function exportJob(){
+  var rows=[['#','Job No.','ทีม','ชื่อ','Zone','Priority','เวลาเริ่ม','สถานะ','SLA']];
+  jobData.forEach(function(j,i){rows.push([i+1,j.jobNum,j.team,j.name,j.zone,j.priority,fmtDT(j.startTime),j.status==='active'?'กำลังทำ':'เสร็จ',isBreach(j)?'เกิน SLA':'ปกติ']);});
+  csvDown(rows,'JobTracker_'+today()+'.csv');
+}
+function exportCable(){
+  var rows=[['#','ชื่อผู้เบิก','วันที่-เวลา','เลขดั้ม','LM เริ่ม','LM สิ้นสุด','ระยะ (ม.)']];
+  cabData.forEach(function(r,i){rows.push([i+1,r.n,fmtDT(r.dt),r.d,r.f,r.t,r.m]);});
+  csvDown(rows,'CableOptic_'+today()+'.csv');
 }
 
-function fmtDate(d) {
-  if (!d) return '-';
-  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-
-function renderAll() {
-  renderKPI();
-  renderCharts();
-  renderTeamTable();
-  renderJobTable();
-}
-
-function renderKPI() {
-  const total = filteredJobs.length;
-  const active = filteredJobs.filter(j => j.status === 'active').length;
-  const done = filteredJobs.filter(j => j.status === 'done').length;
-  const breach = filteredJobs.filter(j => isBreach(j)).length;
-  const donedJobs = filteredJobs.filter(j => j.status === 'done' && j.elapsedMin > 0);
-  const avgMin = donedJobs.length > 0 ? Math.round(donedJobs.reduce((s,j) => s+j.elapsedMin, 0) / donedJobs.length) : 0;
-
-  document.getElementById('k-total').textContent = total;
-  document.getElementById('k-active').textContent = active;
-  document.getElementById('k-done').textContent = done;
-  document.getElementById('k-breach').textContent = breach;
-  document.getElementById('k-breach-pct').textContent = total > 0 ? `${Math.round(breach/total*100)}% ของทั้งหมด` : '';
-  document.getElementById('k-avgtime').textContent = avgMin || '-';
-}
-
-function destroyChart(id) { if(charts[id]) { charts[id].destroy(); delete charts[id]; } }
-
-function renderCharts() {
-  // TEAM CHART
-  const teamCount = {};
-  filteredJobs.forEach(j => { const t = j.team||'ไม่ระบุ'; teamCount[t] = (teamCount[t]||0)+1; });
-  const teamsSorted = Object.entries(teamCount).sort((a,b)=>b[1]-a[1]).slice(0,15);
-  destroyChart('team');
-  charts['team'] = new Chart(document.getElementById('chart-team'), {
-    type: 'bar',
-    data: {
-      labels: teamsSorted.map(t=>t[0]),
-      datasets: [{
-        label: 'จำนวน Job',
-        data: teamsSorted.map(t=>t[1]),
-        backgroundColor: teamsSorted.map((_,i) => `hsl(${30+i*20},80%,55%)`),
-        borderRadius: 6, borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { font: { family: 'Kanit', size: 11 } } } }
-    }
-  });
-
-  // PRIORITY CHART
-  const prioCount = { Critical:0, Major:0, Minor:0, Other:0 };
-  filteredJobs.forEach(j => { if(prioCount[j.priority]!==undefined) prioCount[j.priority]++; });
-  destroyChart('priority');
-  charts['priority'] = new Chart(document.getElementById('chart-priority'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Critical','Major','Minor','Other'],
-      datasets: [{ data: Object.values(prioCount), backgroundColor: ['#e8001d','#f47920','#0057b8','#888'], borderWidth: 3, borderColor: '#fff' }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { font: { family: 'Kanit' }, padding: 16 } } }
-    }
-  });
-
-  // ZONE CHART
-  const zoneCount = {};
-  filteredJobs.forEach(j => { const z = j.zone||'ไม่ระบุ'; zoneCount[z] = (zoneCount[z]||0)+1; });
-  destroyChart('zone');
-  charts['zone'] = new Chart(document.getElementById('chart-zone'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(zoneCount),
-      datasets: [{
-        label: 'จำนวน Job',
-        data: Object.values(zoneCount),
-        backgroundColor: '#003087', borderRadius: 6, borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-    }
-  });
-
-  // SLA CHART
-  const slaOk = filteredJobs.filter(j => !isBreach(j)).length;
-  const slaBreach = filteredJobs.filter(j => isBreach(j)).length;
-  destroyChart('sla');
-  charts['sla'] = new Chart(document.getElementById('chart-sla'), {
-    type: 'pie',
-    data: {
-      labels: [`✅ ปกติ (${slaOk})`, `🚨 เกิน SLA (${slaBreach})`],
-      datasets: [{ data: [slaOk, slaBreach], backgroundColor: ['#00a651','#e8001d'], borderWidth: 3, borderColor: '#fff' }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { font: { family: 'Kanit', size: 13 }, padding: 20 } } }
-    }
-  });
-}
-
-function renderTeamTable() {
-  const teamMap = {};
-  filteredJobs.forEach(j => {
-    const t = j.team || 'ไม่ระบุ';
-    if (!teamMap[t]) teamMap[t] = { team: t, zone: j.zone||'-', total:0, done:0, active:0, breach:0, totalMin:0, doneCount:0 };
-    teamMap[t].total++;
-    if (j.status==='done') { teamMap[t].done++; if(j.elapsedMin>0){teamMap[t].totalMin+=j.elapsedMin;teamMap[t].doneCount++;} }
-    if (j.status==='active') teamMap[t].active++;
-    if (isBreach(j)) teamMap[t].breach++;
-  });
-
-  const rows = Object.values(teamMap).sort((a,b)=>b.total-a.total);
-  document.getElementById('team-tbody').innerHTML = rows.length === 0
-    ? '<tr><td colspan="8" class="empty-state">ไม่มีข้อมูล</td></tr>'
-    : rows.map(r => {
-        const slaRate = r.total > 0 ? Math.round((1 - r.breach/r.total)*100) : 100;
-        const avgMin = r.doneCount > 0 ? Math.round(r.totalMin/r.doneCount) : 0;
-        const barColor = slaRate >= 90 ? '#00a651' : slaRate >= 70 ? '#f47920' : '#e8001d';
-        return `<tr>
-          <td style="font-family:'Kanit',sans-serif;font-weight:700;">${r.team}</td>
-          <td>${r.zone}</td>
-          <td style="font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;">${r.total}</td>
-          <td><span style="color:#00a651;font-weight:700;">${r.done}</span></td>
-          <td><span style="color:var(--ais-orange);font-weight:700;">${r.active}</span></td>
-          <td><span style="color:var(--critical);font-weight:700;">${r.breach}</span></td>
-          <td>
-            <div style="font-weight:700;color:${barColor};">${slaRate}%</div>
-            <div class="sla-bar"><div class="sla-bar-fill" style="width:${slaRate}%;background:${barColor};"></div></div>
-          </td>
-          <td>${avgMin > 0 ? fmtMin(avgMin) : '-'}</td>
-        </tr>`;
-      }).join('');
-}
-
-function renderJobTable() {
-  const sorted = [...filteredJobs].sort((a,b) => (b.startTime||0) - (a.startTime||0));
-  document.getElementById('job-tbody').innerHTML = sorted.length === 0
-    ? '<tr><td colspan="11" class="empty-state">ไม่มีข้อมูล</td></tr>'
-    : sorted.map(j => {
-        const min = getElapsedMin(j);
-        const breach = isBreach(j);
-        const pClass = j.priority==='Critical'?'pill-critical':j.priority==='Major'?'pill-major':j.priority==='Minor'?'pill-minor':'pill-other';
-        return `<tr>
-          <td style="font-family:'Kanit',sans-serif;font-weight:700;">${j.jobNum||'-'}</td>
-          <td style="font-family:'Kanit',sans-serif;font-size:12px;">${j.team||'-'}</td>
-          <td>${j.name||'-'}</td>
-          <td>${j.zone||'-'}</td>
-          <td><span class="pill ${pClass}">${j.priority||'-'}</span></td>
-          <td style="font-size:12px;">${fmtDate(j.startTime)}</td>
-          <td style="color:${breach?'var(--critical)':'var(--text)'};font-weight:${breach?'700':'400'};">${fmtMin(min)}</td>
-          <td style="font-size:12px;color:var(--critical);">${j.issue?'⚠️ '+j.issue:'-'}</td>
-          <td style="font-size:11px;">${j.otInfo?'⏰ '+j.otInfo:'-'}</td>
-          <td>${j.status==='active'?'<span class="pill pill-active">🔧 กำลังทำ</span>':'<span class="pill pill-ok">✅ เสร็จ</span>'}</td>
-          <td>${breach?'<span class="pill pill-breach">🚨 เกิน</span>':'<span class="pill pill-ok">✅ ปกติ</span>'}</td>
-        </tr>`;
-      }).join('');
-}
-
-// EXPORT EXCEL
-function exportExcel() {
-  let csv = '\uFEFF'; // BOM for Thai
-  csv += 'Job Number,ทีม,ชื่อ,Zone,Priority,เวลาเริ่ม,ใช้เวลา(นาที),ปัญหา,OT,สถานะ,SLA\n';
-  filteredJobs.forEach(j => {
-    const min = getElapsedMin(j);
-    const breach = isBreach(j) ? 'เกิน SLA' : 'ปกติ';
-    const status = j.status === 'active' ? 'กำลังทำ' : 'เสร็จแล้ว';
-    csv += [j.jobNum,j.team,j.name,j.zone,j.priority,fmtDate(j.startTime),min,j.issue||'',j.otInfo||'',status,breach]
-      .map(v => `"${(v||'').toString().replace(/"/g,'""')}"`)
-      .join(',') + '\n';
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `WFM_Report_${new Date().toLocaleDateString('th-TH')}.csv`;
-  a.click(); URL.revokeObjectURL(url);
-}
-
-// AUTO REFRESH
-setInterval(() => { if (allJobs.length > 0) applyFilters(); }, 60000);
-
-// INIT
-loadData();
+// ── INIT ─────────────────────────────────────────────────
+loadAll();
+setInterval(function(){loadAll();},120000);
 </script>
-
-<a class="back-btn" href="WFM_Home.html">🏠 หน้าหลัก</a>
 </body>
 </html>
