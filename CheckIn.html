@@ -96,7 +96,7 @@ input[type=file]{display:none}
 .card-row{background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
 .card-row-lbl{font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
 .card-row-val{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
-.card-photo{width:100%;border-radius:12px;height:180px;object-fit:cover;object-position:center top;margin-bottom:12px;border:2px solid rgba(255,255,255,.2)}
+
 .card-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(244,121,32,.3);border:1px solid rgba(244,121,32,.5);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
 .card-stamp{position:absolute;top:18px;right:18px;background:rgba(141,198,63,.2);border:2px solid rgba(141,198,63,.5);border-radius:10px;padding:6px 10px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#8dc63f;transform:rotate(5deg)}
 
@@ -183,8 +183,8 @@ input[type=file]{display:none}
     <div id="card-preview" class="checkin-card" style="max-width:420px;margin:0 auto 16px;">
       <div class="card-stamp">CHECK-IN ✓</div>
       <div class="card-logo">AIS 3BB · WFM NOPBIGMAN</div>
-      <div id="card-photo-wrap" style="display:none">
-        <img id="card-photo-img" class="card-photo" src="" alt="photo"/>
+      <div id="card-photo-wrap" style="display:none;width:100%;height:200px;border-radius:12px;overflow:hidden;margin-bottom:12px;border:2px solid rgba(255,255,255,.2)">
+        <div id="card-photo-img" style="width:100%;height:100%;background-size:cover;background-position:center center;background-repeat:no-repeat"></div>
       </div>
       <div class="card-name" id="card-name">-</div>
       <div class="card-zone" id="card-zone">-</div>
@@ -402,7 +402,7 @@ function submitCheckin(){
   document.getElementById('card-time').textContent=timeVal;
   document.getElementById('card-shift').textContent=selShiftLbl+' '+selShiftVal;
   if(photoB64){
-    document.getElementById('card-photo-img').src=photoB64;
+    document.getElementById('card-photo-img').style.backgroundImage='url('+photoB64+')';
     document.getElementById('card-photo-wrap').style.display='block';
   } else {
     document.getElementById('card-photo-wrap').style.display='none';
@@ -446,7 +446,7 @@ function resetForm(){
 function copyCard(){
   var card=document.getElementById('card-preview');
   toast('⏳ กำลังสร้างการ์ด...','');
-  html2canvas(card,{scale:2,useCORS:true,logging:false,width:420}).then(function(rawCanvas){
+  html2canvas(card,{scale:2,useCORS:true,allowTaint:true,logging:false,imageTimeout:0}).then(function(rawCanvas){
     // Resize to max 800px wide for clean sharing
     var maxW=800;
     var ratio=Math.min(maxW/rawCanvas.width,1);
@@ -514,19 +514,34 @@ function loadDash(){
   document.getElementById('dash-date-lbl').textContent=n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
   document.getElementById('dash-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div>';
 
+  // ดึงผ่าน Apps Script action=getCheckin
   var cbN='cb_'+Date.now();
   var url=SCRIPT_URL+'?action=getCheckin&callback='+cbN;
   window[cbN]=function(data){
     delete window[cbN]; document.getElementById(cbN+'_s')?.remove();
     var list=[];
-    if(data&&data.checkins) list=data.checkins;
+    if(data&&data.success&&data.checkins) list=data.checkins;
     else if(data&&data.rows) list=data.rows;
     renderDash(list);
   };
   var s=document.createElement('script'); s.id=cbN+'_s'; s.src=url;
-  s.onerror=function(){delete window[cbN];s.remove();renderDash([]);};
+  s.onerror=function(){delete window[cbN];s.remove();showDashError();};
   document.body.appendChild(s);
-  setTimeout(function(){if(window[cbN]){delete window[cbN];s.remove();renderDash([]);}},10000);
+  setTimeout(function(){if(window[cbN]){delete window[cbN];s.remove();showDashError();}},10000);
+}
+
+function showDashError(){
+  document.getElementById('dash-content').innerHTML=
+    '<div style="background:#fff3e8;border:2px solid #f47920;border-radius:14px;padding:20px;text-align:center">'+
+    '<div style="font-size:28px;margin-bottom:10px">⚙️</div>'+
+    '<div style="font-family:Kanit,sans-serif;font-weight:800;font-size:15px;color:#b85710;margin-bottom:8px">ต้องเพิ่ม Code ใน Apps Script</div>'+
+    '<div style="font-size:12px;color:#666;line-height:1.8;text-align:left;background:#fff;border-radius:8px;padding:12px;margin-top:10px">'+
+    '1. เปิด <b>script.google.com</b> → Project WFM<br>'+
+    '2. เพิ่ม function <b>getCheckinData()</b> ด้านล่าง<br>'+
+    '3. ใน doGet() เพิ่ม: if(action=='getCheckin') return getCheckinData()<br>'+
+    '4. Deploy ใหม่</div>'+
+    '<button onclick="loadDash()" style="margin-top:12px;background:#f47920;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-family:Kanit,sans-serif;font-weight:700;cursor:pointer">🔄 ลองใหม่</button>'+
+    '</div>';
 }
 
 function renderDash(list){
