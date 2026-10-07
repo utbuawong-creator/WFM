@@ -150,7 +150,7 @@ input[type=file]{display:none}
 </div>
 
 <!-- TABS -->
-<div style="background:var(--surface);border-bottom:2px solid var(--border);sticky;top:0;z-index:50">
+<div style="background:var(--surface);border-bottom:2px solid var(--border);position:sticky;top:0;z-index:50">
   <div class="tab-bar">
     <button class="tab-btn on" id="tab-form" onclick="switchTab('form')">📋 Check-in</button>
     <button class="tab-btn" id="tab-dash" onclick="switchTab('dash');loadDash()">📊 Dashboard</button>
@@ -447,7 +447,6 @@ function copyCard(){
   var card=document.getElementById('card-preview');
   toast('⏳ กำลังสร้างการ์ด...','');
   html2canvas(card,{scale:2,useCORS:true,allowTaint:true,logging:false,imageTimeout:0}).then(function(rawCanvas){
-    // Resize to max 800px wide for clean sharing
     var maxW=800;
     var ratio=Math.min(maxW/rawCanvas.width,1);
     var canvas=document.createElement('canvas');
@@ -460,7 +459,6 @@ function copyCard(){
     canvas.toBlob(function(blob){
       var file=new File([blob],'checkin_wfm.png',{type:'image/png'});
 
-      // Mobile: ใช้ Web Share API (ส่งรูปไปแอปต่างๆ ได้เลย)
       var isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent);
       if(isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
         navigator.share({
@@ -475,14 +473,12 @@ function copyCard(){
         return;
       }
 
-      // Desktop: Copy รูปไปยัง Clipboard → Paste ใน Teams/Line ได้เลย
       if(navigator.clipboard && window.ClipboardItem){
         navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
           .then(function(){
             toast('📋 Copy แล้ว! Ctrl+V วางใน Teams / Line ได้เลย ✓','ok');
           })
           .catch(function(){
-            // Fallback: download
             downloadCard(canvas);
           });
       } else {
@@ -514,7 +510,6 @@ function loadDash(){
   document.getElementById('dash-date-lbl').textContent=n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
   document.getElementById('dash-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div>';
 
-  // ดึงผ่าน Apps Script action=getCheckin
   var cbN='cb_'+Date.now();
   var url=SCRIPT_URL+'?action=getCheckin&callback='+cbN;
   window[cbN]=function(data){
@@ -538,14 +533,13 @@ function showDashError(){
     '<div style="font-size:12px;color:#666;line-height:1.8;text-align:left;background:#fff;border-radius:8px;padding:12px;margin-top:10px">'+
     '1. เปิด <b>script.google.com</b> → Project WFM<br>'+
     '2. เพิ่ม function <b>getCheckinData()</b> ด้านล่าง<br>'+
-    '3. ใน doGet() เพิ่ม: if(action=='getCheckin') return getCheckinData()<br>'+
+    '3. ใน doGet() เพิ่ม: if(action==\'getCheckin\') return getCheckinData()<br>'+
     '4. Deploy ใหม่</div>'+
     '<button onclick="loadDash()" style="margin-top:12px;background:#f47920;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-family:Kanit,sans-serif;font-weight:700;cursor:pointer">🔄 ลองใหม่</button>'+
     '</div>';
 }
 
 function renderDash(list){
-  // Filter today
   var today=new Date();
   var todayStr=today.getDate()+' '+MONTHS[today.getMonth()]+' '+(today.getFullYear()+543);
   var todayList=list.filter(function(r){
@@ -587,7 +581,6 @@ function renderDash(list){
     html+='</div>';
   });
 
-  // ถ้าไม่มีข้อมูลเลย
   if(list.length===0){
     html+='<div style="background:rgba(244,121,32,.06);border:1px dashed rgba(244,121,32,.3);border-radius:12px;padding:16px;text-align:center;font-size:13px;color:var(--text2)">';
     html+='⚠️ ยังไม่มีข้อมูลจาก Google Sheets<br><span style="font-size:11px">ต้องเพิ่ม action getCheckin ใน Apps Script ครับ</span></div>';
