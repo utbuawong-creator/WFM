@@ -4,543 +4,476 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Check-in WFM">
 <title>Check-in | WFM NOPBIGMAN</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-:root{
-  --org:#f47920;--org2:#e8670a;--grn:#8dc63f;--grn2:#6aaa2a;
-  --blue:#003087;--bg:#f0f4f0;--surface:#fff;--border:#e0e8e0;
-  --text:#1a2a1a;--text2:#5a7a5a;--radius:18px;--radius-sm:12px;
-}
+:root{--org:#f47920;--grn:#8dc63f;--blue:#003087;--bg:#f0f4f0;--surface:#fff;--border:#e0e8e0;--text:#1a2a1a;--text2:#5a7a5a;--r:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
-
-/* HEADER */
-.header{background:linear-gradient(135deg,#e8670a 0%,#f47920 45%,#8dc63f 100%);color:#fff;box-shadow:0 4px 24px rgba(244,121,32,.4)}
-.header-inner{padding:14px 20px 16px;display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto}
-.header-brand .dept{font-size:10px;letter-spacing:3px;opacity:.8;text-transform:uppercase;font-family:'Kanit',sans-serif}
-.header-brand .title{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;line-height:1.1}
-.header-brand .sub{font-size:12px;opacity:.8;margin-top:2px}
-.home-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;border-radius:10px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
-
-/* TABS */
-.tab-bar{background:var(--surface);border-bottom:2px solid var(--border);display:flex;max-width:600px;margin:0 auto}
-.tab-btn{flex:1;padding:13px 8px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
-.tab-btn.on{color:var(--org);border-bottom-color:var(--org)}
-
-/* PAGES */
-.page{display:none;max-width:600px;margin:0 auto;padding:16px 16px 80px}
-.page.on{display:block}
-
-/* CLOCK */
-.clock-card{background:linear-gradient(135deg,#003087,#0057b8);border-radius:var(--radius);padding:14px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 5px 0 #001f5c}
+.hdr{background:linear-gradient(135deg,#e8670a,#f47920 45%,#8dc63f);color:#fff;box-shadow:0 4px 20px rgba(244,121,32,.4)}
+.hdr-in{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto}
+.hdr-brand .d{font-size:10px;letter-spacing:3px;opacity:.8;text-transform:uppercase;font-family:'Kanit',sans-serif}
+.hdr-brand .t{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800}
+.hdr-brand .s{font-size:12px;opacity:.8;margin-top:2px}
+.home-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;border-radius:10px;padding:7px 13px;font-size:12px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif}
+.tabs{background:var(--surface);border-bottom:2px solid var(--border);display:flex;max-width:600px;margin:0 auto}
+.tab{flex:1;padding:13px 8px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab.on{color:var(--org);border-bottom-color:var(--org)}
+.pg{display:none;max-width:600px;margin:0 auto;padding:16px 16px 80px}
+.pg.on{display:block}
+.clock-card{background:linear-gradient(135deg,#003087,#0057b8);border-radius:var(--r);padding:14px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 5px 0 #001f5c}
 .clock-val{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;letter-spacing:2px}
-.clock-date{font-size:12px;opacity:.8;margin-top:2px}
+.clock-dt{font-size:12px;opacity:.8;margin-top:2px}
 .dot{width:8px;height:8px;border-radius:50%;background:#8dc63f;animation:pulse 1.5s infinite;display:inline-block}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
-
-/* FORM CARD */
-.fcard{background:var(--surface);border-radius:var(--radius);padding:20px 18px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,.07);border:1px solid var(--border)}
-.fcard-hdr{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border)}
-.fcard-bar{width:4px;height:22px;background:linear-gradient(180deg,var(--org),var(--grn));border-radius:3px}
-.fcard-title{font-family:'Kanit',sans-serif;font-weight:800;font-size:15px}
-.L{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;margin-top:14px;letter-spacing:.5px}
-.L:first-child{margin-top:0}
+.card{background:var(--surface);border-radius:var(--r);padding:20px 18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid var(--border)}
+.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.card-bar{width:4px;height:22px;background:linear-gradient(180deg,var(--org),var(--grn));border-radius:3px}
+.card-title{font-family:'Kanit',sans-serif;font-weight:800;font-size:15px}
+.lbl{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;margin-top:14px}
+.lbl:first-child{margin-top:0}
 .inp{width:100%;background:#f8faf8;border:2px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Sarabun',sans-serif;outline:none;transition:border .2s;-webkit-appearance:none}
-.inp:focus{border-color:var(--org);background:#fff}
-.inp option{background:#fff;color:var(--text)}
-.inp-readonly{background:#f0f4f0;color:var(--text2)}
-
-/* SHIFT CARDS */
+.inp:focus{border-color:var(--org)}
+.inp-ro{background:#f0f4f0;color:var(--text2);cursor:default}
 .shift-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.shift-card{background:#f8faf8;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px}
-.shift-card.on{border-color:var(--org);background:linear-gradient(135deg,#fff8f3,#fff);box-shadow:0 2px 10px rgba(244,121,32,.2)}
-.shift-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.shift-card.on .shift-radio{background:var(--org);border-color:var(--org)}
-.shift-radio-dot{width:8px;height:8px;border-radius:50%;background:#fff;display:none}
-.shift-card.on .shift-radio-dot{display:block}
-.shift-time{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
-.shift-lbl{font-size:11px;color:var(--text2);margin-top:1px}
-
-/* PHOTO UPLOAD */
-.photo-upload{border:2px dashed var(--border);border-radius:12px;background:#f8faf8;cursor:pointer;overflow:hidden;position:relative;transition:all .2s;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
-.photo-upload:hover{border-color:var(--org);background:#fff8f3}
-.photo-upload img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.photo-upload .ph-icon{font-size:32px;color:var(--text2)}
-.photo-upload .ph-lbl{font-size:12px;color:var(--text2);font-weight:600}
-.photo-del{position:absolute;top:8px;right:8px;background:rgba(232,0,29,.85);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:2}
-input[type=file]{display:none}
-
-/* BTN */
-.btn-submit{width:100%;background:linear-gradient(135deg,var(--org),var(--org2));color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 6px 0 #b85710;transition:all .15s;margin-top:8px;letter-spacing:.5px}
-.btn-submit:active{transform:translateY(4px);box-shadow:0 2px 0 #b85710}
+.sc{background:#f8faf8;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .18s;user-select:none}
+.sc.on{border-color:var(--org);background:linear-gradient(135deg,#fff8f3,#fff);box-shadow:0 2px 10px rgba(244,121,32,.2)}
+.sc-rb{width:20px;height:20px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.sc.on .sc-rb{background:var(--org);border-color:var(--org)}
+.sc-dot{width:8px;height:8px;border-radius:50%;background:#fff;display:none}
+.sc.on .sc-dot{display:block}
+.sc-time{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
+.sc-lbl{font-size:11px;color:var(--text2);margin-top:1px}
+.photo-box{border:2px dashed var(--border);border-radius:12px;background:#f8faf8;cursor:pointer;overflow:hidden;position:relative;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;transition:all .2s}
+.photo-box:hover{border-color:var(--org);background:#fff8f3}
+.photo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-box .ph-ic{font-size:36px;color:var(--text2)}
+.photo-box .ph-tx{font-size:13px;color:var(--text2);font-weight:600}
+.photo-box .ph-sub{font-size:11px;color:#aaa}
+.del-ph{position:absolute;top:8px;right:8px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:2;font-family:'Sarabun',sans-serif}
+.btn-sub{width:100%;background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 6px 0 #b85710;transition:all .15s;margin-top:8px;letter-spacing:.5px}
+.btn-sub:active{transform:translateY(4px);box-shadow:0 2px 0 #b85710}
+.btn-sub:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .btn-gray{width:100%;background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:10px}
-
-/* SUCCESS PAGE */
-.success-wrap{text-align:center;padding:20px 0}
-.success-ic{font-size:72px;margin-bottom:12px;animation:pop .4s ease}
+/* SUCCESS */
+#sec-success{display:none}
+.suc-ic{font-size:72px;text-align:center;margin-bottom:12px;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.success-title{font-family:'Kanit',sans-serif;font-size:24px;font-weight:800;color:var(--grn2);margin-bottom:4px}
-.success-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
-
-/* CARD PREVIEW */
-.checkin-card{background:linear-gradient(135deg,#1a3a1a 0%,#2d5a1b 40%,#1B5E20 100%);border-radius:20px;padding:22px 20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2)}
-.checkin-card::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05)}
-.checkin-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(244,121,32,.1)}
-.card-logo{font-size:11px;letter-spacing:3px;opacity:.7;text-transform:uppercase;font-family:'Kanit',sans-serif;margin-bottom:12px}
-.card-name{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px}
-.card-zone{font-size:13px;opacity:.8;margin-bottom:16px}
-.card-rows{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.card-row{background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
-.card-row-lbl{font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
-.card-row-val{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
-
-.card-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(244,121,32,.3);border:1px solid rgba(244,121,32,.5);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
-.card-stamp{position:absolute;top:18px;right:18px;background:rgba(141,198,63,.2);border:2px solid rgba(141,198,63,.5);border-radius:10px;padding:6px 10px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#8dc63f;transform:rotate(5deg)}
-
+.suc-title{font-family:'Kanit',sans-serif;font-size:24px;font-weight:800;color:#2e7d32;text-align:center;margin-bottom:4px}
+.suc-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:20px}
+/* CHECKIN CARD */
+.ci-card{background:linear-gradient(160deg,#1B5E20 0%,#2E7D32 50%,#1a3a1a 100%);border-radius:20px;padding:22px 20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2);max-width:420px;margin-left:auto;margin-right:auto}
+.ci-card::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.04)}
+.ci-card-stamp{position:absolute;top:16px;right:16px;background:rgba(141,198,63,.2);border:2px solid rgba(141,198,63,.5);border-radius:10px;padding:5px 10px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#8dc63f;transform:rotate(5deg)}
+.ci-card-logo{font-size:11px;letter-spacing:3px;opacity:.7;text-transform:uppercase;font-family:'Kanit',sans-serif;margin-bottom:12px}
+.ci-card-photo{width:100%;height:180px;border-radius:12px;object-fit:cover;object-position:center;margin-bottom:14px;border:2px solid rgba(255,255,255,.2);display:none}
+.ci-card-name{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px}
+.ci-card-zone{font-size:13px;opacity:.8;margin-bottom:14px}
+.ci-card-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ci-card-row{background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
+.ci-card-row.full{grid-column:1/-1}
+.ci-row-lbl{font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.ci-row-val{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
+.ci-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(244,121,32,.25);border:1px solid rgba(244,121,32,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
 /* ACTION BTNS */
-.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.btn-copy{background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 0 #001f5c;transition:all .15s}
-.btn-copy:active{transform:translateY(3px);box-shadow:0 1px 0 #001f5c}
-.btn-new{background:linear-gradient(135deg,var(--org),var(--org2));color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 0 #b85710;transition:all .15s}
-.btn-new:active{transform:translateY(3px);box-shadow:0 1px 0 #b85710}
-.btn-home2{width:100%;background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;text-decoration:none;display:block;text-align:center}
-
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.btn-copy{background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #001f5c;transition:all .15s}
+.btn-copy:active{transform:translateY(3px)}
+.btn-new{background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #b85710;transition:all .15s}
+.btn-new:active{transform:translateY(3px)}
+.btn-home2{width:100%;background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-decoration:none;display:block;text-align:center;font-family:'Sarabun',sans-serif}
 /* DASHBOARD */
-.dash-date{font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:8px}
-.btn-refresh{background:linear-gradient(135deg,var(--org),var(--grn));color:#fff;border:none;border-radius:10px;padding:8px 14px;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 3px 0 #b85710}
-.btn-refresh:active{transform:translateY(2px);box-shadow:0 1px 0 #b85710}
-
+.dash-total{background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:16px;padding:16px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.dash-total-num{font-family:'Kanit',sans-serif;font-size:48px;font-weight:800;line-height:1}
+.shift-box{background:var(--surface);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.shift-box-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.shift-ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.shift-name{font-family:'Kanit',sans-serif;font-size:15px;font-weight:800}
+.shift-time{font-size:12px;color:var(--text2);margin-top:1px}
+.shift-cnt{font-family:'Kanit',sans-serif;font-size:20px;font-weight:800;padding:6px 16px;border-radius:20px;color:#fff}
+.mem-row{display:flex;align-items:center;gap:10px;background:#f8faf8;border-radius:10px;padding:9px 12px;margin-bottom:6px}
+.mem-num{width:26px;height:26px;border-radius:8px;color:#fff;font-family:'Kanit',sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mem-name{font-size:14px;font-weight:700;flex:1}
+.mem-zone{font-size:11px;color:var(--text2);background:var(--bg);border-radius:6px;padding:2px 8px}
+.mem-time{font-family:'Kanit',sans-serif;font-size:12px;color:var(--text2)}
+.no-mem{text-align:center;padding:14px;color:var(--text2);font-size:13px}
 /* TOAST */
-.toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;pointer-events:none}
-.toast{background:#1a2a1a;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;opacity:0;transform:translateY(10px);transition:all .3s;white-space:nowrap}
+.toast-w{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;pointer-events:none}
+.toast{background:#1a2a1a;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;opacity:0;transform:translateY(10px);transition:all .3s;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.ok{background:#2e7d32}.toast.err{background:#c62828}
 </style>
 </head>
 <body>
-
-<div class="header">
-  <div class="header-inner">
-    <div class="header-brand">
-      <div class="dept">WFM · NOPBIGMAN</div>
-      <div class="title">✅ Check-in</div>
-      <div class="sub">บันทึกเวลาเข้างาน</div>
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-brand">
+      <div class="d">WFM · NOPBIGMAN</div>
+      <div class="t">✅ Check-in</div>
+      <div class="s">บันทึกเวลาเข้างาน</div>
     </div>
     <a href="WFM_Home.html" class="home-btn">🏠 หน้าหลัก</a>
   </div>
 </div>
-
-<!-- TABS -->
-<div style="background:var(--surface);border-bottom:2px solid var(--border);position:sticky;top:0;z-index:50">
-  <div class="tab-bar">
-    <button class="tab-btn on" id="tab-form" onclick="switchTab('form')">📋 Check-in</button>
-    <button class="tab-btn" id="tab-dash" onclick="switchTab('dash');loadDash()">📊 Dashboard</button>
+<div style="background:var(--surface);border-bottom:2px solid var(--border)">
+  <div class="tabs">
+    <button class="tab on" id="t-form" onclick="goTab('form')">📋 Check-in</button>
+    <button class="tab" id="t-dash" onclick="goTab('dash');loadDash()">📊 Dashboard</button>
   </div>
 </div>
 
-<!-- PAGE: FORM -->
-<div class="page on" id="pg-form">
+<!-- FORM PAGE -->
+<div class="pg on" id="pg-form">
   <div class="clock-card" style="margin-top:16px">
     <div>
-      <div class="clock-val" id="clock">--:--:--</div>
-      <div class="clock-date" id="clock-date">กำลังโหลด...</div>
+      <div class="clock-val" id="cl-time">--:--:--</div>
+      <div class="clock-dt" id="cl-date">กำลังโหลด...</div>
     </div>
-    <div style="display:flex;align-items:center;gap:6px;font-size:12px;opacity:.85">
-      <div class="dot"></div> ออนไลน์
-    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;opacity:.85"><div class="dot"></div> ออนไลน์</div>
   </div>
 
-  <div id="success-section" style="display:none">
-    <div class="success-wrap">
-      <div class="success-ic">✅</div>
-      <div class="success-title">Check-in สำเร็จ!</div>
-      <div class="success-sub">บันทึกลง Google Sheets เรียบร้อยแล้ว ✓</div>
+  <div id="sec-form">
+    <div class="card">
+      <div class="card-hdr"><div class="card-bar"></div><div class="card-title">ข้อมูลการเข้างาน</div></div>
+      <label class="lbl">👤 ชื่อ-นามสกุล</label>
+      <select class="inp" id="f-name">
+        <option value="">— เลือกชื่อ —</option>
+        <option>โพธิยา มหาชัย</option><option>จักรพงษ์ บัวประทะ</option><option>เอกรินทร์ โสภา</option>
+        <option>วัชริศ ปินใจ</option><option>อัมพวัฒน์ พัชรพัฒนชัย</option><option>เมธาศิษฎ์ เศรษฐจ์วุฒิภัทร</option>
+        <option>วรชัย นุ่มตูม</option><option>พัทธนันท์ ปันเขียว</option><option>ทักษิณ ลาดกำแพง</option>
+        <option>ฐูกลวิทย์ กิตติกุลสุวรรณ</option><option>เจษฎา จิโน</option><option>สุรศักดิ์ ใหม่ป้อ</option>
+        <option>อลงกรณ์ โปริ๊</option><option>ปรัตถกร คุ้มประคอง</option><option>ธนิน ถึงสุข</option>
+        <option>นนทพัทธ์ ไฝหาวิทย์</option><option>ชัชชัย ก้อยงามเลิศ</option><option>บรรจง ตี๋เนาะ</option>
+        <option>นำโชค คงอิ่ม</option><option>ธงชัย มณีสิงหราช</option><option>เอกลักษณ์ ดอกสม</option>
+        <option>วรเชษฐ์ จันตี๊คาด</option><option>สุทธิพงศ์ ปาลี</option><option>นวพล ธรรมขันแก้ว</option>
+        <option>บดินทร์ อาษากิจ</option><option>สมเพชร ก้อยงามเลิศ</option><option>สรายุทธ กรนทีกาญจน์</option>
+        <option>นิเวศ ตาแม่กั๋ง</option><option>พงษ์นคร กองมี</option><option>ณัฐนนท์ สุวรรณ์</option>
+        <option>ธนาพันธ์ อินทะจันทร์</option><option>จิรพงศ์ ใจจิต</option><option>จิรวัฒน์ พรธนานิธินันท์</option>
+        <option>อนุชิต คำเขียว</option><option>ภาสกร ญาติฝูง</option><option>มงคล ไทยประเทศ</option>
+        <option>นพดนัย อมรวิโรจน์รัตน์</option><option>มานิตย์ ทิวาประดับดาว</option><option>อภิวัฒน์ ไชยสุรินทร์</option>
+        <option>ณัฐฐพล พิศพันธุ์</option><option>วิทยา แสนเกรียง</option><option>ณัฐพล พัชรพัฒนชัย</option>
+        <option>คมกริช ทาแกง</option><option>สรศักดิ์ ผิวขาว</option><option>ศรายุทธ สมพงษ์</option>
+        <option>พุฒิพงษ์ บดินทร์ชัยการ</option><option>วีรยุทธ อินทจักร</option><option>สัจจะ ดวงชื่น</option>
+        <option>วิชัย ทำนุศาสตร์</option><option>อภิสิทธิ์ ศิริกิจ</option><option>ไกรสิทธิ์ เชื้อสมเกียรติ</option>
+        <option>กรภัทร จีนอนันต์</option><option>คมกริช สายวงศ์เปียง</option><option>ธนกฤต ดอกดวง</option>
+        <option>ประสาร สุพรรณคง</option><option>นพดล เมืองชัย</option><option>ปิยะวัฒน์ ปงกันทา</option>
+        <option>นิธิพันธ์ ศิริโปทา</option><option>อภิรักษ์ จันทร์คำ</option>
+      </select>
+      <label class="lbl">🗺️ MC Zone</label>
+      <select class="inp" id="f-zone">
+        <option value="">— เลือก Zone —</option>
+        <option>CMI Zone AB</option><option>CMI Zone CD</option>
+        <option>LPN Zone</option><option>MSN Zone</option>
+      </select>
+      <label class="lbl">📅 วันที่ปัจจุบัน</label>
+      <input class="inp inp-ro" id="f-date" readonly/>
+      <label class="lbl">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
+      <input class="inp inp-ro" id="f-time" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
     </div>
 
-    <div id="card-preview" class="checkin-card" style="max-width:420px;margin:0 auto 16px;">
-      <div class="card-stamp">CHECK-IN ✓</div>
-      <div class="card-logo">AIS 3BB · WFM NOPBIGMAN</div>
-      <div id="card-photo-wrap" style="display:none;width:100%;height:200px;border-radius:12px;overflow:hidden;margin-bottom:12px;border:2px solid rgba(255,255,255,.2)">
-        <div id="card-photo-img" style="width:100%;height:100%;background-size:cover;background-position:center center;background-repeat:no-repeat"></div>
-      </div>
-      <div class="card-name" id="card-name">-</div>
-      <div class="card-zone" id="card-zone">-</div>
-      <div class="card-rows">
-        <div class="card-row">
-          <div class="card-row-lbl">📅 วันที่</div>
-          <div class="card-row-val" id="card-date">-</div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-bar"></div><div class="card-title">⏱️ เลือก Shift</div></div>
+      <div class="shift-grid">
+        <div class="sc" id="sc0" onclick="pickShift(0)">
+          <div class="sc-rb"><div class="sc-dot"></div></div>
+          <div><div class="sc-time">08:30—17:30</div><div class="sc-lbl">☀️ Day Shift</div></div>
         </div>
-        <div class="card-row">
-          <div class="card-row-lbl">⏰ เวลา</div>
-          <div class="card-row-val" id="card-time">-</div>
+        <div class="sc" id="sc1" onclick="pickShift(1)">
+          <div class="sc-rb"><div class="sc-dot"></div></div>
+          <div><div class="sc-time">08:30—20:30</div><div class="sc-lbl">🌆 Evening Shift</div></div>
         </div>
-        <div class="card-row" style="grid-column:1/-1">
-          <div class="card-row-lbl">⏱️ Shift</div>
-          <div class="card-row-val" id="card-shift">-</div>
+        <div class="sc" id="sc2" onclick="pickShift(2)">
+          <div class="sc-rb"><div class="sc-dot"></div></div>
+          <div><div class="sc-time">08:30—23:59</div><div class="sc-lbl">🌙 Night Shift</div></div>
+        </div>
+        <div class="sc" id="sc3" onclick="pickShift(3)">
+          <div class="sc-rb"><div class="sc-dot"></div></div>
+          <div><div class="sc-time">00:00—08:00</div><div class="sc-lbl">🌑 Midnight Shift</div></div>
         </div>
       </div>
-      <div class="card-badge">✅ รายงานตัวเรียบร้อย</div>
     </div>
 
-    <div class="action-btns">
-      <button class="btn-copy" onclick="copyCard()">📤 ส่งการ์ด / Copy</button>
+    <div class="card">
+      <div class="card-hdr"><div class="card-bar"></div><div class="card-title">📸 รูปยืนยันตำแหน่ง</div></div>
+      <div class="photo-box" id="ph-box" onclick="document.getElementById('ph-file').click()">
+        <div class="ph-ic">📷</div>
+        <div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div>
+        <div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>
+      </div>
+      <input type="file" id="ph-file" accept="image/*" capture="environment" onchange="loadPh(this)">
+    </div>
+
+    <button class="btn-sub" id="btn-sub" onclick="doCheckin()">✅ Check-in เลย!</button>
+    <button class="btn-gray" onclick="resetForm()">ล้างข้อมูล</button>
+  </div>
+
+  <div id="sec-success">
+    <div class="suc-ic">✅</div>
+    <div class="suc-title">Check-in สำเร็จ!</div>
+    <div class="suc-sub" id="suc-sub">บันทึกลง Google Sheets เรียบร้อยแล้ว ✓</div>
+    <div class="ci-card" id="ci-card">
+      <div class="ci-card-stamp">CHECK-IN ✓</div>
+      <div class="ci-card-logo">AIS 3BB · WFM NOPBIGMAN</div>
+      <img id="ci-photo" class="ci-card-photo" src="" alt=""/>
+      <div class="ci-card-name" id="ci-name">-</div>
+      <div class="ci-card-zone" id="ci-zone">-</div>
+      <div class="ci-card-rows">
+        <div class="ci-card-row">
+          <div class="ci-row-lbl">📅 วันที่</div>
+          <div class="ci-row-val" id="ci-date">-</div>
+        </div>
+        <div class="ci-card-row">
+          <div class="ci-row-lbl">⏰ เวลา</div>
+          <div class="ci-row-val" id="ci-time">-</div>
+        </div>
+        <div class="ci-card-row full">
+          <div class="ci-row-lbl">⏱️ Shift</div>
+          <div class="ci-row-val" id="ci-shift">-</div>
+        </div>
+      </div>
+      <div class="ci-badge">✅ รายงานตัวเรียบร้อย</div>
+    </div>
+    <div class="act-grid">
+      <button class="btn-copy" onclick="copyCard()">📤 ส่ง/Copy การ์ด</button>
       <button class="btn-new" onclick="resetForm()">➕ รายงานตัวอีกคน</button>
     </div>
     <a href="WFM_Home.html" class="btn-home2">🏠 กลับหน้าหลัก</a>
   </div>
-
-  <div id="form-section">
-    <div class="fcard">
-      <div class="fcard-hdr"><div class="fcard-bar"></div><div class="fcard-title">ข้อมูลการเข้างาน</div></div>
-
-      <label class="L">👤 ชื่อ-นามสกุล</label>
-      <select class="inp" id="inp-name">
-        <option value="">— เลือกชื่อ —</option>
-        <option>โพธิยา มหาชัย</option><option>จักรพงษ์ บัวประทะ</option>
-        <option>เอกรินทร์ โสภา</option><option>วัชริศ ปินใจ</option>
-        <option>อัมพวัฒน์ พัชรพัฒนชัย</option><option>เมธาศิษฎ์ เศรษฐจ์วุฒิภัทร</option>
-        <option>วรชัย นุ่มตูม</option><option>พัทธนันท์ ปันเขียว</option>
-        <option>ทักษิณ ลาดกำแพง</option><option>ฐูกลวิทย์ กิตติกุลสุวรรณ</option>
-        <option>เจษฎา จิโน</option><option>สุรศักดิ์ ใหม่ป้อ</option>
-        <option>อลงกรณ์ โปริ๊</option><option>ปรัตถกร คุ้มประคอง</option>
-        <option>ธนิน ถึงสุข</option><option>นนทพัทธ์ ไฝหาวิทย์</option>
-        <option>ชัชชัย ก้อยงามเลิศ</option><option>บรรจง ตี๋เนาะ</option>
-        <option>นำโชค คงอิ่ม</option><option>ธงชัย มณีสิงหราช</option>
-        <option>เอกลักษณ์ ดอกสม</option><option>วรเชษฐ์ จันตี๊คาด</option>
-        <option>สุทธิพงศ์ ปาลี</option><option>นวพล ธรรมขันแก้ว</option>
-        <option>บดินทร์ อาษากิจ</option><option>สมเพชร ก้อยงามเลิศ</option>
-        <option>สรายุทธ กรนทีกาญจน์</option><option>นิเวศ ตาแม่กั๋ง</option>
-        <option>พงษ์นคร กองมี</option><option>ณัฐนนท์ สุวรรณ์</option>
-        <option>ธนาพันธ์ อินทะจันทร์</option><option>จิรพงศ์ ใจจิต</option>
-        <option>จิรวัฒน์ พรธนานิธินันท์</option><option>อนุชิต คำเขียว</option>
-        <option>ภาสกร ญาติฝูง</option><option>มงคล ไทยประเทศ</option>
-        <option>นพดนัย อมรวิโรจน์รัตน์</option><option>มานิตย์ ทิวาประดับดาว</option>
-        <option>อภิวัฒน์ ไชยสุรินทร์</option><option>ณัฐฐพล พิศพันธุ์</option>
-        <option>วิทยา แสนเกรียง</option><option>ณัฐพล พัชรพัฒนชัย</option>
-        <option>คมกริช ทาแกง</option><option>สรศักดิ์ ผิวขาว</option>
-        <option>ศรายุทธ สมพงษ์</option><option>พุฒิพงษ์ บดินทร์ชัยการ</option>
-        <option>วีรยุทธ อินทจักร</option><option>สัจจะ ดวงชื่น</option>
-        <option>วิชัย ทำนุศาสตร์</option><option>อภิสิทธิ์ ศิริกิจ</option>
-        <option>ไกรสิทธิ์ เชื้อสมเกียรติ</option><option>กรภัทร จีนอนันต์</option>
-        <option>คมกริช สายวงศ์เปียง</option><option>ธนกฤต ดอกดวง</option>
-        <option>ประสาร สุพรรณคง</option><option>นพดล เมืองชัย</option>
-        <option>ปิยะวัฒน์ ปงกันทา</option><option>นิธิพันธ์ ศิริโปทา</option>
-        <option>อภิรักษ์ จันทร์คำ</option>
-      </select>
-
-      <label class="L">🗺️ MC Zone</label>
-      <select class="inp" id="inp-zone">
-        <option value="">— เลือก Zone —</option>
-        <option>CMI Zone AB</option>
-        <option>CMI Zone CD</option>
-        <option>LPN Zone</option>
-        <option>MSN Zone</option>
-      </select>
-
-      <label class="L">📅 วันที่ปัจจุบัน</label>
-      <input class="inp inp-readonly" id="inp-date" readonly/>
-
-      <label class="L">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
-      <input class="inp inp-readonly" id="inp-time" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
-    </div>
-
-    <div class="fcard">
-      <div class="fcard-hdr"><div class="fcard-bar"></div><div class="fcard-title">⏱️ เลือก Shift</div></div>
-      <div class="shift-grid" id="shift-grid">
-        <div class="shift-card" onclick="selShift(this,'08:30 - 17:30','☀️ Day Shift')">
-          <div class="shift-radio"><div class="shift-radio-dot"></div></div>
-          <div><div class="shift-time">08:30—17:30</div><div class="shift-lbl">☀️ Day Shift</div></div>
-        </div>
-        <div class="shift-card" onclick="selShift(this,'08:30 - 20:30','🌆 Evening Shift')">
-          <div class="shift-radio"><div class="shift-radio-dot"></div></div>
-          <div><div class="shift-time">08:30—20:30</div><div class="shift-lbl">🌆 Evening Shift</div></div>
-        </div>
-        <div class="shift-card" onclick="selShift(this,'08:30 - 23:59','🌙 Night Shift')">
-          <div class="shift-radio"><div class="shift-radio-dot"></div></div>
-          <div><div class="shift-time">08:30—23:59</div><div class="shift-lbl">🌙 Night Shift</div></div>
-        </div>
-        <div class="shift-card" onclick="selShift(this,'00:00 - 08:00','🌑 Midnight Shift')">
-          <div class="shift-radio"><div class="shift-radio-dot"></div></div>
-          <div><div class="shift-time">00:00—08:00</div><div class="shift-lbl">🌑 Midnight Shift</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="fcard">
-      <div class="fcard-hdr"><div class="fcard-bar"></div><div class="fcard-title">📸 รูปยืนยันตำแหน่ง</div></div>
-      <div class="photo-upload" id="photo-slot" onclick="document.getElementById('photo-file').click()">
-        <div class="ph-icon">📷</div>
-        <div class="ph-lbl">แตะเพื่อถ่ายรูป / เลือกรูป</div>
-        <div style="font-size:11px;color:var(--text2)">รูปจะแนบในการ์ด Check-in</div>
-      </div>
-      <input type="file" id="photo-file" accept="image/*" capture="environment" onchange="loadPhoto(this)">
-    </div>
-
-    <button class="btn-submit" onclick="submitCheckin()">✅ Check-in เลย!</button>
-    <button class="btn-gray" onclick="resetForm()">ล้างข้อมูล</button>
-  </div>
 </div>
 
-<!-- PAGE: DASHBOARD -->
-<div class="page" id="pg-dash">
-  <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <div class="dash-date">📊 รายงานตัววันนี้ — <span id="dash-date-lbl"></span></div>
-    <button class="btn-refresh" onclick="loadDash()">🔄 รีเฟรช</button>
+<!-- DASHBOARD PAGE -->
+<div class="pg" id="pg-dash">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 14px">
+    <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2)">📊 วันนี้ — <span id="d-today"></span></div>
+    <button onclick="loadDash()" style="background:linear-gradient(135deg,var(--org),var(--grn));color:#fff;border:none;border-radius:10px;padding:8px 14px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔄 รีเฟรช</button>
   </div>
-  <div id="dash-content">
-    <div style="text-align:center;padding:40px;color:var(--text2);font-size:14px">⏳ กำลังโหลดข้อมูล...</div>
-  </div>
+  <div id="d-content"><div style="text-align:center;padding:40px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div></div>
 </div>
 
-<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+<div class="toast-w"><div class="toast" id="toast"></div></div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
-const MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const DAYS=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
-var selShiftVal='', selShiftLbl='', photoB64=null;
+var GS = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
+var MO = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var DA = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+var SHIFTS = [
+  {val:'08:30 - 17:30',lbl:'☀️ Day Shift',   ic:'☀️', col:'#f47920', bg:'rgba(244,121,32,.08)', bd:'rgba(244,121,32,.3)'},
+  {val:'08:30 - 20:30',lbl:'🌆 Evening Shift',ic:'🌆', col:'#0891b2', bg:'rgba(8,145,178,.08)',  bd:'rgba(8,145,178,.3)'},
+  {val:'08:30 - 23:59',lbl:'🌙 Night Shift',  ic:'🌙', col:'#003087', bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
+  {val:'00:00 - 08:00',lbl:'🌑 Midnight Shift',ic:'🌑',col:'#7c3aed', bg:'rgba(124,58,237,.08)', bd:'rgba(124,58,237,.3)'}
+];
+var selIdx = -1;
+var phB64 = null;
+var lastName='', lastZone='', lastDateThai='', lastTime='', lastShiftLbl='';
 
-function updateClock(){
-  var n=new Date();
-  var hh=String(n.getHours()).padStart(2,'0');
-  var mm=String(n.getMinutes()).padStart(2,'0');
-  var ss=String(n.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent=hh+':'+mm+':'+ss;
-  document.getElementById('clock-date').textContent='วัน'+DAYS[n.getDay()]+'ที่ '+n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('inp-date').value=n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('inp-time').value=hh+':'+mm+':'+ss;
+// CLOCK
+function tick() {
+  var n = new Date();
+  var h = pad(n.getHours()), m = pad(n.getMinutes()), s = pad(n.getSeconds());
+  document.getElementById('cl-time').textContent = h+':'+m+':'+s;
+  document.getElementById('cl-date').textContent = 'วัน'+DA[n.getDay()]+'ที่ '+n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('f-date').value = n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('f-time').value = h+':'+m+':'+s;
 }
-setInterval(updateClock,1000); updateClock();
+function pad(v){ return String(v).padStart(2,'0'); }
+setInterval(tick, 1000);
+tick();
 
-function switchTab(t){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.getElementById('tab-'+t).classList.add('on');
+// TABS
+function goTab(t) {
+  document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.pg').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('t-'+t).classList.add('on');
   document.getElementById('pg-'+t).classList.add('on');
 }
 
-function selShift(el,val,lbl){
-  document.querySelectorAll('.shift-card').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  selShiftVal=val; selShiftLbl=lbl;
+// SHIFT
+function pickShift(i) {
+  selIdx = i;
+  for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
+  document.getElementById('sc'+i).classList.add('on');
 }
 
-function loadPhoto(input){
-  if(!input.files[0])return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var img=new Image();
-    img.onload=function(){
-      var canvas=document.createElement('canvas');
-      var max=1200; var w=img.width,h=img.height;
-      if(w>max||h>max){var r=Math.min(max/w,max/h);w=Math.round(w*r);h=Math.round(h*r);}
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      photoB64=canvas.toDataURL('image/jpeg',0.8);
-      var slot=document.getElementById('photo-slot');
-      slot.innerHTML='<img src="'+photoB64+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px"/><button class="photo-del" onclick="delPhoto(event)">✕ ลบรูป</button>';
+// PHOTO
+function loadPh(inp) {
+  if(!inp.files[0]) return;
+  var r = new FileReader();
+  r.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var c = document.createElement('canvas');
+      var max = 1000, w = img.width, h = img.height;
+      if(w>max||h>max){ var rt=Math.min(max/w,max/h); w=Math.round(w*rt); h=Math.round(h*rt); }
+      c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      phB64 = c.toDataURL('image/jpeg',0.8);
+      var box = document.getElementById('ph-box');
+      box.innerHTML = '<img src="'+phB64+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><button class="del-ph" onclick="delPh(event)">✕ ลบรูป</button>';
     };
-    img.src=e.target.result;
+    img.src = e.target.result;
   };
-  reader.readAsDataURL(input.files[0]);
-  input.value='';
+  r.readAsDataURL(inp.files[0]);
+  inp.value='';
 }
-function delPhoto(e){
+function delPh(e) {
   e.stopPropagation();
-  photoB64=null;
-  document.getElementById('photo-slot').innerHTML='<div class="ph-icon">📷</div><div class="ph-lbl">แตะเพื่อถ่ายรูป / เลือกรูป</div><div style="font-size:11px;color:var(--text2)">รูปจะแนบในการ์ด Check-in</div>';
-  document.getElementById('photo-slot').onclick=function(){document.getElementById('photo-file').click();};
+  phB64 = null;
+  var box = document.getElementById('ph-box');
+  box.innerHTML = '<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
+  box.onclick = function(){ document.getElementById('ph-file').click(); };
 }
 
-function submitCheckin(){
-  var name=document.getElementById('inp-name').value;
-  var zone=document.getElementById('inp-zone').value;
-  var dateVal=document.getElementById('inp-date').value;
-  var timeVal=document.getElementById('inp-time').value;
-  if(!name){toast('กรุณาเลือกชื่อ','err');return;}
-  if(!zone){toast('กรุณาเลือก Zone','err');return;}
-  if(!selShiftVal){toast('กรุณาเลือก Shift','err');return;}
+// CHECKIN
+function doCheckin() {
+  var name = document.getElementById('f-name').value;
+  var zone = document.getElementById('f-zone').value;
+  if(!name){ showToast('กรุณาเลือกชื่อ','err'); return; }
+  if(!zone){ showToast('กรุณาเลือก Zone','err'); return; }
+  if(selIdx < 0){ showToast('กรุณาเลือก Shift','err'); return; }
+  var sh = SHIFTS[selIdx];
+  var n = new Date();
+  var dd = pad(n.getDate()), mm = pad(n.getMonth()+1), yyyy = n.getFullYear();
+  var dateSheet = dd+'/'+mm+'/'+yyyy;
+  var dateThai = n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
+  var timeTxt = pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
 
-  var btn=document.querySelector('.btn-submit');
+  lastName=name; lastZone=zone; lastDateThai=dateThai; lastTime=timeTxt; lastShiftLbl=sh.lbl;
+
+  var btn = document.getElementById('btn-sub');
   btn.textContent='⏳ กำลังบันทึก...'; btn.disabled=true;
 
-  document.getElementById('card-name').textContent=name;
-  document.getElementById('card-zone').textContent=zone;
-  document.getElementById('card-date').textContent=dateVal;
-  document.getElementById('card-time').textContent=timeVal;
-  document.getElementById('card-shift').textContent=selShiftLbl+' '+selShiftVal;
-  if(photoB64){
-    document.getElementById('card-photo-img').style.backgroundImage='url('+photoB64+')';
-    document.getElementById('card-photo-wrap').style.display='block';
-  } else {
-    document.getElementById('card-photo-wrap').style.display='none';
-  }
-
-  var params=new URLSearchParams({action:'checkin',name:name,zone:zone,date:dateVal,time:timeVal,shift:selShiftVal,type:'CHECK-IN'});
-  var cbN='cb_'+Date.now();
-  var url=SCRIPT_URL+'?'+params.toString()+'&callback='+cbN;
-  window[cbN]=function(data){
-    delete window[cbN]; document.getElementById(cbN+'_s')?.remove();
-    btn.textContent='✅ Check-in เลย!'; btn.disabled=false;
-    showSuccess();
-  };
-  var s=document.createElement('script'); s.id=cbN+'_s'; s.src=url;
-  s.onerror=function(){delete window[cbN];s.remove();btn.textContent='✅ Check-in เลย!';btn.disabled=false;showSuccess();};
+  var params = 'action=checkin&name='+encodeURIComponent(name)+'&zone='+encodeURIComponent(zone)+'&date='+encodeURIComponent(dateSheet)+'&time='+encodeURIComponent(timeTxt)+'&shift='+encodeURIComponent(sh.val);
+  var cb = 'cb'+Date.now();
+  var url = GS+'?'+params+'&callback='+cb;
+  window[cb] = function(d){ delete window[cb]; showSuccess(d&&d.success); };
+  var s = document.createElement('script'); s.src=url;
+  s.onerror = function(){ delete window[cb]; showSuccess(false); };
   document.body.appendChild(s);
-  setTimeout(function(){if(window[cbN]){delete window[cbN];s.remove();btn.textContent='✅ Check-in เลย!';btn.disabled=false;showSuccess();}},8000);
+  setTimeout(function(){ if(window[cb]){ delete window[cb]; showSuccess(false); } }, 8000);
 }
 
-function showSuccess(){
-  document.getElementById('form-section').style.display='none';
-  document.getElementById('success-section').style.display='block';
+function showSuccess(ok) {
+  var btn = document.getElementById('btn-sub');
+  btn.textContent='✅ Check-in เลย!'; btn.disabled=false;
+  document.getElementById('suc-sub').textContent = ok ? 'บันทึกลง Google Sheets เรียบร้อยแล้ว ✓' : 'บันทึกแล้ว (Offline)';
+  document.getElementById('ci-name').textContent = lastName;
+  document.getElementById('ci-zone').textContent = lastZone;
+  document.getElementById('ci-date').textContent = lastDateThai;
+  document.getElementById('ci-time').textContent = lastTime;
+  document.getElementById('ci-shift').textContent = lastShiftLbl+' '+SHIFTS[selIdx].val;
+  var photo = document.getElementById('ci-photo');
+  if(phB64){ photo.src=phB64; photo.style.display='block'; }
+  else { photo.style.display='none'; }
+  document.getElementById('sec-form').style.display='none';
+  document.getElementById('sec-success').style.display='block';
   window.scrollTo(0,0);
-  toast('Check-in สำเร็จ! 🎉','ok');
+  showToast('Check-in สำเร็จ! 🎉','ok');
 }
 
-function resetForm(){
-  document.getElementById('form-section').style.display='block';
-  document.getElementById('success-section').style.display='none';
-  document.getElementById('inp-name').value='';
-  document.getElementById('inp-zone').value='';
-  document.querySelectorAll('.shift-card').forEach(c=>c.classList.remove('on'));
-  selShiftVal=''; selShiftLbl=''; photoB64=null;
-  document.getElementById('photo-slot').innerHTML='<div class="ph-icon">📷</div><div class="ph-lbl">แตะเพื่อถ่ายรูป / เลือกรูป</div><div style="font-size:11px;color:var(--text2)">รูปจะแนบในการ์ด Check-in</div>';
-  document.getElementById('photo-slot').onclick=function(){document.getElementById('photo-file').click();};
+function resetForm() {
+  document.getElementById('f-name').value='';
+  document.getElementById('f-zone').value='';
+  for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
+  selIdx=-1; phB64=null;
+  var box=document.getElementById('ph-box');
+  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
+  box.onclick=function(){ document.getElementById('ph-file').click(); };
+  document.getElementById('sec-form').style.display='block';
+  document.getElementById('sec-success').style.display='none';
   window.scrollTo(0,0);
 }
 
-function copyCard(){
-  var card=document.getElementById('card-preview');
-  toast('⏳ กำลังสร้างการ์ด...','');
-  html2canvas(card,{scale:2,useCORS:true,allowTaint:true,logging:false,imageTimeout:0}).then(function(rawCanvas){
-    var maxW=800;
-    var ratio=Math.min(maxW/rawCanvas.width,1);
-    var canvas=document.createElement('canvas');
-    canvas.width=Math.round(rawCanvas.width*ratio);
-    canvas.height=Math.round(rawCanvas.height*ratio);
-    var ctx=canvas.getContext('2d');
-    ctx.imageSmoothingEnabled=true;
-    ctx.imageSmoothingQuality='high';
-    ctx.drawImage(rawCanvas,0,0,canvas.width,canvas.height);
-    canvas.toBlob(function(blob){
+// COPY CARD
+function copyCard() {
+  var card = document.getElementById('ci-card');
+  showToast('⏳ กำลังสร้างการ์ด...','');
+  html2canvas(card,{scale:2,useCORS:true,allowTaint:true,logging:false}).then(function(raw){
+    var maxW=800, ratio=Math.min(maxW/raw.width,1);
+    var c=document.createElement('canvas');
+    c.width=Math.round(raw.width*ratio); c.height=Math.round(raw.height*ratio);
+    var ctx=c.getContext('2d'); ctx.imageSmoothingQuality='high';
+    ctx.drawImage(raw,0,0,c.width,c.height);
+    c.toBlob(function(blob){
       var file=new File([blob],'checkin_wfm.png',{type:'image/png'});
-      var isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent);
-      if(isMobile && navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
-        navigator.share({files:[file],title:'Check-in WFM NOPBIGMAN',text:'✅ รายงานตัวเรียบร้อย'}).then(function(){
-          toast('ส่งการ์ดสำเร็จ ✓','ok');
-        }).catch(function(e){if(e.name!=='AbortError') downloadCard(canvas);});
-        return;
-      }
-      if(navigator.clipboard && window.ClipboardItem){
-        navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(function(){
-          toast('📋 Copy แล้ว! Ctrl+V วางใน Teams / Line ได้เลย ✓','ok');
-        }).catch(function(){downloadCard(canvas);});
-      } else {downloadCard(canvas);}
+      var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+      if(isMob&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'Check-in WFM',text:'✅ รายงานตัวเรียบร้อย'})
+          .then(function(){ showToast('ส่งสำเร็จ ✓','ok'); })
+          .catch(function(e){ if(e.name!=='AbortError') dlCard(c); });
+      } else if(navigator.clipboard&&window.ClipboardItem){
+        navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
+          .then(function(){ showToast('📋 Copy แล้ว! กด Ctrl+V วางใน Teams/Line ได้เลย','ok'); })
+          .catch(function(){ dlCard(c); });
+      } else { dlCard(c); }
     },'image/png');
   });
 }
-
-function downloadCard(canvas){
+function dlCard(c){
   var a=document.createElement('a');
-  a.href=canvas.toDataURL('image/png');
-  a.download='checkin_wfm_'+Date.now()+'.png';
+  a.href=c.toDataURL('image/png');
+  a.download='checkin_wfm.png';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  toast('💾 บันทึกรูปแล้ว! ส่งใน Teams / Line ได้เลย ✓','ok');
+  showToast('💾 บันทึกรูปแล้ว! ส่งใน Teams/Line ได้เลย','ok');
 }
 
-var SHIFTS=[
-  {val:'08:30 - 17:30',lbl:'Day Shift',ic:'☀️',color:'#f47920',bg:'rgba(244,121,32,.08)',border:'rgba(244,121,32,.25)'},
-  {val:'08:30 - 20:30',lbl:'Evening Shift',ic:'🌆',color:'#0891b2',bg:'rgba(8,145,178,.08)',border:'rgba(8,145,178,.25)'},
-  {val:'08:30 - 23:59',lbl:'Night Shift',ic:'🌙',color:'#003087',bg:'rgba(0,48,135,.08)',border:'rgba(0,48,135,.25)'},
-  {val:'00:00 - 08:00',lbl:'Midnight Shift',ic:'🌑',color:'#7c3aed',bg:'rgba(124,58,237,.08)',border:'rgba(124,58,237,.25)'},
-];
-
-function loadDash(){
+// DASHBOARD
+function loadDash() {
   var n=new Date();
-  document.getElementById('dash-date-lbl').textContent=n.getDate()+' '+MONTHS[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('dash-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2);font-size:14px">⏳ กำลังโหลดข้อมูล...</div>';
+  var dd=pad(n.getDate()), mm=pad(n.getMonth()+1), yyyy=n.getFullYear();
+  var todaySheet=dd+'/'+mm+'/'+yyyy;
+  document.getElementById('d-today').textContent=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
+  document.getElementById('d-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div>';
 
-  var cbN='cb_'+Date.now();
-  var url=SCRIPT_URL+'?action=getCheckin&callback='+cbN;
-  window[cbN]=function(data){
-    delete window[cbN]; document.getElementById(cbN+'_s')?.remove();
-    var list=[];
-    if(data&&data.success&&data.checkins) list=data.checkins;
-    renderDash(list);
+  var cb='cb'+Date.now();
+  var url=GS+'?action=getCheckin&callback='+cb;
+  window[cb]=function(d){
+    delete window[cb];
+    var list=(d&&d.success&&d.checkins)?d.checkins:[];
+    renderDash(list, todaySheet);
   };
-  var s=document.createElement('script'); s.id=cbN+'_s'; s.src=url;
-  s.onerror=function(){delete window[cbN];s.remove();showDashError();};
+  var s=document.createElement('script'); s.src=url;
+  s.onerror=function(){ delete window[cb]; renderDash([], todaySheet); };
   document.body.appendChild(s);
-  setTimeout(function(){if(window[cbN]){delete window[cbN];s.remove();showDashError();}},10000);
+  setTimeout(function(){ if(window[cb]){ delete window[cb]; renderDash([],todaySheet); } },10000);
 }
 
-function showDashError(){
-  document.getElementById('dash-content').innerHTML='<div style="background:#fff3e8;border:2px solid #f47920;border-radius:14px;padding:20px;text-align:center"><div style="font-size:28px;margin-bottom:10px">⚠️</div><div style="font-family:Kanit,sans-serif;font-weight:800;font-size:15px;color:#b85710;margin-bottom:8px">ไม่สามารถดึงข้อมูลได้</div><button onclick="loadDash()" style="margin-top:10px;background:#f47920;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-family:Kanit,sans-serif;font-weight:700;cursor:pointer">🔄 ลองใหม่</button></div>';
-}
-
-function renderDash(list){
-  var today=new Date();
-  var todayStr=today.getDate()+' '+MONTHS[today.getMonth()]+' '+(today.getFullYear()+543);
-  
-  var todayList=list.filter(function(r){
-    if(!r.date) return false;
-    var cleanR = r.date.trim();
-    var cleanT = todayStr.trim();
-    return cleanR === cleanT || cleanR.includes(today.getDate()+' '+MONTHS[today.getMonth()]);
-  });
-
-  var total=todayList.length;
-  var html='<div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:16px;padding:16px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">';
-  html+='<div><div style="font-size:11px;opacity:.8;letter-spacing:2px;font-family:Kanit,sans-serif">รายงานตัววันนี้ทั้งหมด</div>';
-  html+='<div style="font-family:Kanit,sans-serif;font-size:40px;font-weight:800">'+total+'</div>';
-  html+='<div style="font-size:12px;opacity:.8">คน</div></div>';
-  html+='<div style="font-size:48px">👥</div></div>';
-
+function renderDash(list, todaySheet) {
+  // filter today
+  var today = list.filter(function(r){ return r.date && r.date.trim()===todaySheet; });
+  var total = today.length;
+  var html = '<div class="dash-total"><div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">รายงานตัววันนี้ทั้งหมด</div><div class="dash-total-num">'+total+'</div><div style="font-size:12px;opacity:.8">คน</div></div><div style="font-size:48px">👥</div></div>';
   SHIFTS.forEach(function(sh){
-    var members=todayList.filter(function(r){
-      var rShift = (r.shift || '').replace(/\s+/g,'');
-      var target = sh.val.replace(/\s+/g,'');
-      return rShift.includes(target) || target.includes(rShift) || (sh.val.slice(0,5) && rShift.includes(sh.val.slice(0,5)));
-    });
-
-    html+='<div style="background:var(--surface);border-radius:16px;padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.06);border:2px solid '+sh.border+'">';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:'+(members.length?'14px':'0')+';">';
-    html+='<div style="display:flex;align-items:center;gap:12px">';
-    html+='<div style="width:46px;height:46px;border-radius:13px;background:'+sh.bg+';border:2px solid '+sh.border+';display:flex;align-items:center;justify-content:center;font-size:22px">'+sh.ic+'</div>';
-    html+='<div><div style="font-family:Kanit,sans-serif;font-size:15px;font-weight:800;color:'+sh.color+'">'+sh.lbl+'</div>';
-    html+='<div style="font-size:12px;color:var(--text2)">'+sh.val+'</div></div></div>';
-    html+='<div style="background:'+sh.color+';color:#fff;font-family:Kanit,sans-serif;font-size:18px;font-weight:800;padding:6px 14px;border-radius:20px;min-width:40px;text-align:center">'+members.length+'</div>';
-    html+='</div>';
-
-    if(members.length){
-      html+='<div style="display:flex;flex-direction:column;gap:6px">';
-      members.forEach(function(m,i){
-        html+='<div style="display:flex;align-items:center;gap:10px;background:'+sh.bg+';border-radius:10px;padding:9px 12px">';
-        html+='<div style="width:26px;height:26px;border-radius:8px;background:'+sh.color+';color:#fff;font-family:Kanit,sans-serif;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
-        html+='<div style="flex:1"><div style="font-size:14px;font-weight:700">'+esc(m.name||'-')+'</div>';
-        html+='<div style="font-size:11px;color:var(--text2)">'+esc(m.zone||'-')+'</div></div>';
-        html+='<div style="font-family:Kanit,sans-serif;font-size:12px;color:var(--text2)">'+esc(m.time||'')+'</div>';
-        html+='</div>';
+    var mems = today.filter(function(r){ return r.shift && r.shift.trim()===sh.val.trim(); });
+    html += '<div class="shift-box" style="border:2px solid '+sh.bd+'">';
+    html += '<div class="shift-box-hdr">';
+    html += '<div style="display:flex;align-items:center;gap:12px"><div class="shift-ic" style="background:'+sh.bg+';border:2px solid '+sh.bd+'">'+sh.ic+'</div>';
+    html += '<div><div class="shift-name" style="color:'+sh.col+'">'+sh.lbl.replace(/^[^\s]+\s/,'')+'</div><div class="shift-time">'+sh.val+'</div></div></div>';
+    html += '<div class="shift-cnt" style="background:'+sh.col+'">'+mems.length+'</div>';
+    html += '</div>';
+    if(mems.length){
+      mems.forEach(function(m,i){
+        html += '<div class="mem-row"><div class="mem-num" style="background:'+sh.col+'">'+(i+1)+'</div>';
+        html += '<div class="mem-name">'+esc(m.name)+'</div>';
+        html += '<div class="mem-zone">'+esc(m.zone||'')+'</div>';
+        html += '<div class="mem-time">'+esc(m.time||'')+'</div></div>';
       });
-      html+='</div>';
     } else {
-      html+='<div style="text-align:center;padding:10px;color:var(--text2);font-size:13px">ยังไม่มีคนรายงานตัว</div>';
+      html += '<div class="no-mem">ยังไม่มีคนรายงานตัว</div>';
     }
-    html+='</div>';
+    html += '</div>';
   });
-
-  document.getElementById('dash-content').innerHTML=html;
+  if(list.length===0){
+    html += '<div style="background:#fff3e8;border:2px solid #f47920;border-radius:14px;padding:16px;text-align:center;font-size:13px;color:#b85710">⚠️ ยังไม่มีข้อมูลจาก Google Sheets<br><small>ลอง Check-in ก่อน แล้วกด 🔄 รีเฟรช</small></div>';
+  }
+  document.getElementById('d-content').innerHTML=html;
 }
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function toast(msg,type){
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showToast(msg,type){
   var t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show'+(type?' '+type:'');
-  setTimeout(function(){t.className='toast';},2800);
+  setTimeout(function(){ t.className='toast'; },3000);
 }
 </script>
 </body>
