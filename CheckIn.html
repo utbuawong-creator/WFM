@@ -6,7 +6,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Check-in | WFM NOPBIGMAN</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{--org:#f47920;--grn:#8dc63f;--blue:#003087;--bg:#f0f4f0;--surface:#fff;--border:#e0e8e0;--text:#1a2a1a;--text2:#5a7a5a;--r:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -180,7 +179,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         </div>
         <div class="sc" id="sc3" onclick="pickShift(3)">
           <div class="sc-rb"><div class="sc-dot"></div></div>
-          <div><div class="sc-time">00:00—08:00</div><div class="sc-lbl">🌑 Midnight Shift</div></div>
+          <div><div class="sc-time">20:30—05:30</div><div class="sc-lbl">🌙 Night Shift OT</div></div>
         </div>
       </div>
     </div>
@@ -243,7 +242,10 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
     <div style="background:var(--surface);border-radius:20px;padding:20px;margin-bottom:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">📊 สรุปรายงานตัว</div>
-        <button onclick="document.getElementById('dash-modal').style.display='none'" style="background:var(--bg);border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="copyDashCard()" style="background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif">📤 คัดลอก</button>
+          <button onclick="document.getElementById('dash-modal').style.display='none'" style="background:var(--bg);border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+        </div>
       </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:14px">วันที่ <span id="d-today" style="font-weight:700;color:var(--text)"></span></div>
       <div id="d-content"><div style="text-align:center;padding:30px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div></div>
@@ -253,232 +255,458 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 <div class="toast-w"><div class="toast" id="toast"></div></div>
 
 <script>
-var GS = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
-var MO = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-var DA = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+var GS  = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
+var FB  = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+var MO  = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var DA  = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 var SHIFTS = [
-  {val:'08:30 - 17:30',lbl:'☀️ Day Shift',   ic:'☀️', col:'#f47920', bg:'rgba(244,121,32,.08)', bd:'rgba(244,121,32,.3)'},
-  {val:'08:30 - 20:30',lbl:'🌆 Evening Shift',ic:'🌆', col:'#0891b2', bg:'rgba(8,145,178,.08)',  bd:'rgba(8,145,178,.3)'},
-  {val:'08:30 - 23:59',lbl:'🌙 Night Shift',  ic:'🌙', col:'#003087', bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
-  {val:'00:00 - 08:00',lbl:'🌑 Midnight Shift',ic:'🌑',col:'#7c3aed', bg:'rgba(124,58,237,.08)', bd:'rgba(124,58,237,.3)'}
+  {val:'08:30 - 17:30', lbl:'☀️ Day Shift',    ic:'☀️', col:'#f47920', bg:'rgba(244,121,32,.08)', bd:'rgba(244,121,32,.3)'},
+  {val:'08:30 - 20:30', lbl:'🌆 Evening Shift', ic:'🌆', col:'#0891b2', bg:'rgba(8,145,178,.08)',  bd:'rgba(8,145,178,.3)'},
+  {val:'08:30 - 23:59', lbl:'🌙 Night Shift',   ic:'🌙', col:'#003087', bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
+  {val:'20:30 - 05:30', lbl:'🌙 Night Shift OT', ic:'🌙', col:'#7c3aed', bg:'rgba(124,58,237,.08)', bd:'rgba(124,58,237,.3)'}
 ];
-var selIdx = -1;
-var phB64 = null;
+var selIdx=-1, phB64=null;
 var lastName='', lastZone='', lastDateThai='', lastTime='', lastShiftLbl='';
 
-// CLOCK
-function tick() {
-  var n = new Date();
-  var h = pad(n.getHours()), m = pad(n.getMinutes()), s = pad(n.getSeconds());
-  document.getElementById('cl-time').textContent = h+':'+m+':'+s;
-  document.getElementById('cl-date').textContent = 'วัน'+DA[n.getDay()]+'ที่ '+n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('f-date').value = n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('f-time').value = h+':'+m+':'+s;
-}
 function pad(v){ return String(v).padStart(2,'0'); }
-setInterval(tick, 1000);
-tick();
 
-
+// CLOCK
+function tick(){
+  var n=new Date();
+  var h=pad(n.getHours()),m=pad(n.getMinutes()),s=pad(n.getSeconds());
+  document.getElementById('cl-time').textContent=h+':'+m+':'+s;
+  document.getElementById('cl-date').textContent='วัน'+DA[n.getDay()]+'ที่ '+n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('f-date').value=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('f-time').value=h+':'+m+':'+s;
+}
+setInterval(tick,1000); tick();
 
 // SHIFT
-function pickShift(i) {
-  selIdx = i;
+function pickShift(i){
+  selIdx=i;
   for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
   document.getElementById('sc'+i).classList.add('on');
 }
 
 // PHOTO
-function loadPh(inp) {
+function loadPh(inp){
   if(!inp.files[0]) return;
-  var r = new FileReader();
-  r.onload = function(e) {
-    var img = new Image();
-    img.onload = function() {
-      var c = document.createElement('canvas');
-      var max = 1000, w = img.width, h = img.height;
-      if(w>max||h>max){ var rt=Math.min(max/w,max/h); w=Math.round(w*rt); h=Math.round(h*rt); }
-      c.width=w; c.height=h;
+  var r=new FileReader();
+  r.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');
+      var max=900,w=img.width,h=img.height;
+      if(w>max||h>max){var rt=Math.min(max/w,max/h);w=Math.round(w*rt);h=Math.round(h*rt);}
+      c.width=w;c.height=h;
       c.getContext('2d').drawImage(img,0,0,w,h);
-      phB64 = c.toDataURL('image/jpeg',0.8);
-      var box = document.getElementById('ph-box');
-      box.innerHTML = '<img src="'+phB64+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><button class="del-ph" onclick="delPh(event)">✕ ลบรูป</button>';
+      phB64=c.toDataURL('image/jpeg',0.75);
+      var box=document.getElementById('ph-box');
+      box.innerHTML='<img src="'+phB64+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><button class="del-ph" onclick="delPh(event)">✕ ลบรูป</button>';
     };
-    img.src = e.target.result;
+    img.src=e.target.result;
   };
   r.readAsDataURL(inp.files[0]);
   inp.value='';
 }
-function delPh(e) {
-  e.stopPropagation();
-  phB64 = null;
-  var box = document.getElementById('ph-box');
-  box.innerHTML = '<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
-  box.onclick = function(){ document.getElementById('ph-file').click(); };
+function delPh(e){
+  e.stopPropagation(); phB64=null;
+  var box=document.getElementById('ph-box');
+  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
+  box.onclick=function(){document.getElementById('ph-file').click();};
 }
 
 // CHECKIN
-function doCheckin() {
-  var name = document.getElementById('f-name').value;
-  var zone = document.getElementById('f-zone').value;
-  if(!name){ showToast('กรุณาเลือกชื่อ','err'); return; }
-  if(!zone){ showToast('กรุณาเลือก Zone','err'); return; }
-  if(selIdx < 0){ showToast('กรุณาเลือก Shift','err'); return; }
-  var sh = SHIFTS[selIdx];
-  var n = new Date();
-  var dd = pad(n.getDate()), mm = pad(n.getMonth()+1), yyyy = n.getFullYear();
-  var dateSheet = dd+'/'+mm+'/'+yyyy;
-  var dateThai = n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
-  var timeTxt = pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+function doCheckin(){
+  var name=document.getElementById('f-name').value;
+  var zone=document.getElementById('f-zone').value;
+  if(!name){showToast('กรุณาเลือกชื่อ','err');return;}
+  if(!zone){showToast('กรุณาเลือก Zone','err');return;}
+  if(selIdx<0){showToast('กรุณาเลือก Shift','err');return;}
+  var sh=SHIFTS[selIdx];
+  var n=new Date();
+  var today=n.toISOString().slice(0,10); // YYYY-MM-DD for Firebase
+  var dd=pad(n.getDate()),mm=pad(n.getMonth()+1),yyyy=n.getFullYear();
+  var dateSheet=dd+'/'+mm+'/'+yyyy;
+  var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
+  var timeTxt=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
 
   lastName=name; lastZone=zone; lastDateThai=dateThai; lastTime=timeTxt; lastShiftLbl=sh.lbl;
 
-  var btn = document.getElementById('btn-sub');
+  var btn=document.getElementById('btn-sub');
   btn.textContent='⏳ กำลังบันทึก...'; btn.disabled=true;
 
-  var params = 'action=checkin&name='+encodeURIComponent(name)+'&zone='+encodeURIComponent(zone)+'&date='+encodeURIComponent(dateSheet)+'&time='+encodeURIComponent(timeTxt)+'&shift='+encodeURIComponent(sh.val);
-  var cb = 'cb'+Date.now();
-  var url = GS+'?'+params+'&callback='+cb;
-  window[cb] = function(d){ delete window[cb]; showSuccess(d&&d.success); };
-  var s = document.createElement('script'); s.src=url;
-  s.onerror = function(){ delete window[cb]; showSuccess(false); };
-  document.body.appendChild(s);
-  setTimeout(function(){ if(window[cb]){ delete window[cb]; showSuccess(false); } }, 8000);
+  var rec={id:Date.now().toString(), name:name, zone:zone, shift:sh.val,
+           date:today, dateThai:dateThai, time:timeTxt, ca:Date.now()};
+
+  // บันทึกลง Firebase (หลัก) + Google Sheets (สำรอง)
+  fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
+    .then(function(r){return r.json();})
+    .then(function(){
+      // ส่งไป Google Sheets ด้วย (background)
+      var p='action=checkin&name='+encodeURIComponent(name)+'&zone='+encodeURIComponent(zone)+'&date='+encodeURIComponent(dateSheet)+'&time='+encodeURIComponent(timeTxt)+'&shift='+encodeURIComponent(sh.val);
+      var cb='cb'+Date.now();
+      var url=GS+'?'+p+'&callback='+cb;
+      window[cb]=function(){delete window[cb];};
+      var s=document.createElement('script');s.src=url;document.body.appendChild(s);
+      showSuccess(true);
+    })
+    .catch(function(){showSuccess(false);});
+
+  setTimeout(function(){
+    if(btn.disabled){btn.textContent='✅ Check-in เลย!';btn.disabled=false;showSuccess(false);}
+  },8000);
 }
 
-function showSuccess(ok) {
-  var btn = document.getElementById('btn-sub');
+function showSuccess(ok){
+  var btn=document.getElementById('btn-sub');
   btn.textContent='✅ Check-in เลย!'; btn.disabled=false;
-  document.getElementById('suc-sub').textContent = ok ? 'บันทึกลง Google Sheets เรียบร้อยแล้ว ✓' : 'บันทึกแล้ว (Offline)';
-  document.getElementById('ci-name').textContent = lastName;
-  document.getElementById('ci-zone').textContent = lastZone;
-  document.getElementById('ci-date').textContent = lastDateThai;
-  document.getElementById('ci-time').textContent = lastTime;
-  document.getElementById('ci-shift').textContent = lastShiftLbl+' '+SHIFTS[selIdx].val;
-  var photo = document.getElementById('ci-photo');
-  if(phB64){ photo.src=phB64; photo.style.display='block'; }
-  else { photo.style.display='none'; }
+  document.getElementById('suc-sub').textContent=ok?'บันทึกสำเร็จ ✓':'บันทึกแล้ว (Offline)';
+  document.getElementById('ci-name').textContent=lastName;
+  document.getElementById('ci-zone').textContent=lastZone;
+  document.getElementById('ci-date').textContent=lastDateThai;
+  document.getElementById('ci-time').textContent=lastTime;
+  document.getElementById('ci-shift').textContent=lastShiftLbl+' '+SHIFTS[selIdx].val;
+  var photo=document.getElementById('ci-photo');
+  if(phB64){photo.src=phB64;photo.style.display='block';}
+  else{photo.style.display='none';}
   document.getElementById('sec-form').style.display='none';
   document.getElementById('sec-success').style.display='block';
   window.scrollTo(0,0);
   showToast('Check-in สำเร็จ! 🎉','ok');
 }
 
-function resetForm() {
+function resetForm(){
   document.getElementById('f-name').value='';
   document.getElementById('f-zone').value='';
   for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
   selIdx=-1; phB64=null;
   var box=document.getElementById('ph-box');
   box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
-  box.onclick=function(){ document.getElementById('ph-file').click(); };
+  box.onclick=function(){document.getElementById('ph-file').click();};
   document.getElementById('sec-form').style.display='block';
   document.getElementById('sec-success').style.display='none';
   window.scrollTo(0,0);
 }
 
-// COPY CARD
-function copyCard() {
-  var card = document.getElementById('ci-card');
+// COPY CARD — วาดด้วย Canvas โดยตรง
+function copyCard(){
   showToast('⏳ กำลังสร้างการ์ด...','');
-  html2canvas(card,{scale:2,useCORS:true,allowTaint:true,logging:false}).then(function(raw){
-    var maxW=800, ratio=Math.min(maxW/raw.width,1);
-    var c=document.createElement('canvas');
-    c.width=Math.round(raw.width*ratio); c.height=Math.round(raw.height*ratio);
-    var ctx=c.getContext('2d'); ctx.imageSmoothingQuality='high';
-    ctx.drawImage(raw,0,0,c.width,c.height);
-    c.toBlob(function(blob){
+  buildCard(function(canvas){
+    canvas.toBlob(function(blob){
       var file=new File([blob],'checkin_wfm.png',{type:'image/png'});
       var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
       if(isMob&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
         navigator.share({files:[file],title:'Check-in WFM',text:'✅ รายงานตัวเรียบร้อย'})
-          .then(function(){ showToast('ส่งสำเร็จ ✓','ok'); })
-          .catch(function(e){ if(e.name!=='AbortError') dlCard(c); });
+          .then(function(){showToast('ส่งสำเร็จ ✓','ok');})
+          .catch(function(e){if(e.name!=='AbortError')dlBlob(blob);});
       } else if(navigator.clipboard&&window.ClipboardItem){
         navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
-          .then(function(){ showToast('📋 Copy แล้ว! กด Ctrl+V วางใน Teams/Line ได้เลย','ok'); })
-          .catch(function(){ dlCard(c); });
-      } else { dlCard(c); }
-    },'image/png');
+          .then(function(){showToast('📋 Copy แล้ว! กด Ctrl+V วางใน Teams/Line ได้เลย','ok');})
+          .catch(function(){dlBlob(blob);});
+      } else {dlBlob(blob);}
+    },'image/png',1.0);
   });
 }
-function dlCard(c){
-  var a=document.createElement('a');
-  a.href=c.toDataURL('image/png');
-  a.download='checkin_wfm.png';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+function dlBlob(blob){
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='checkin_wfm.png';document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
   showToast('💾 บันทึกรูปแล้ว! ส่งใน Teams/Line ได้เลย','ok');
 }
 
-// DASHBOARD
-function loadDash() {
-  var n=new Date();
-  var dd=pad(n.getDate()), mm=pad(n.getMonth()+1), yyyy=n.getFullYear();
-  var todaySheet=dd+'/'+mm+'/'+yyyy;
-  document.getElementById('d-today').textContent=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
-  document.getElementById('d-content').innerHTML='<div style="text-align:center;padding:30px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div>';
-  document.getElementById('dash-modal').style.display='block';
+// วาดการ์ดด้วย Canvas โดยตรง — แนวตั้ง 720x1080, คมชัด
+function buildCard(callback){
+  var W=720, H=1080, PAD=40;
+  var c=document.createElement('canvas');
+  c.width=W; c.height=H;
+  var ctx=c.getContext('2d');
 
-  var cb='cb'+Date.now();
-  var url=GS+'?action=getCheckin&callback='+cb;
-  window[cb]=function(d){
-    delete window[cb];
-    var list=(d&&d.success&&d.checkins)?d.checkins:[];
-    renderDash(list, todaySheet);
-  };
-  var s=document.createElement('script'); s.src=url;
-  s.onerror=function(){ delete window[cb]; renderDash([], todaySheet); };
-  document.body.appendChild(s);
-  setTimeout(function(){ if(window[cb]){ delete window[cb]; renderDash([],todaySheet); } },10000);
+  // BG gradient
+  var grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,'#1B5E20');
+  grad.addColorStop(0.5,'#2E7D32');
+  grad.addColorStop(1,'#1a3a1a');
+  ctx.fillStyle=grad;
+  ctx.roundRect(0,0,W,H,28);
+  ctx.fill();
+
+  // overlay circles
+  ctx.fillStyle='rgba(255,255,255,0.04)';
+  ctx.beginPath();ctx.arc(W+60,-60,220,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(-60,H+60,180,0,Math.PI*2);ctx.fill();
+
+  // stamp badge
+  ctx.save();
+  ctx.translate(W-PAD-10,PAD+10);
+  ctx.rotate(0.08);
+  ctx.fillStyle='rgba(141,198,63,0.15)';
+  roundRect(ctx,-60,-18,120,36,8);ctx.fill();
+  ctx.strokeStyle='rgba(141,198,63,0.6)';ctx.lineWidth=2;
+  roundRect(ctx,-60,-18,120,36,8);ctx.stroke();
+  ctx.fillStyle='#8dc63f';
+  ctx.font='bold 13px Kanit,sans-serif';ctx.textAlign='center';
+  ctx.fillText('CHECK-IN ✓',0,5);
+  ctx.restore();
+
+  // logo text
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.font='11px Kanit,sans-serif';ctx.textAlign='left';ctx.letterSpacing='3px';
+  ctx.fillText('AIS 3BB  ·  WFM NOPBIGMAN',PAD,PAD+16);
+
+  var photoH=phB64?340:0;
+  var photoY=PAD+40;
+
+  function drawText(){
+    var y=photoY+(phB64?photoH+24:0);
+
+    // name
+    ctx.fillStyle='#ffffff';
+    ctx.font='800 38px Kanit,sans-serif';ctx.textAlign='left';ctx.letterSpacing='0px';
+    ctx.fillText(lastName||'-',PAD,y+40);
+    // zone
+    ctx.fillStyle='rgba(255,255,255,0.75)';
+    ctx.font='18px Sarabun,sans-serif';
+    ctx.fillText(lastZone||'-',PAD,y+70);
+
+    var ry=y+100, rh=80, rw=(W-PAD*2-16)/2;
+    // date box
+    drawInfoBox(ctx,PAD,ry,rw,rh,'📅 วันที่',lastDateThai||'-');
+    // time box
+    drawInfoBox(ctx,PAD+rw+16,ry,rw,rh,'⏰ เวลา',lastTime||'-');
+    // shift box full width
+    drawInfoBox(ctx,PAD,ry+rh+12,W-PAD*2,rh,'⏱️ SHIFT',lastShiftLbl+(selIdx>=0?' '+SHIFTS[selIdx].val:''));
+
+    // badge
+    var by=ry+rh*2+36;
+    ctx.fillStyle='rgba(244,121,32,0.25)';
+    roundRect(ctx,PAD,by,220,38,19);ctx.fill();
+    ctx.strokeStyle='rgba(244,121,32,0.5)';ctx.lineWidth=1.5;
+    roundRect(ctx,PAD,by,220,38,19);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 14px Kanit,sans-serif';ctx.textAlign='left';
+    ctx.fillText('✅  รายงานตัวเรียบร้อย',PAD+14,by+24);
+
+    callback(c);
+  }
+
+  if(phB64){
+    var img=new Image();
+    img.onload=function(){
+      ctx.save();
+      roundRect(ctx,PAD,photoY,W-PAD*2,photoH,14);
+      ctx.clip();
+      // center crop
+      var iw=img.width,ih=img.height;
+      var tw=W-PAD*2,th=photoH;
+      var scale=Math.max(tw/iw,th/ih);
+      var sw=tw/scale,sh=th/scale;
+      var sx=(iw-sw)/2,sy=ih>iw?(ih-sh)*0.15:0; // portrait: crop from top-ish
+      ctx.drawImage(img,sx,sy,sw,sh,PAD,photoY,tw,th);
+      ctx.restore();
+      drawText();
+    };
+    img.onerror=function(){phB64=null;drawText();};
+    img.src=phB64;
+  } else {
+    drawText();
+  }
 }
 
-function renderDash(list, todaySheet) {
-  // filter today
-  // flexible date matching: dd/MM/yyyy OR d/M/yyyy
-  var today = list.filter(function(r){
-    if(!r.date) return false;
-    var d = r.date.trim();
-    // normalize both to d/M/yyyy for comparison
-    var p = d.split('/');
-    if(p.length!==3) return false;
-    var norm = parseInt(p[0])+'/'+parseInt(p[1])+'/'+p[2];
-    var tp = todaySheet.split('/');
-    var todayNorm = parseInt(tp[0])+'/'+parseInt(tp[1])+'/'+tp[2];
-    return norm===todayNorm;
-  });
-  var total = today.length;
-  var html = '<div class="dash-total"><div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">รายงานตัววันนี้ทั้งหมด</div><div class="dash-total-num">'+total+'</div><div style="font-size:12px;opacity:.8">คน</div></div><div style="font-size:48px">👥</div></div>';
+function drawInfoBox(ctx,x,y,w,h,lbl,val){
+  ctx.fillStyle='rgba(255,255,255,0.1)';
+  roundRect(ctx,x,y,w,h,10);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.55)';
+  ctx.font='11px Sarabun,sans-serif';ctx.textAlign='left';ctx.letterSpacing='1px';
+  ctx.fillText(lbl,x+14,y+20);
+  ctx.fillStyle='#ffffff';
+  ctx.font='bold 17px Kanit,sans-serif';ctx.letterSpacing='0px';
+  ctx.fillText(val,x+14,y+50);
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+// DASHBOARD — ดึงจาก Firebase
+function loadDash(){
+  var n=new Date();
+  var today=n.toISOString().slice(0,10); // YYYY-MM-DD
+  document.getElementById('d-today').textContent=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('d-content').innerHTML='<div style="text-align:center;padding:30px;color:#666;font-size:14px">⏳ กำลังโหลด...</div>';
+  document.getElementById('dash-modal').style.display='block';
+
+  fetch(FB+'/checkins.json')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var list=d?Object.values(d):[];
+      var todayList=list.filter(function(r){return r.date&&r.date===today;});
+      renderDash(todayList);
+    })
+    .catch(function(){renderDash([]);});
+}
+
+function renderDash(today){
+  var total=today.length;
+  var html='<div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:14px;padding:14px 18px;color:#fff;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">'
+    +'<div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">รายงานตัววันนี้ทั้งหมด</div>'
+    +'<div style="font-family:Kanit,sans-serif;font-size:44px;font-weight:800;line-height:1">'+total+'</div>'
+    +'<div style="font-size:12px;opacity:.8">คน</div></div><div style="font-size:44px">👥</div></div>';
+
   SHIFTS.forEach(function(sh){
-    var mems = today.filter(function(r){ return r.shift && r.shift.trim()===sh.val.trim(); });
-    html += '<div class="shift-box" style="border:2px solid '+sh.bd+'">';
-    html += '<div class="shift-box-hdr">';
-    html += '<div style="display:flex;align-items:center;gap:12px"><div class="shift-ic" style="background:'+sh.bg+';border:2px solid '+sh.bd+'">'+sh.ic+'</div>';
-    html += '<div><div class="shift-name" style="color:'+sh.col+'">'+sh.lbl.replace(/^[^\s]+\s/,'')+'</div><div class="shift-time">'+sh.val+'</div></div></div>';
-    html += '<div class="shift-cnt" style="background:'+sh.col+'">'+mems.length+'</div>';
-    html += '</div>';
+    var mems=today.filter(function(r){return r.shift&&r.shift.trim()===sh.val.trim();});
+    html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:2px solid '+sh.bd+'">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:'+(mems.length?'10px':'0')+'">';
+    html+='<div style="display:flex;align-items:center;gap:10px">';
+    html+='<div style="width:42px;height:42px;border-radius:12px;background:'+sh.bg+';border:2px solid '+sh.bd+';display:flex;align-items:center;justify-content:center;font-size:20px">'+sh.ic+'</div>';
+    html+='<div><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:'+sh.col+'">'+sh.lbl.replace(/^[^\s]+\s/,'')+'</div>';
+    html+='<div style="font-size:12px;color:#888">'+sh.val+'</div></div></div>';
+    html+='<div style="background:'+sh.col+';color:#fff;font-family:Kanit,sans-serif;font-size:18px;font-weight:800;padding:5px 14px;border-radius:20px">'+mems.length+'</div></div>';
     if(mems.length){
       mems.forEach(function(m,i){
-        html += '<div class="mem-row"><div class="mem-num" style="background:'+sh.col+'">'+(i+1)+'</div>';
-        html += '<div class="mem-name">'+esc(m.name)+'</div>';
-        html += '<div class="mem-zone">'+esc(m.zone||'')+'</div>';
-        html += '<div class="mem-time">'+esc(m.time||'')+'</div></div>';
+        html+='<div style="display:flex;align-items:center;gap:8px;background:#f8faf8;border-radius:10px;padding:8px 12px;margin-bottom:5px">';
+        html+='<div style="width:24px;height:24px;border-radius:7px;background:'+sh.col+';color:#fff;font-family:Kanit,sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
+        html+='<div style="flex:1;font-size:14px;font-weight:700">'+esc(m.name||'-')+'</div>';
+        html+='<div style="font-size:11px;color:#888;background:#eee;border-radius:6px;padding:2px 7px">'+esc(m.zone||'')+'</div>';
+        html+='<div style="font-family:Kanit,sans-serif;font-size:11px;color:#aaa">'+esc(m.time||'')+'</div></div>';
       });
     } else {
-      html += '<div class="no-mem">ยังไม่มีคนรายงานตัว</div>';
+      html+='<div style="text-align:center;padding:10px;color:#aaa;font-size:13px">ยังไม่มีคนรายงานตัว</div>';
     }
-    html += '</div>';
+    html+='</div>';
   });
-  if(list.length===0){
-    html += '<div style="background:#fff3e8;border:2px solid #f47920;border-radius:14px;padding:16px;text-align:center;font-size:13px;color:#b85710">⚠️ ยังไม่มีข้อมูลจาก Google Sheets<br><small>ลอง Check-in ก่อน แล้วกด 🔄 รีเฟรช</small></div>';
-  }
   document.getElementById('d-content').innerHTML=html;
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// COPY DASHBOARD SUMMARY
+function copyDashCard(){
+  var content=document.getElementById('d-content');
+  var dateText=document.getElementById('d-today').textContent;
+  showToast('⏳ กำลังสร้างภาพสรุป...','');
+
+  // Build summary canvas
+  var n=new Date();
+  var today=n.toISOString().slice(0,10);
+  fetch(FB+'/checkins.json')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var list=d?Object.values(d):[];
+      var todayList=list.filter(function(r){return r.date&&r.date===today;});
+      buildDashCanvas(todayList,dateText,function(canvas){
+        canvas.toBlob(function(blob){
+          var file=new File([blob],'checkin_summary.png',{type:'image/png'});
+          var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+          if(isMob&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+            navigator.share({files:[file],title:'สรุปรายงานตัว',text:'📊 Check-in Summary WFM'})
+              .then(function(){showToast('ส่งสำเร็จ ✓','ok');})
+              .catch(function(){dlBlob(blob);});
+          } else if(navigator.clipboard&&window.ClipboardItem){
+            navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
+              .then(function(){showToast('📋 Copy แล้ว! วางใน Teams/Line ได้เลย','ok');})
+              .catch(function(){dlBlob(blob);});
+          } else {dlBlob(blob);}
+        },'image/png',1.0);
+      });
+    });
+}
+
+function buildDashCanvas(todayList,dateText,callback){
+  var W=720;
+  var rowH=70;
+  var shiftH=function(sh){
+    var mems=todayList.filter(function(r){return r.shift&&r.shift.trim()===sh.val.trim();});
+    return 80+(mems.length?mems.length*rowH:50);
+  };
+  var totalH=100+80+SHIFTS.reduce(function(s,sh){return s+shiftH(sh)+12;},0)+40;
+  var H=Math.max(totalH,400);
+
+  var c=document.createElement('canvas');c.width=W;c.height=H;
+  var ctx=c.getContext('2d');
+
+  // BG
+  ctx.fillStyle='#f0f4f0';ctx.fillRect(0,0,W,H);
+
+  // Header
+  var hgrad=ctx.createLinearGradient(0,0,W,80);
+  hgrad.addColorStop(0,'#1B5E20');hgrad.addColorStop(1,'#2E7D32');
+  ctx.fillStyle=hgrad;ctx.fillRect(0,0,W,80);
+  ctx.fillStyle='#fff';ctx.font='800 22px Kanit,sans-serif';ctx.textAlign='left';
+  ctx.fillText('📊  สรุปรายงานตัว',24,36);
+  ctx.font='13px Sarabun,sans-serif';ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.fillText('วันที่ '+dateText+' · WFM NOPBIGMAN',24,58);
+
+  // Total box
+  var total=todayList.length;
+  ctx.fillStyle='#1B5E20';
+  roundRect(ctx,20,90,W-40,70,12);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='800 40px Kanit,sans-serif';ctx.textAlign='left';
+  ctx.fillText(String(total),36,143);
+  ctx.font='14px Sarabun,sans-serif';ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.fillText('คน  (รายงานตัววันนี้ทั้งหมด)',90,143);
+
+  var y=170;
+  SHIFTS.forEach(function(sh){
+    var mems=todayList.filter(function(r){return r.shift&&r.shift.trim()===sh.val.trim();});
+    var boxH=shiftH(sh);
+    // box bg
+    ctx.fillStyle='#ffffff';
+    roundRect(ctx,20,y,W-40,boxH,12);ctx.fill();
+    ctx.strokeStyle=sh.bd;ctx.lineWidth=2;
+    roundRect(ctx,20,y,W-40,boxH,12);ctx.stroke();
+    // shift header
+    ctx.fillStyle=sh.col;ctx.font='800 16px Kanit,sans-serif';ctx.textAlign='left';
+    ctx.fillText(sh.ic+' '+sh.lbl.replace(/^[^\s]+\s/,''),36,y+30);
+    ctx.fillStyle='#888';ctx.font='12px Sarabun,sans-serif';
+    ctx.fillText(sh.val,36,y+50);
+    // count badge
+    ctx.fillStyle=sh.col;
+    roundRect(ctx,W-80,y+16,48,30,15);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='800 16px Kanit,sans-serif';ctx.textAlign='center';
+    ctx.fillText(String(mems.length),W-56,y+35);
+
+    if(mems.length){
+      mems.forEach(function(m,i){
+        var my=y+65+i*rowH;
+        ctx.fillStyle='#f8faf8';
+        roundRect(ctx,32,my,W-64,56,8);ctx.fill();
+        // num
+        ctx.fillStyle=sh.col;
+        roundRect(ctx,44,my+14,28,28,7);ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='800 12px Kanit,sans-serif';ctx.textAlign='center';
+        ctx.fillText(String(i+1),58,my+31);
+        // name
+        ctx.fillStyle='#1a2a1a';ctx.font='700 15px Kanit,sans-serif';ctx.textAlign='left';
+        ctx.fillText(m.name||'-',82,my+25);
+        // zone
+        ctx.fillStyle='#888';ctx.font='12px Sarabun,sans-serif';
+        ctx.fillText(m.zone||'',82,my+44);
+        // time
+        ctx.fillStyle='#aaa';ctx.font='12px Kanit,sans-serif';ctx.textAlign='right';
+        ctx.fillText(m.time||'',W-44,my+31);
+      });
+    } else {
+      ctx.fillStyle='#bbb';ctx.font='13px Sarabun,sans-serif';ctx.textAlign='center';
+      ctx.fillText('ยังไม่มีคนรายงานตัว',W/2,y+72);
+    }
+    y+=boxH+12;
+  });
+
+  // footer
+  ctx.fillStyle='#aaa';ctx.font='11px Sarabun,sans-serif';ctx.textAlign='center';
+  ctx.fillText('AIS 3BB · WFM System NOPBIGMAN',W/2,H-16);
+
+  callback(c);
+}
+
 function showToast(msg,type){
   var t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
-  setTimeout(function(){ t.className='toast'; },3000);
+  t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(function(){t.className='toast';},3000);
 }
 </script>
 </body>
