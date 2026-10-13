@@ -325,7 +325,7 @@ function doCheckin(){
   if(selIdx<0){showToast('กรุณาเลือก Shift','err');return;}
   var sh=SHIFTS[selIdx];
   var n=new Date();
-  var today=n.toISOString().slice(0,10); // YYYY-MM-DD for Firebase
+  var today=n.toISOString().slice(0,10);
   var dd=pad(n.getDate()),mm=pad(n.getMonth()+1),yyyy=n.getFullYear();
   var dateSheet=dd+'/'+mm+'/'+yyyy;
   var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
@@ -334,12 +334,34 @@ function doCheckin(){
   lastName=name; lastZone=zone; lastDateThai=dateThai; lastTime=timeTxt; lastShiftLbl=sh.lbl;
 
   var btn=document.getElementById('btn-sub');
-  btn.textContent='⏳ กำลังบันทึก...'; btn.disabled=true;
+  btn.textContent='⏳ กำลังตรวจสอบ...'; btn.disabled=true;
 
+  // ── เช็คซ้ำก่อน ──
+  fetch(FB+'/checkins.json?orderBy="name"&equalTo="'+encodeURIComponent(name)+'"')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d && typeof d==='object'){
+        var exists=Object.values(d).some(function(r){return r.date===today && r.name===name;});
+        if(exists){
+          btn.textContent='✅ Check-in เลย!'; btn.disabled=false;
+          showToast('⚠️ '+name+' Check-in แล้ววันนี้!','err');
+          return;
+        }
+      }
+      // ไม่ซ้ำ → บันทึก
+      doSave(name,zone,sh,today,dateSheet,dateThai,timeTxt,btn);
+    })
+    .catch(function(){
+      // ถ้า Firebase query ผิดพลาด → บันทึกปกติ
+      doSave(name,zone,sh,today,dateSheet,dateThai,timeTxt,btn);
+    });
+}
+
+function doSave(name,zone,sh,today,dateSheet,dateThai,timeTxt,btn){
+  btn.textContent='⏳ กำลังบันทึก...';
   var rec={id:Date.now().toString(), name:name, zone:zone, shift:sh.val,
            date:today, dateThai:dateThai, time:timeTxt, ca:Date.now()};
 
-  // บันทึกลง Firebase (หลัก) + Google Sheets (สำรอง)
   fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
     .then(function(r){return r.json();})
     .then(function(){
@@ -356,7 +378,7 @@ function doCheckin(){
   setTimeout(function(){
     if(btn.disabled){btn.textContent='✅ Check-in เลย!';btn.disabled=false;showSuccess(false);}
   },8000);
-}
+}  // end doSave
 
 function showSuccess(ok){
   var btn=document.getElementById('btn-sub');
@@ -415,101 +437,102 @@ function dlBlob(blob){
   showToast('💾 บันทึกรูปแล้ว! ส่งใน Teams/Line ได้เลย','ok');
 }
 
-// วาดการ์ดด้วย Canvas โดยตรง — แนวตั้ง 720x1080, คมชัด
+// วาดการ์ดด้วย Canvas — รูปเป็นหลัก ข้อความล่าง
 function buildCard(callback){
-  var W=720, H=1080, PAD=40;
+  var W=720, PAD=28;
+  // รูปสูง 500px ถ้ามีรูป ไม่มีรูป H=700
+  var PHOTO_H=phB64?500:0;
+  var INFO_H=320; // ส่วนข้อมูลล่าง
+  var H=PHOTO_H+INFO_H+(phB64?0:80);
   var c=document.createElement('canvas');
   c.width=W; c.height=H;
   var ctx=c.getContext('2d');
 
-  // BG gradient
+  // BG เขียวเข้มทั้งใบ
   var grad=ctx.createLinearGradient(0,0,W,H);
   grad.addColorStop(0,'#1B5E20');
-  grad.addColorStop(0.5,'#2E7D32');
+  grad.addColorStop(0.6,'#2E7D32');
   grad.addColorStop(1,'#1a3a1a');
   ctx.fillStyle=grad;
-  ctx.roundRect(0,0,W,H,28);
-  ctx.fill();
+  ctx.beginPath();ctx.roundRect(0,0,W,H,24);ctx.fill();
 
-  // overlay circles
-  ctx.fillStyle='rgba(255,255,255,0.04)';
-  ctx.beginPath();ctx.arc(W+60,-60,220,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(-60,H+60,180,0,Math.PI*2);ctx.fill();
+  // ── ส่วนรูปภาพ (เต็มความกว้าง ด้านบน) ──
+  function drawPhoto(done){
+    if(!phB64){done();return;}
+    var img=new Image();
+    img.onload=function(){
+      ctx.save();
+      // Clip พื้นที่รูป (top rounded)
+      ctx.beginPath();
+      ctx.moveTo(24,0);ctx.lineTo(W-24,0);ctx.arcTo(W,0,W,24,24);
+      ctx.lineTo(W,PHOTO_H);ctx.lineTo(0,PHOTO_H);ctx.lineTo(0,24);
+      ctx.arcTo(0,0,24,0,24);ctx.closePath();ctx.clip();
+      // วาดรูปให้เต็มพื้นที่ crop ตรงกลาง
+      var iw=img.width,ih=img.height;
+      var scale=Math.max(W/iw,PHOTO_H/ih);
+      var dw=iw*scale,dh=ih*scale;
+      var dx=(W-dw)/2,dy=0; // crop กลาง, เริ่มจากบน
+      ctx.drawImage(img,dx,dy,dw,dh);
+      // gradient overlay ล่างรูปให้ข้อความอ่านออก
+      var ov=ctx.createLinearGradient(0,PHOTO_H-120,0,PHOTO_H);
+      ov.addColorStop(0,'rgba(27,94,32,0)');
+      ov.addColorStop(1,'rgba(27,94,32,0.85)');
+      ctx.fillStyle=ov;ctx.fillRect(0,PHOTO_H-120,W,120);
+      ctx.restore();
+      done();
+    };
+    img.onerror=function(){phB64=null;done();};
+    img.src=phB64;
+  }
 
-  // stamp badge
-  ctx.save();
-  ctx.translate(W-PAD-10,PAD+10);
-  ctx.rotate(0.08);
-  ctx.fillStyle='rgba(141,198,63,0.15)';
-  roundRect(ctx,-60,-18,120,36,8);ctx.fill();
-  ctx.strokeStyle='rgba(141,198,63,0.6)';ctx.lineWidth=2;
-  roundRect(ctx,-60,-18,120,36,8);ctx.stroke();
-  ctx.fillStyle='#8dc63f';
-  ctx.font='bold 13px Kanit,sans-serif';ctx.textAlign='center';
-  ctx.fillText('CHECK-IN ✓',0,5);
-  ctx.restore();
+  function drawInfo(){
+    var y=PHOTO_H;
 
-  // logo text
-  ctx.fillStyle='rgba(255,255,255,0.6)';
-  ctx.font='11px Kanit,sans-serif';ctx.textAlign='left';ctx.letterSpacing='3px';
-  ctx.fillText('AIS 3BB  ·  WFM NOPBIGMAN',PAD,PAD+16);
+    // stamp badge มุมขวาบน
+    ctx.save();
+    ctx.translate(W-PAD-10,PAD+10);ctx.rotate(0.06);
+    ctx.fillStyle='rgba(141,198,63,0.2)';
+    roundRect(ctx,-54,-16,108,32,8);ctx.fill();
+    ctx.strokeStyle='rgba(141,198,63,0.7)';ctx.lineWidth=2;
+    roundRect(ctx,-54,-16,108,32,8);ctx.stroke();
+    ctx.fillStyle='#8dc63f';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('CHECK-IN ✓',0,5);
+    ctx.restore();
 
-  var photoH=phB64?340:0;
-  var photoY=PAD+40;
+    // logo (บนรูป)
+    ctx.fillStyle='rgba(255,255,255,0.65)';
+    ctx.font='11px sans-serif';ctx.textAlign='left';
+    ctx.fillText('AIS 3BB  ·  WFM NOPBIGMAN',PAD,PAD+14);
 
-  function drawText(){
-    var y=photoY+(phB64?photoH+24:0);
-
-    // name
+    // ชื่อ
     ctx.fillStyle='#ffffff';
-    ctx.font='800 38px Kanit,sans-serif';ctx.textAlign='left';ctx.letterSpacing='0px';
-    ctx.fillText(lastName||'-',PAD,y+40);
-    // zone
-    ctx.fillStyle='rgba(255,255,255,0.75)';
-    ctx.font='18px Sarabun,sans-serif';
-    ctx.fillText(lastZone||'-',PAD,y+70);
+    ctx.font='800 36px sans-serif';ctx.textAlign='left';
+    ctx.fillText(lastName||'-',PAD,y+46);
 
-    var ry=y+100, rh=80, rw=(W-PAD*2-16)/2;
-    // date box
-    drawInfoBox(ctx,PAD,ry,rw,rh,'📅 วันที่',lastDateThai||'-');
-    // time box
-    drawInfoBox(ctx,PAD+rw+16,ry,rw,rh,'⏰ เวลา',lastTime||'-');
-    // shift box full width
-    drawInfoBox(ctx,PAD,ry+rh+12,W-PAD*2,rh,'⏱️ SHIFT',lastShiftLbl+(selIdx>=0?' '+SHIFTS[selIdx].val:''));
+    // zone
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    ctx.font='16px sans-serif';
+    ctx.fillText(lastZone||'-',PAD,y+72);
+
+    // info boxes
+    var rh=74, rw=(W-PAD*2-14)/2, ry=y+90;
+    drawInfoBox(ctx,PAD,ry,rw,rh,'📅  วันที่',lastDateThai||'-');
+    drawInfoBox(ctx,PAD+rw+14,ry,rw,rh,'⏰  เวลา',lastTime||'-');
+    drawInfoBox(ctx,PAD,ry+rh+10,W-PAD*2,rh,'⏱️  SHIFT',lastShiftLbl+(selIdx>=0?' '+SHIFTS[selIdx].val:''));
 
     // badge
-    var by=ry+rh*2+36;
+    var by=ry+rh*2+24;
     ctx.fillStyle='rgba(244,121,32,0.25)';
-    roundRect(ctx,PAD,by,220,38,19);ctx.fill();
+    roundRect(ctx,PAD,by,230,36,18);ctx.fill();
     ctx.strokeStyle='rgba(244,121,32,0.5)';ctx.lineWidth=1.5;
-    roundRect(ctx,PAD,by,220,38,19);ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 14px Kanit,sans-serif';ctx.textAlign='left';
-    ctx.fillText('✅  รายงานตัวเรียบร้อย',PAD+14,by+24);
+    roundRect(ctx,PAD,by,230,36,18);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('✅  รายงานตัวเรียบร้อย',PAD+14,by+23);
 
     callback(c);
   }
 
-  if(phB64){
-    var img=new Image();
-    img.onload=function(){
-      ctx.save();
-      roundRect(ctx,PAD,photoY,W-PAD*2,photoH,14);
-      ctx.clip();
-      // center crop
-      var iw=img.width,ih=img.height;
-      var tw=W-PAD*2,th=photoH;
-      var scale=Math.max(tw/iw,th/ih);
-      var sw=tw/scale,sh=th/scale;
-      var sx=(iw-sw)/2,sy=ih>iw?(ih-sh)*0.15:0; // portrait: crop from top-ish
-      ctx.drawImage(img,sx,sy,sw,sh,PAD,photoY,tw,th);
-      ctx.restore();
-      drawText();
-    };
-    img.onerror=function(){phB64=null;drawText();};
-    img.src=phB64;
-  } else {
-    drawText();
-  }
+  drawPhoto(drawInfo);
 }
 
 function drawInfoBox(ctx,x,y,w,h,lbl,val){
