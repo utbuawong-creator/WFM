@@ -441,7 +441,7 @@ function dlBlob(blob){
 function buildCard(callback){
   var W=720, PAD=28;
   // รูปสูง 500px ถ้ามีรูป ไม่มีรูป H=700
-  var PHOTO_H=phB64?500:0;
+  var PHOTO_H=phB64?520:0;
   var INFO_H=320; // ส่วนข้อมูลล่าง
   var H=PHOTO_H+INFO_H+(phB64?0:80);
   var c=document.createElement('canvas');
@@ -471,7 +471,9 @@ function buildCard(callback){
       var iw=img.width,ih=img.height;
       var scale=Math.max(W/iw,PHOTO_H/ih);
       var dw=iw*scale,dh=ih*scale;
-      var dx=(W-dw)/2,dy=0; // crop กลาง, เริ่มจากบน
+      var dx=(W-dw)/2;
+      // selfie จากมือถือ: ใบหน้ามักอยู่ upper-center → crop จาก 15% จากบน
+      var dy=ih>iw?(PHOTO_H-dh)*0.15:Math.max((PHOTO_H-dh)/2,0);
       ctx.drawImage(img,dx,dy,dw,dh);
       // gradient overlay ล่างรูปให้ข้อความอ่านออก
       var ov=ctx.createLinearGradient(0,PHOTO_H-120,0,PHOTO_H);
