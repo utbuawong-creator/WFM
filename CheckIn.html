@@ -2,100 +2,81 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Check-in | WFM NOPBIGMAN</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--org:#f47920;--grn:#8dc63f;--blue:#003087;--bg:#f0f4f0;--surface:#fff;--border:#e0e8e0;--text:#1a2a1a;--text2:#5a7a5a;--r:16px}
+:root{--org:#f47920;--grn:#8dc63f;--blue:#003087;--red:#e8001d;--bg:#f0f4f0;--sf:#fff;--bd:#e0e8e0;--tx:#1a2a1a;--tx2:#5a7a5a;--r:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
+html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--tx)}
 .hdr{background:linear-gradient(135deg,#e8670a,#f47920 45%,#8dc63f);color:#fff;box-shadow:0 4px 20px rgba(244,121,32,.4)}
 .hdr-in{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;max-width:600px;margin:0 auto}
-.hdr-brand .d{font-size:10px;letter-spacing:3px;opacity:.8;text-transform:uppercase;font-family:'Kanit',sans-serif}
-.hdr-brand .t{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800}
-.hdr-brand .s{font-size:12px;opacity:.8;margin-top:2px}
-.home-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;border-radius:10px;padding:7px 13px;font-size:12px;font-weight:700;text-decoration:none;font-family:'Sarabun',sans-serif}
-
+.hdr-t{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800}
+.hdr-s{font-size:12px;opacity:.8;margin-top:2px}
+.hdr-d{font-size:10px;letter-spacing:3px;opacity:.8;text-transform:uppercase;font-family:'Kanit',sans-serif}
+.home-a{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;border-radius:10px;padding:7px 13px;font-size:12px;font-weight:700;text-decoration:none}
+.wrap{max-width:600px;margin:0 auto;padding:16px 16px 80px}
 .clock-card{background:linear-gradient(135deg,#003087,#0057b8);border-radius:var(--r);padding:14px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 5px 0 #001f5c}
-.clock-val{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;letter-spacing:2px}
-.clock-dt{font-size:12px;opacity:.8;margin-top:2px}
+.cv{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;letter-spacing:2px}
+.cd{font-size:12px;opacity:.8;margin-top:2px}
 .dot{width:8px;height:8px;border-radius:50%;background:#8dc63f;animation:pulse 1.5s infinite;display:inline-block}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
-.card{background:var(--surface);border-radius:var(--r);padding:20px 18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid var(--border)}
-.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border)}
-.card-bar{width:4px;height:22px;background:linear-gradient(180deg,var(--org),var(--grn));border-radius:3px}
-.card-title{font-family:'Kanit',sans-serif;font-weight:800;font-size:15px}
-.lbl{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;margin-top:14px}
-.lbl:first-child{margin-top:0}
-.inp{width:100%;background:#f8faf8;border:2px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Sarabun',sans-serif;outline:none;transition:border .2s;-webkit-appearance:none}
+.card{background:var(--sf);border-radius:var(--r);padding:20px 18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:1px solid var(--bd)}
+.ch{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--bd)}
+.cb{width:4px;height:22px;background:linear-gradient(180deg,var(--org),var(--grn));border-radius:3px}
+.ct{font-family:'Kanit',sans-serif;font-weight:800;font-size:15px}
+.L{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px;margin-top:14px}
+.L:first-child{margin-top:0}
+.inp{width:100%;background:#f8faf8;border:2px solid var(--bd);border-radius:10px;padding:12px 14px;color:var(--tx);font-size:15px;font-family:'Sarabun',sans-serif;outline:none;transition:border .2s;-webkit-appearance:none}
 .inp:focus{border-color:var(--org)}
-.inp-ro{background:#f0f4f0;color:var(--text2);cursor:default}
-.shift-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.sc{background:#f8faf8;border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .18s;user-select:none}
+.inp-ro{background:#f0f4f0;color:var(--tx2)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.sc{background:#f8faf8;border:2px solid var(--bd);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .18s;user-select:none}
 .sc.on{border-color:var(--org);background:linear-gradient(135deg,#fff8f3,#fff);box-shadow:0 2px 10px rgba(244,121,32,.2)}
-.sc-rb{width:20px;height:20px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.sc.on .sc-rb{background:var(--org);border-color:var(--org)}
-.sc-dot{width:8px;height:8px;border-radius:50%;background:#fff;display:none}
-.sc.on .sc-dot{display:block}
-.sc-time{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
-.sc-lbl{font-size:11px;color:var(--text2);margin-top:1px}
-.photo-box{border:2px dashed var(--border);border-radius:12px;background:#f8faf8;cursor:pointer;overflow:hidden;position:relative;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;transition:all .2s}
-.photo-box:hover{border-color:var(--org);background:#fff8f3}
-.photo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.photo-box .ph-ic{font-size:36px;color:var(--text2)}
-.photo-box .ph-tx{font-size:13px;color:var(--text2);font-weight:600}
-.photo-box .ph-sub{font-size:11px;color:#aaa}
+.sr{width:20px;height:20px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.sc.on .sr{background:var(--org);border-color:var(--org)}
+.sd{width:8px;height:8px;border-radius:50%;background:#fff;display:none}
+.sc.on .sd{display:block}
+.st{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
+.sl{font-size:11px;color:var(--tx2);margin-top:1px}
+.pb{border:2px dashed var(--bd);border-radius:12px;background:#f8faf8;cursor:pointer;overflow:hidden;position:relative;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.pb:hover{border-color:var(--org);background:#fff8f3}
+.pb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph-ic{font-size:36px;color:var(--tx2)}
+.ph-tx{font-size:13px;color:var(--tx2);font-weight:600}
+.ph-sub{font-size:11px;color:#aaa}
 .del-ph{position:absolute;top:8px;right:8px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:2;font-family:'Sarabun',sans-serif}
-.btn-sub{width:100%;background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 6px 0 #b85710;transition:all .15s;margin-top:8px;letter-spacing:.5px}
-.btn-sub:active{transform:translateY(4px);box-shadow:0 2px 0 #b85710}
-.btn-sub:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btn-gray{width:100%;background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:10px}
-/* SUCCESS */
-#sec-success{display:none}
-.suc-ic{font-size:72px;text-align:center;margin-bottom:12px;animation:pop .4s ease}
+.btn-s{width:100%;background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 6px 0 #b85710;transition:all .15s;margin-top:8px}
+.btn-s:active{transform:translateY(4px);box-shadow:0 2px 0 #b85710}
+.btn-s:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-g{width:100%;background:#f0f4f0;color:var(--tx2);border:2px solid var(--bd);border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:10px}
+.btn-db{width:100%;background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 5px 0 #001f5c;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px}
+#sf{display:none}
+.si{font-size:72px;text-align:center;margin-bottom:12px;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.suc-title{font-family:'Kanit',sans-serif;font-size:24px;font-weight:800;color:#2e7d32;text-align:center;margin-bottom:4px}
-.suc-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:20px}
-/* CHECKIN CARD */
-.ci-card{background:linear-gradient(160deg,#1B5E20 0%,#2E7D32 50%,#1a3a1a 100%);border-radius:20px;padding:22px 20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2);max-width:420px;margin-left:auto;margin-right:auto}
-.ci-card::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.04)}
-.ci-card-stamp{position:absolute;top:16px;right:16px;background:rgba(141,198,63,.2);border:2px solid rgba(141,198,63,.5);border-radius:10px;padding:5px 10px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#8dc63f;transform:rotate(5deg)}
-.ci-card-logo{font-size:11px;letter-spacing:3px;opacity:.7;text-transform:uppercase;font-family:'Kanit',sans-serif;margin-bottom:12px}
-.ci-card-photo{width:100%;height:180px;border-radius:12px;object-fit:cover;object-position:center;margin-bottom:14px;border:2px solid rgba(255,255,255,.2);display:none}
-.ci-card-name{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px}
-.ci-card-zone{font-size:13px;opacity:.8;margin-bottom:14px}
-.ci-card-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.ci-card-row{background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
-.ci-card-row.full{grid-column:1/-1}
-.ci-row-lbl{font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
-.ci-row-val{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
+.st2{font-family:'Kanit',sans-serif;font-size:24px;font-weight:800;color:#2e7d32;text-align:center;margin-bottom:4px}
+.ss{font-size:13px;color:var(--tx2);text-align:center;margin-bottom:20px}
+.ci-card{background:linear-gradient(160deg,#1B5E20,#2E7D32 50%,#1a3a1a);border-radius:20px;padding:22px 20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.2);max-width:420px;margin-left:auto;margin-right:auto}
+.ci-stamp{position:absolute;top:16px;right:16px;background:rgba(141,198,63,.2);border:2px solid rgba(141,198,63,.5);border-radius:10px;padding:5px 10px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#8dc63f;transform:rotate(5deg)}
+.ci-logo{font-size:11px;letter-spacing:3px;opacity:.7;text-transform:uppercase;font-family:'Kanit',sans-serif;margin-bottom:12px}
+.ci-photo{width:100%;height:220px;border-radius:12px;object-fit:cover;object-position:center 20%;margin-bottom:14px;border:2px solid rgba(255,255,255,.2);display:none}
+.ci-name{font-family:'Kanit',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px}
+.ci-zone{font-size:13px;opacity:.8;margin-bottom:14px}
+.ci-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ci-row{background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
+.ci-row.full{grid-column:1/-1}
+.ci-rl{font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.ci-rv{font-family:'Kanit',sans-serif;font-size:14px;font-weight:700}
 .ci-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(244,121,32,.25);border:1px solid rgba(244,121,32,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
-/* ACTION BTNS */
-.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.btn-copy{background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #001f5c;transition:all .15s}
-.btn-copy:active{transform:translateY(3px)}
-.btn-new{background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #b85710;transition:all .15s}
-.btn-new:active{transform:translateY(3px)}
-.btn-home2{width:100%;background:#f0f4f0;color:var(--text2);border:2px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-decoration:none;display:block;text-align:center;font-family:'Sarabun',sans-serif}
-/* DASHBOARD */
-.dash-total{background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:16px;padding:16px 18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-.dash-total-num{font-family:'Kanit',sans-serif;font-size:48px;font-weight:800;line-height:1}
-.shift-box{background:var(--surface);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
-.shift-box-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.shift-ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.shift-name{font-family:'Kanit',sans-serif;font-size:15px;font-weight:800}
-.shift-time{font-size:12px;color:var(--text2);margin-top:1px}
-.shift-cnt{font-family:'Kanit',sans-serif;font-size:20px;font-weight:800;padding:6px 16px;border-radius:20px;color:#fff}
-.mem-row{display:flex;align-items:center;gap:10px;background:#f8faf8;border-radius:10px;padding:9px 12px;margin-bottom:6px}
-.mem-num{width:26px;height:26px;border-radius:8px;color:#fff;font-family:'Kanit',sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.mem-name{font-size:14px;font-weight:700;flex:1}
-.mem-zone{font-size:11px;color:var(--text2);background:var(--bg);border-radius:6px;padding:2px 8px}
-.mem-time{font-family:'Kanit',sans-serif;font-size:12px;color:var(--text2)}
-.no-mem{text-align:center;padding:14px;color:var(--text2);font-size:13px}
-/* TOAST */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.btn-cp{background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #001f5c}
+.btn-nw{background:linear-gradient(135deg,#f47920,#e8670a);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #b85710}
+.btn-hm{width:100%;background:#f0f4f0;color:var(--tx2);border:2px solid var(--bd);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-decoration:none;display:block;text-align:center;font-family:'Sarabun',sans-serif}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;overflow-y:auto;padding:12px;backdrop-filter:blur(4px)}
+.modal-box{max-width:520px;margin:0 auto;background:var(--sf);border-radius:20px;padding:20px}
 .toast-w{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;pointer-events:none}
-.toast{background:#1a2a1a;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;opacity:0;transform:translateY(10px);transition:all .3s;white-space:nowrap;max-width:90vw}
+.toast{background:#1a2a1a;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;color:#fff;opacity:0;transform:translateY(10px);transition:all .3s;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.ok{background:#2e7d32}.toast.err{background:#c62828}
 </style>
@@ -103,31 +84,27 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 <body>
 <div class="hdr">
   <div class="hdr-in">
-    <div class="hdr-brand">
-      <div class="d">WFM · NOPBIGMAN</div>
-      <div class="t">✅ Check-in</div>
-      <div class="s">บันทึกเวลาเข้างาน</div>
+    <div>
+      <div class="hdr-d">WFM · NOPBIGMAN</div>
+      <div class="hdr-t">✅ Check-in</div>
+      <div class="hdr-s">บันทึกเวลาเข้างาน</div>
     </div>
-    <a href="WFM_Home.html" class="home-btn">🏠 หน้าหลัก</a>
+    <a href="WFM_Home.html" class="home-a">🏠 หน้าหลัก</a>
   </div>
 </div>
 
-
-<!-- FORM PAGE -->
-<div id="pg-form" style="max-width:600px;margin:0 auto;padding:16px 16px 80px">
-  <div class="clock-card" style="margin-top:16px">
-    <div>
-      <div class="clock-val" id="cl-time">--:--:--</div>
-      <div class="clock-dt" id="cl-date">กำลังโหลด...</div>
-    </div>
+<div class="wrap">
+  <div class="clock-card">
+    <div><div class="cv" id="cl-t">--:--:--</div><div class="cd" id="cl-d">กำลังโหลด...</div></div>
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;opacity:.85"><div class="dot"></div> ออนไลน์</div>
   </div>
 
-  <div id="sec-form">
+  <!-- FORM -->
+  <div id="ff">
     <div class="card">
-      <div class="card-hdr"><div class="card-bar"></div><div class="card-title">ข้อมูลการเข้างาน</div></div>
-      <label class="lbl">👤 ชื่อ-นามสกุล</label>
-      <select class="inp" id="f-name">
+      <div class="ch"><div class="cb"></div><div class="ct">ข้อมูลการเข้างาน</div></div>
+      <label class="L">👤 ชื่อ-นามสกุล</label>
+      <select class="inp" id="fn">
         <option value="">— เลือกชื่อ —</option>
         <option>โพธิยา มหาชัย</option><option>จักรพงษ์ บัวประทะ</option><option>เอกรินทร์ โสภา</option>
         <option>วัชริศ ปินใจ</option><option>อัมพวัฒน์ พัชรพัฒนชัย</option><option>เมธาศิษฎ์ เศรษฐจ์วุฒิภัทร</option>
@@ -150,405 +127,107 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         <option>ประสาร สุพรรณคง</option><option>นพดล เมืองชัย</option><option>ปิยะวัฒน์ ปงกันทา</option>
         <option>นิธิพันธ์ ศิริโปทา</option><option>อภิรักษ์ จันทร์คำ</option>
       </select>
-      <label class="lbl">🗺️ MC Zone</label>
-      <select class="inp" id="f-zone">
+      <label class="L">🗺️ MC Zone</label>
+      <select class="inp" id="fz">
         <option value="">— เลือก Zone —</option>
         <option>CMI Zone AB</option><option>CMI Zone CD</option>
         <option>LPN Zone</option><option>MSN Zone</option>
       </select>
-      <label class="lbl">📅 วันที่ปัจจุบัน</label>
-      <input class="inp inp-ro" id="f-date" readonly/>
-      <label class="lbl">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
-      <input class="inp inp-ro" id="f-time" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
+      <label class="L">📅 วันที่ปัจจุบัน</label>
+      <input class="inp inp-ro" id="fd" readonly/>
+      <label class="L">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
+      <input class="inp inp-ro" id="ft" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
     </div>
 
     <div class="card">
-      <div class="card-hdr"><div class="card-bar"></div><div class="card-title">⏱️ เลือก Shift</div></div>
-      <div class="shift-grid">
-        <div class="sc" id="sc0" onclick="pickShift(0)">
-          <div class="sc-rb"><div class="sc-dot"></div></div>
-          <div><div class="sc-time">08:30—17:30</div><div class="sc-lbl">☀️ Day Shift</div></div>
-        </div>
-        <div class="sc" id="sc1" onclick="pickShift(1)">
-          <div class="sc-rb"><div class="sc-dot"></div></div>
-          <div><div class="sc-time">08:30—20:30</div><div class="sc-lbl">🌆 Evening Shift</div></div>
-        </div>
-        <div class="sc" id="sc2" onclick="pickShift(2)">
-          <div class="sc-rb"><div class="sc-dot"></div></div>
-          <div><div class="sc-time">08:30—23:59</div><div class="sc-lbl">🌙 Night Shift</div></div>
-        </div>
-        <div class="sc" id="sc3" onclick="pickShift(3)">
-          <div class="sc-rb"><div class="sc-dot"></div></div>
-          <div><div class="sc-time">20:30—05:30</div><div class="sc-lbl">🌙 Night Shift OT</div></div>
-        </div>
+      <div class="ch"><div class="cb"></div><div class="ct">⏱️ เลือก Shift</div></div>
+      <div class="sg">
+        <div class="sc" id="sc0" onclick="psh(0)"><div class="sr"><div class="sd"></div></div><div><div class="st">08:30—17:30</div><div class="sl">☀️ Day Shift</div></div></div>
+        <div class="sc" id="sc1" onclick="psh(1)"><div class="sr"><div class="sd"></div></div><div><div class="st">08:30—20:30</div><div class="sl">🌆 Evening Shift</div></div></div>
+        <div class="sc" id="sc2" onclick="psh(2)"><div class="sr"><div class="sd"></div></div><div><div class="st">08:30—23:59</div><div class="sl">🌙 Night Shift</div></div></div>
+        <div class="sc" id="sc3" onclick="psh(3)"><div class="sr"><div class="sd"></div></div><div><div class="st">20:30—05:30</div><div class="sl">🌙 Night Shift OT</div></div></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-hdr"><div class="card-bar"></div><div class="card-title">📸 รูปยืนยันตำแหน่ง</div></div>
-      <div class="photo-box" id="ph-box" onclick="document.getElementById('ph-file').click()">
+      <div class="ch"><div class="cb"></div><div class="ct">📸 รูปยืนยันตำแหน่ง</div></div>
+      <div class="pb" id="phb" onclick="document.getElementById('phf').click()">
         <div class="ph-ic">📷</div>
         <div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div>
         <div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>
       </div>
-      <input type="file" id="ph-file" accept="image/*" capture="environment" onchange="loadPh(this)">
+      <input type="file" id="phf" accept="image/*" capture="environment" onchange="ldph(this)">
     </div>
 
-    <button class="btn-sub" id="btn-sub" onclick="doCheckin()">✅ Check-in เลย!</button>
-    <button class="btn-gray" onclick="resetForm()">ล้างข้อมูล</button>
-    <button onclick="loadDash()" style="width:100%;background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif;box-shadow:0 5px 0 #001f5c;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px">📊 ดูสรุปรายงานตัววันนี้</button>
+    <button class="btn-s" id="bsb" onclick="doci()">✅ Check-in เลย!</button>
+    <button class="btn-g" onclick="rst()">ล้างข้อมูล</button>
+    <button class="btn-db" onclick="ldDash()">📊 ดูสรุปรายงานตัววันนี้</button>
   </div>
 
-  <div id="sec-success">
-    <div class="suc-ic">✅</div>
-    <div class="suc-title">Check-in สำเร็จ!</div>
-    <div class="suc-sub" id="suc-sub">บันทึกลง Google Sheets เรียบร้อยแล้ว ✓</div>
-    <div class="ci-card" id="ci-card">
-      <div class="ci-card-stamp">CHECK-IN ✓</div>
-      <div class="ci-card-logo">AIS 3BB · WFM NOPBIGMAN</div>
-      <img id="ci-photo" class="ci-card-photo" src="" alt=""/>
-      <div class="ci-card-name" id="ci-name">-</div>
-      <div class="ci-card-zone" id="ci-zone">-</div>
-      <div class="ci-card-rows">
-        <div class="ci-card-row">
-          <div class="ci-row-lbl">📅 วันที่</div>
-          <div class="ci-row-val" id="ci-date">-</div>
-        </div>
-        <div class="ci-card-row">
-          <div class="ci-row-lbl">⏰ เวลา</div>
-          <div class="ci-row-val" id="ci-time">-</div>
-        </div>
-        <div class="ci-card-row full">
-          <div class="ci-row-lbl">⏱️ Shift</div>
-          <div class="ci-row-val" id="ci-shift">-</div>
-        </div>
+  <!-- SUCCESS -->
+  <div id="sf">
+    <div class="si">✅</div>
+    <div class="st2">Check-in สำเร็จ!</div>
+    <div class="ss" id="ssb">บันทึกสำเร็จ ✓</div>
+    <div class="ci-card" id="cic">
+      <div class="ci-stamp">CHECK-IN ✓</div>
+      <div class="ci-logo">AIS 3BB · WFM NOPBIGMAN</div>
+      <img id="cph" class="ci-photo" src="" alt=""/>
+      <div class="ci-name" id="cnm">-</div>
+      <div class="ci-zone" id="czn">-</div>
+      <div class="ci-rows">
+        <div class="ci-row"><div class="ci-rl">📅 วันที่</div><div class="ci-rv" id="cdt">-</div></div>
+        <div class="ci-row"><div class="ci-rl">⏰ เวลา</div><div class="ci-rv" id="ctm">-</div></div>
+        <div class="ci-row full"><div class="ci-rl">⏱️ SHIFT</div><div class="ci-rv" id="csh">-</div></div>
       </div>
       <div class="ci-badge">✅ รายงานตัวเรียบร้อย</div>
     </div>
-    <div class="act-grid">
-      <button class="btn-copy" onclick="copyCard()">📤 ส่ง/Copy การ์ด</button>
-      <button class="btn-new" onclick="resetForm()">➕ รายงานตัวอีกคน</button>
+    <div class="ag">
+      <button class="btn-cp" onclick="cpCard()">📤 ส่ง/Copy การ์ด</button>
+      <button class="btn-nw" onclick="rst()">➕ รายงานตัวอีกคน</button>
     </div>
-    <a href="WFM_Home.html" class="btn-home2">🏠 กลับหน้าหลัก</a>
+    <a href="WFM_Home.html" class="btn-hm">🏠 กลับหน้าหลัก</a>
   </div>
 </div>
-
-
-
 
 <!-- DASHBOARD MODAL -->
-<div id="dash-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;overflow-y:auto;padding:16px;backdrop-filter:blur(4px)">
-  <div style="max-width:500px;margin:0 auto">
-    <div style="background:var(--surface);border-radius:20px;padding:20px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">📊 สรุปรายงานตัว</div>
-        <div style="display:flex;gap:8px">
-          <button onclick="copyDashCard()" style="background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif">📤 คัดลอก</button>
-          <button onclick="document.getElementById('dash-modal').style.display='none'" style="background:var(--bg);border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
-        </div>
+<div class="modal-bg" id="dm">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">📊 สรุปรายงานตัว</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="cpDash()" style="background:linear-gradient(135deg,#003087,#0057b8);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif">📤 คัดลอก</button>
+        <button onclick="exDash()" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Kanit',sans-serif">📥 Excel</button>
+        <button onclick="document.getElementById('dm').style.display='none'" style="background:var(--bg);border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <div style="font-size:12px;color:var(--text2)">วันที่ <span id="d-today" style="font-weight:700;color:var(--text)"></span></div>
-        <input type="date" id="d-picker" onchange="pickDate(this.value)" style="border:2px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'Sarabun',sans-serif;color:var(--text);background:var(--bg);cursor:pointer"/>
-      </div>
-      <div id="d-content"><div style="text-align:center;padding:30px;color:var(--text2);font-size:14px">⏳ กำลังโหลด...</div></div>
     </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="font-size:12px;color:var(--tx2)">วันที่ <span id="dtx" style="font-weight:700;color:var(--tx)"></span></div>
+      <input type="date" id="dpk" onchange="pkDate(this.value)" style="border:2px solid var(--bd);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'Sarabun',sans-serif;color:var(--tx);background:var(--bg);cursor:pointer"/>
+    </div>
+    <div id="dc"><div style="text-align:center;padding:30px;color:#888;font-size:14px">⏳ กำลังโหลด...</div></div>
   </div>
 </div>
-<div class="toast-w"><div class="toast" id="toast"></div></div>
+
+<div class="toast-w"><div class="toast" id="tst"></div></div>
 
 <script>
-var GS  = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
-var FB  = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
-var MO  = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-var DA  = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
-var SHIFTS = [
-  {val:'08:30 - 17:30', lbl:'☀️ Day Shift',    ic:'☀️', col:'#f47920', bg:'rgba(244,121,32,.08)', bd:'rgba(244,121,32,.3)'},
-  {val:'08:30 - 20:30', lbl:'🌆 Evening Shift', ic:'🌆', col:'#0891b2', bg:'rgba(8,145,178,.08)',  bd:'rgba(8,145,178,.3)'},
-  {val:'08:30 - 23:59', lbl:'🌙 Night Shift',   ic:'🌙', col:'#003087', bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
-  {val:'20:30 - 05:30', lbl:'🌙 Night Shift OT', ic:'🌙', col:'#7c3aed', bg:'rgba(124,58,237,.08)', bd:'rgba(124,58,237,.3)'}
+var GS='https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
+var FB='https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+var MO=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var DA=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+var SH=[
+  {v:'08:30 - 17:30',l:'☀️ Day Shift',    ic:'☀️',c:'#f47920',bg:'rgba(244,121,32,.08)',bd:'rgba(244,121,32,.3)'},
+  {v:'08:30 - 20:30',l:'🌆 Evening Shift',ic:'🌆',c:'#0891b2',bg:'rgba(8,145,178,.08)',  bd:'rgba(8,145,178,.3)'},
+  {v:'08:30 - 23:59',l:'🌙 Night Shift',  ic:'🌙',c:'#003087',bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
+  {v:'20:30 - 05:30',l:'🌙 Night Shift OT',ic:'🌙',c:'#7c3aed',bg:'rgba(124,58,237,.08)',bd:'rgba(124,58,237,.3)'}
 ];
-var selIdx=-1, phB64=null;
-var lastName='', lastZone='', lastDateThai='', lastTime='', lastShiftLbl='';
+var si=-1,ph=null,lnm='',lzn='',ldt='',ltm='',lsh='';
 
-function pad(v){ return String(v).padStart(2,'0'); }
+function pad(v){return String(v).padStart(2,'0');}
 
-// CLOCK
-function tick(){
-  var n=new Date();
-  var h=pad(n.getHours()),m=pad(n.getMinutes()),s=pad(n.getSeconds());
-  document.getElementById('cl-time').textContent=h+':'+m+':'+s;
-  document.getElementById('cl-date').textContent='วัน'+DA[n.getDay()]+'ที่ '+n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('f-date').value=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
-  document.getElementById('f-time').value=h+':'+m+':'+s;
-}
-setInterval(tick,1000); tick();
-
-// SHIFT
-function pickShift(i){
-  selIdx=i;
-  for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
-  document.getElementById('sc'+i).classList.add('on');
-}
-
-// PHOTO
-function loadPh(inp){
-  if(!inp.files[0]) return;
-  var r=new FileReader();
-  r.onload=function(e){
-    var img=new Image();
-    img.onload=function(){
-      var c=document.createElement('canvas');
-      var max=900,w=img.width,h=img.height;
-      if(w>max||h>max){var rt=Math.min(max/w,max/h);w=Math.round(w*rt);h=Math.round(h*rt);}
-      c.width=w;c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      phB64=c.toDataURL('image/jpeg',0.75);
-      var box=document.getElementById('ph-box');
-      box.innerHTML='<img src="'+phB64+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><button class="del-ph" onclick="delPh(event)">✕ ลบรูป</button>';
-    };
-    img.src=e.target.result;
-  };
-  r.readAsDataURL(inp.files[0]);
-  inp.value='';
-}
-function delPh(e){
-  e.stopPropagation(); phB64=null;
-  var box=document.getElementById('ph-box');
-  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
-  box.onclick=function(){document.getElementById('ph-file').click();};
-}
-
-// CHECKIN
-function doCheckin(){
-  var name=document.getElementById('f-name').value;
-  var zone=document.getElementById('f-zone').value;
-  if(!name){showToast('กรุณาเลือกชื่อ','err');return;}
-  if(!zone){showToast('กรุณาเลือก Zone','err');return;}
-  if(selIdx<0){showToast('กรุณาเลือก Shift','err');return;}
-  var sh=SHIFTS[selIdx];
-  var n=new Date();
-  var today=n.toISOString().slice(0,10);
-  var dd=pad(n.getDate()),mm=pad(n.getMonth()+1),yyyy=n.getFullYear();
-  var dateSheet=dd+'/'+mm+'/'+yyyy;
-  var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
-  var timeTxt=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
-
-  lastName=name; lastZone=zone; lastDateThai=dateThai; lastTime=timeTxt; lastShiftLbl=sh.lbl;
-
-  var btn=document.getElementById('btn-sub');
-  btn.textContent='⏳ กำลังตรวจสอบ...'; btn.disabled=true;
-
-  // ── เช็คซ้ำ — fetch ทั้งหมดแล้ว filter ใน JS ──
-  fetch(FB+'/checkins.json')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var list=d&&typeof d==='object'?Object.values(d):[];
-      var exists=list.some(function(r){return r.date===today && r.name===name;});
-      if(exists){
-        btn.textContent='✅ Check-in เลย!'; btn.disabled=false;
-        showToast('⚠️ '+name+' Check-in แล้ววันนี้ ไม่สามารถลงซ้ำได้!','err');
-        return;
-      }
-      doSave(name,zone,sh,today,dateSheet,dateThai,timeTxt,btn);
-    })
-    .catch(function(){
-      doSave(name,zone,sh,today,dateSheet,dateThai,timeTxt,btn);
-    });
-}
-
-function doSave(name,zone,sh,today,dateSheet,dateThai,timeTxt,btn){
-  btn.textContent='⏳ กำลังบันทึก...';
-  var rec={id:Date.now().toString(), name:name, zone:zone, shift:sh.val,
-           date:today, dateThai:dateThai, time:timeTxt, ca:Date.now()};
-
-  fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
-    .then(function(r){return r.json();})
-    .then(function(){
-      // ส่งไป Google Sheets ด้วย (background)
-      var p='action=checkin&name='+encodeURIComponent(name)+'&zone='+encodeURIComponent(zone)+'&date='+encodeURIComponent(dateSheet)+'&time='+encodeURIComponent(timeTxt)+'&shift='+encodeURIComponent(sh.val);
-      var cb='cb'+Date.now();
-      var url=GS+'?'+p+'&callback='+cb;
-      window[cb]=function(){delete window[cb];};
-      var s=document.createElement('script');s.src=url;document.body.appendChild(s);
-      showSuccess(true);
-    })
-    .catch(function(){showSuccess(false);});
-
-  setTimeout(function(){
-    if(btn.disabled){btn.textContent='✅ Check-in เลย!';btn.disabled=false;showSuccess(false);}
-  },8000);
-}  // end doSave
-
-function showSuccess(ok){
-  var btn=document.getElementById('btn-sub');
-  btn.textContent='✅ Check-in เลย!'; btn.disabled=false;
-  document.getElementById('suc-sub').textContent=ok?'บันทึกสำเร็จ ✓':'บันทึกแล้ว (Offline)';
-  document.getElementById('ci-name').textContent=lastName;
-  document.getElementById('ci-zone').textContent=lastZone;
-  document.getElementById('ci-date').textContent=lastDateThai;
-  document.getElementById('ci-time').textContent=lastTime;
-  document.getElementById('ci-shift').textContent=lastShiftLbl+' '+SHIFTS[selIdx].val;
-  var photo=document.getElementById('ci-photo');
-  if(phB64){photo.src=phB64;photo.style.display='block';}
-  else{photo.style.display='none';}
-  document.getElementById('sec-form').style.display='none';
-  document.getElementById('sec-success').style.display='block';
-  window.scrollTo(0,0);
-  showToast('Check-in สำเร็จ! 🎉','ok');
-}
-
-function resetForm(){
-  document.getElementById('f-name').value='';
-  document.getElementById('f-zone').value='';
-  for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
-  selIdx=-1; phB64=null;
-  var box=document.getElementById('ph-box');
-  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
-  box.onclick=function(){document.getElementById('ph-file').click();};
-  document.getElementById('sec-form').style.display='block';
-  document.getElementById('sec-success').style.display='none';
-  window.scrollTo(0,0);
-}
-
-// COPY CARD — วาดด้วย Canvas โดยตรง
-function copyCard(){
-  showToast('⏳ กำลังสร้างการ์ด...','');
-  buildCard(function(canvas){
-    canvas.toBlob(function(blob){
-      var file=new File([blob],'checkin_wfm.png',{type:'image/png'});
-      var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
-      if(isMob&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-        navigator.share({files:[file],title:'Check-in WFM',text:'✅ รายงานตัวเรียบร้อย'})
-          .then(function(){showToast('ส่งสำเร็จ ✓','ok');})
-          .catch(function(e){if(e.name!=='AbortError')dlBlob(blob);});
-      } else if(navigator.clipboard&&window.ClipboardItem){
-        navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
-          .then(function(){showToast('📋 Copy แล้ว! กด Ctrl+V วางใน Teams/Line ได้เลย','ok');})
-          .catch(function(){dlBlob(blob);});
-      } else {dlBlob(blob);}
-    },'image/png',1.0);
-  });
-}
-function dlBlob(blob){
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='checkin_wfm.png';document.body.appendChild(a);a.click();
-  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
-  showToast('💾 บันทึกรูปแล้ว! ส่งใน Teams/Line ได้เลย','ok');
-}
-
-// วาดการ์ดด้วย Canvas — รูปเป็นหลัก ข้อความล่าง
-function buildCard(callback){
-  var W=720, PAD=28;
-  // รูปสูง 500px ถ้ามีรูป ไม่มีรูป H=700
-  var PHOTO_H=phB64?520:0;
-  var INFO_H=320; // ส่วนข้อมูลล่าง
-  var H=PHOTO_H+INFO_H+(phB64?0:80);
-  var c=document.createElement('canvas');
-  c.width=W; c.height=H;
-  var ctx=c.getContext('2d');
-
-  // BG เขียวเข้มทั้งใบ
-  var grad=ctx.createLinearGradient(0,0,W,H);
-  grad.addColorStop(0,'#1B5E20');
-  grad.addColorStop(0.6,'#2E7D32');
-  grad.addColorStop(1,'#1a3a1a');
-  ctx.fillStyle=grad;
-  ctx.beginPath();ctx.roundRect(0,0,W,H,24);ctx.fill();
-
-  // ── ส่วนรูปภาพ (เต็มความกว้าง ด้านบน) ──
-  function drawPhoto(done){
-    if(!phB64){done();return;}
-    var img=new Image();
-    img.onload=function(){
-      ctx.save();
-      // Clip พื้นที่รูป (top rounded)
-      ctx.beginPath();
-      ctx.moveTo(24,0);ctx.lineTo(W-24,0);ctx.arcTo(W,0,W,24,24);
-      ctx.lineTo(W,PHOTO_H);ctx.lineTo(0,PHOTO_H);ctx.lineTo(0,24);
-      ctx.arcTo(0,0,24,0,24);ctx.closePath();ctx.clip();
-      // วาดรูปให้เต็มพื้นที่ crop ตรงกลาง
-      var iw=img.width,ih=img.height;
-      var scale=Math.max(W/iw,PHOTO_H/ih);
-      var dw=iw*scale,dh=ih*scale;
-      var dx=(W-dw)/2;
-      // selfie จากมือถือ: ใบหน้ามักอยู่ upper-center → crop จาก 15% จากบน
-      var dy=ih>iw?(PHOTO_H-dh)*0.15:Math.max((PHOTO_H-dh)/2,0);
-      ctx.drawImage(img,dx,dy,dw,dh);
-      // gradient overlay ล่างรูปให้ข้อความอ่านออก
-      var ov=ctx.createLinearGradient(0,PHOTO_H-120,0,PHOTO_H);
-      ov.addColorStop(0,'rgba(27,94,32,0)');
-      ov.addColorStop(1,'rgba(27,94,32,0.85)');
-      ctx.fillStyle=ov;ctx.fillRect(0,PHOTO_H-120,W,120);
-      ctx.restore();
-      done();
-    };
-    img.onerror=function(){phB64=null;done();};
-    img.src=phB64;
-  }
-
-  function drawInfo(){
-    var y=PHOTO_H;
-
-    // stamp badge มุมขวาบน
-    ctx.save();
-    ctx.translate(W-PAD-10,PAD+10);ctx.rotate(0.06);
-    ctx.fillStyle='rgba(141,198,63,0.2)';
-    roundRect(ctx,-54,-16,108,32,8);ctx.fill();
-    ctx.strokeStyle='rgba(141,198,63,0.7)';ctx.lineWidth=2;
-    roundRect(ctx,-54,-16,108,32,8);ctx.stroke();
-    ctx.fillStyle='#8dc63f';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
-    ctx.fillText('CHECK-IN ✓',0,5);
-    ctx.restore();
-
-    // logo (บนรูป)
-    ctx.fillStyle='rgba(255,255,255,0.65)';
-    ctx.font='11px sans-serif';ctx.textAlign='left';
-    ctx.fillText('AIS 3BB  ·  WFM NOPBIGMAN',PAD,PAD+14);
-
-    // ชื่อ
-    ctx.fillStyle='#ffffff';
-    ctx.font='800 36px sans-serif';ctx.textAlign='left';
-    ctx.fillText(lastName||'-',PAD,y+46);
-
-    // zone
-    ctx.fillStyle='rgba(255,255,255,0.7)';
-    ctx.font='16px sans-serif';
-    ctx.fillText(lastZone||'-',PAD,y+72);
-
-    // info boxes
-    var rh=74, rw=(W-PAD*2-14)/2, ry=y+90;
-    drawInfoBox(ctx,PAD,ry,rw,rh,'📅  วันที่',lastDateThai||'-');
-    drawInfoBox(ctx,PAD+rw+14,ry,rw,rh,'⏰  เวลา',lastTime||'-');
-    drawInfoBox(ctx,PAD,ry+rh+10,W-PAD*2,rh,'⏱️  SHIFT',lastShiftLbl+(selIdx>=0?' '+SHIFTS[selIdx].val:''));
-
-    // badge
-    var by=ry+rh*2+24;
-    ctx.fillStyle='rgba(244,121,32,0.25)';
-    roundRect(ctx,PAD,by,230,36,18);ctx.fill();
-    ctx.strokeStyle='rgba(244,121,32,0.5)';ctx.lineWidth=1.5;
-    roundRect(ctx,PAD,by,230,36,18);ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('✅  รายงานตัวเรียบร้อย',PAD+14,by+23);
-
-    callback(c);
-  }
-
-  drawPhoto(drawInfo);
-}
-
-function drawInfoBox(ctx,x,y,w,h,lbl,val){
-  ctx.fillStyle='rgba(255,255,255,0.1)';
-  roundRect(ctx,x,y,w,h,10);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.55)';
-  ctx.font='11px Sarabun,sans-serif';ctx.textAlign='left';ctx.letterSpacing='1px';
-  ctx.fillText(lbl,x+14,y+20);
-  ctx.fillStyle='#ffffff';
-  ctx.font='bold 17px Kanit,sans-serif';ctx.letterSpacing='0px';
-  ctx.fillText(val,x+14,y+50);
-}
-
-function roundRect(ctx,x,y,w,h,r){
+// ── HELPERS ──────────────────────────────────────────────
+function rr(ctx,x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
   ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
@@ -556,200 +235,377 @@ function roundRect(ctx,x,y,w,h,r){
   ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
   ctx.closePath();
 }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// DASHBOARD — ดึงจาก Firebase
-function loadDash(){
+// ── CLOCK ─────────────────────────────────────────────────
+function tick(){
   var n=new Date();
-  var today=n.toISOString().slice(0,10);
-  var picker=document.getElementById('d-picker');
-  if(picker) picker.value=today;
-  showDashForDate(today);
-  document.getElementById('dash-modal').style.display='block';
+  var h=pad(n.getHours()),m=pad(n.getMinutes()),s=pad(n.getSeconds());
+  document.getElementById('cl-t').textContent=h+':'+m+':'+s;
+  document.getElementById('cl-d').textContent='วัน'+DA[n.getDay()]+'ที่ '+n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('fd').value=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
+  document.getElementById('ft').value=h+':'+m+':'+s;
+}
+setInterval(tick,1000);tick();
+
+// ── SHIFT ─────────────────────────────────────────────────
+function psh(i){
+  si=i;
+  for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
+  document.getElementById('sc'+i).classList.add('on');
 }
 
-function pickDate(dateStr){
-  if(!dateStr) return;
-  var d=new Date(dateStr+'T00:00:00');
-  document.getElementById('d-today').textContent=d.getDate()+' '+MO[d.getMonth()]+' '+(d.getFullYear()+543);
-  document.getElementById('d-content').innerHTML='<div style="text-align:center;padding:30px;color:#666;font-size:14px">⏳ กำลังโหลด...</div>';
+// ── PHOTO ─────────────────────────────────────────────────
+function ldph(inp){
+  if(!inp.files[0])return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');
+      var max=1000,w=img.width,h=img.height;
+      if(w>max||h>max){var rt=Math.min(max/w,max/h);w=Math.round(w*rt);h=Math.round(h*rt);}
+      c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      ph=c.toDataURL('image/jpeg',0.82);
+      var box=document.getElementById('phb');
+      box.innerHTML='<img src="'+ph+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><button class="del-ph" onclick="dlph(event)">✕ ลบรูป</button>';
+    };
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(inp.files[0]);
+  inp.value='';
+}
+function dlph(e){
+  e.stopPropagation();ph=null;
+  var box=document.getElementById('phb');
+  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
+  box.onclick=function(){document.getElementById('phf').click();};
+}
+
+// ── CHECKIN ───────────────────────────────────────────────
+function doci(){
+  var name=document.getElementById('fn').value;
+  var zone=document.getElementById('fz').value;
+  if(!name){toast('กรุณาเลือกชื่อ','err');return;}
+  if(!zone){toast('กรุณาเลือก Zone','err');return;}
+  if(si<0){toast('กรุณาเลือก Shift','err');return;}
+  var sh=SH[si];
+  var n=new Date();
+  var today=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());
+  var dd=pad(n.getDate()),mm=pad(n.getMonth()+1),yyyy=n.getFullYear();
+  var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
+  var timeTxt=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+  lnm=name;lzn=zone;ldt=dateThai;ltm=timeTxt;lsh=sh.l;
+  var btn=document.getElementById('bsb');
+  btn.textContent='⏳ กำลังตรวจสอบ...';btn.disabled=true;
+  // Check duplicate
   fetch(FB+'/checkins.json')
     .then(function(r){return r.json();})
-    .then(function(d2){
-      var list=d2?Object.values(d2):[];
-      var filtered=list.filter(function(r){return r.date&&r.date===dateStr;});
+    .then(function(d){
+      var list=d&&typeof d==='object'?Object.values(d):[];
+      var dup=list.some(function(r){return r.date===today&&r.name===name;});
+      if(dup){btn.textContent='✅ Check-in เลย!';btn.disabled=false;toast('⚠️ '+name+' Check-in แล้ววันนี้!','err');return;}
+      doSave(name,zone,sh,today,dateThai,timeTxt,btn);
+    })
+    .catch(function(){doSave(name,zone,sh,today,dateThai,timeTxt,btn);});
+}
+function doSave(name,zone,sh,today,dateThai,timeTxt,btn){
+  btn.textContent='⏳ กำลังบันทึก...';
+  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now()};
+  fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
+    .then(function(){
+      // Background: Google Sheets
+      var p='action=checkin&name='+encodeURIComponent(name)+'&zone='+encodeURIComponent(zone)+'&date='+encodeURIComponent(dateThai)+'&time='+encodeURIComponent(timeTxt)+'&shift='+encodeURIComponent(sh.v);
+      var cb='cb'+Date.now();
+      window[cb]=function(){delete window[cb];};
+      var s=document.createElement('script');s.src=GS+'?'+p+'&callback='+cb;document.body.appendChild(s);
+      showSuc(true,btn);
+    })
+    .catch(function(){showSuc(false,btn);});
+  setTimeout(function(){if(btn.disabled){showSuc(false,btn);}},8000);
+}
+function showSuc(ok,btn){
+  if(btn){btn.textContent='✅ Check-in เลย!';btn.disabled=false;}
+  document.getElementById('ssb').textContent=ok?'บันทึกลง Firebase เรียบร้อยแล้ว ✓':'บันทึกแล้ว (Offline)';
+  document.getElementById('cnm').textContent=lnm;
+  document.getElementById('czn').textContent=lzn;
+  document.getElementById('cdt').textContent=ldt;
+  document.getElementById('ctm').textContent=ltm;
+  document.getElementById('csh').textContent=lsh+(si>=0?' '+SH[si].v:'');
+  var cph=document.getElementById('cph');
+  if(ph){cph.src=ph;cph.style.display='block';}else{cph.style.display='none';}
+  document.getElementById('ff').style.display='none';
+  document.getElementById('sf').style.display='block';
+  window.scrollTo(0,0);
+  toast('Check-in สำเร็จ! 🎉','ok');
+}
+function rst(){
+  document.getElementById('fn').value='';
+  document.getElementById('fz').value='';
+  for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
+  si=-1;ph=null;
+  var box=document.getElementById('phb');
+  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
+  box.onclick=function(){document.getElementById('phf').click();};
+  document.getElementById('ff').style.display='block';
+  document.getElementById('sf').style.display='none';
+  window.scrollTo(0,0);
+}
+
+// ── CARD CANVAS ───────────────────────────────────────────
+function cpCard(){
+  toast('⏳ กำลังสร้างการ์ด...','');
+  buildCard(function(canvas){
+    canvas.toBlob(function(blob){
+      shareOrDl(blob,'checkin_wfm.png','📋 Copy แล้ว! กด Ctrl+V วางใน Teams/Line ได้เลย');
+    },'image/png',1.0);
+  });
+}
+function buildCard(cb){
+  var W=720,PAD=28;
+  var PH=ph?520:0;
+  var IH=300;
+  var H=PH+IH;
+  var c=document.createElement('canvas');c.width=W;c.height=H;
+  var ctx=c.getContext('2d');
+  // BG
+  var g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#1B5E20');g.addColorStop(0.6,'#2E7D32');g.addColorStop(1,'#1a3a1a');
+  ctx.fillStyle=g;rr(ctx,0,0,W,H,24);ctx.fill();
+  // stamp
+  ctx.save();ctx.translate(W-PAD-10,PAD+10);ctx.rotate(0.06);
+  ctx.fillStyle='rgba(141,198,63,.2)';rr(ctx,-54,-16,108,32,8);ctx.fill();
+  ctx.strokeStyle='rgba(141,198,63,.7)';ctx.lineWidth=2;rr(ctx,-54,-16,108,32,8);ctx.stroke();
+  ctx.fillStyle='#8dc63f';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('CHECK-IN \u2713',0,5);ctx.restore();
+  // logo
+  ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='11px sans-serif';ctx.textAlign='left';
+  ctx.fillText('AIS 3BB  \u00b7  WFM NOPBIGMAN',PAD,PAD+14);
+  function drawInfo(){
+    var y=PH;
+    ctx.fillStyle='#fff';ctx.font='800 36px sans-serif';ctx.textAlign='left';
+    ctx.fillText(lnm||'-',PAD,y+46);
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='16px sans-serif';
+    ctx.fillText(lzn||'-',PAD,y+72);
+    var rh=62,rw=(W-PAD*2-14)/2,ry=y+88;
+    drawIB(ctx,PAD,ry,rw,rh,'\ud83d\udcc5  \u0e27\u0e31\u0e19\u0e17\u0e35\u0e48',ldt||'-');
+    drawIB(ctx,PAD+rw+14,ry,rw,rh,'\u23f0  \u0e40\u0e27\u0e25\u0e32',ltm||'-');
+    drawIB(ctx,PAD,ry+rh+10,W-PAD*2,rh,'\u23f1\ufe0f  SHIFT',lsh+(si>=0?' '+SH[si].v:''));
+    var by=ry+rh*2+22;
+    ctx.fillStyle='rgba(244,121,32,.25)';rr(ctx,PAD,by,230,36,18);ctx.fill();
+    ctx.strokeStyle='rgba(244,121,32,.5)';ctx.lineWidth=1.5;rr(ctx,PAD,by,230,36,18);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
+    ctx.fillText('\u2705  \u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22',PAD+14,by+23);
+    cb(c);
+  }
+  if(ph){
+    var img=new Image();
+    img.onload=function(){
+      ctx.save();
+      ctx.beginPath();ctx.moveTo(24,0);ctx.lineTo(W-24,0);ctx.arcTo(W,0,W,24,24);
+      ctx.lineTo(W,PH);ctx.lineTo(0,PH);ctx.lineTo(0,24);ctx.arcTo(0,0,24,0,24);ctx.closePath();ctx.clip();
+      var iw=img.width,ih=img.height;
+      var sc=Math.max(W/iw,PH/ih);
+      var dw=iw*sc,dh=ih*sc;
+      var dx=(W-dw)/2,dy=ih>iw?(PH-dh)*0.15:Math.max((PH-dh)/2,0);
+      ctx.drawImage(img,dx,dy,dw,dh);
+      var ov=ctx.createLinearGradient(0,PH-120,0,PH);
+      ov.addColorStop(0,'rgba(27,94,32,0)');ov.addColorStop(1,'rgba(27,94,32,.85)');
+      ctx.fillStyle=ov;ctx.fillRect(0,PH-120,W,120);
+      ctx.restore();drawInfo();
+    };
+    img.onerror=function(){ph=null;drawInfo();};
+    img.src=ph;
+  } else {drawInfo();}
+}
+function drawIB(ctx,x,y,w,h,lb,val){
+  ctx.fillStyle='rgba(255,255,255,.1)';rr(ctx,x,y,w,h,10);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText(lb,x+14,y+18);
+  ctx.fillStyle='#fff';ctx.font='bold 16px sans-serif';ctx.fillText(val,x+14,y+44);
+}
+
+// ── SHARE HELPER ─────────────────────────────────────────
+function shareOrDl(blob,fname,okMsg){
+  var file=new File([blob],fname,{type:'image/png'});
+  var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+  if(isMob&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'Check-in WFM'}).then(function(){toast('ส่งสำเร็จ ✓','ok');}).catch(function(e){if(e.name!=='AbortError')dlBlob(blob,fname);});
+  } else if(navigator.clipboard&&window.ClipboardItem){
+    navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(function(){toast(okMsg,'ok');}).catch(function(){dlBlob(blob,fname);});
+  } else {dlBlob(blob,fname);}
+}
+function dlBlob(blob,fname){
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname||'image.png';
+  document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);},1000);
+  toast('💾 บันทึกรูปแล้ว!','ok');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function ldDash(){
+  var n=new Date();
+  var today=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());
+  document.getElementById('dpk').value=today;
+  document.getElementById('dm').style.display='block';
+  fetchDash(today);
+}
+function pkDate(v){if(v)fetchDash(v);}
+function fetchDash(dateStr){
+  var d=new Date(dateStr+'T12:00:00');
+  document.getElementById('dtx').textContent=d.getDate()+' '+MO[d.getMonth()]+' '+(d.getFullYear()+543);
+  document.getElementById('dc').innerHTML='<div style="text-align:center;padding:30px;color:#888;font-size:14px">\u23f3 \u0e01\u0e33\u0e25\u0e31\u0e07\u0e42\u0e2b\u0e25\u0e14...</div>';
+  fetch(FB+'/checkins.json')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var list=data&&typeof data==='object'?Object.values(data):[];
+      var filtered=list.filter(function(r){return r.date===dateStr;});
       renderDash(filtered);
     })
     .catch(function(){renderDash([]);});
 }
-
-function showDashForDate(dateStr){
-  var d=new Date(dateStr+'T00:00:00');
-  document.getElementById('d-today').textContent=d.getDate()+' '+MO[d.getMonth()]+' '+(d.getFullYear()+543);
-  document.getElementById('d-content').innerHTML='<div style="text-align:center;padding:30px;color:#666;font-size:14px">⏳ กำลังโหลด...</div>';
-  fetch(FB+'/checkins.json')
-    .then(function(r){return r.json();})
-    .then(function(d2){
-      var list=d2?Object.values(d2):[];
-      // filter เฉพาะวันที่เลือก (date format YYYY-MM-DD)
-      var filtered=list.filter(function(r){return r.date&&r.date===dateStr;});
-      renderDash(filtered);
-    })
-    .catch(function(){renderDash([]);});
-}
-
-function renderDash(today){
-  var total=today.length;
+function renderDash(list){
+  var total=list.length;
   var html='<div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:14px;padding:14px 18px;color:#fff;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">'
-    +'<div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">รายงานตัววันนี้ทั้งหมด</div>'
+    +'<div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14</div>'
     +'<div style="font-family:Kanit,sans-serif;font-size:44px;font-weight:800;line-height:1">'+total+'</div>'
-    +'<div style="font-size:12px;opacity:.8">คน</div></div><div style="font-size:44px">👥</div></div>';
-
-  SHIFTS.forEach(function(sh){
-    var mems=today.filter(function(r){return r.shift&&r.shift.trim()===sh.val.trim();});
+    +'<div style="font-size:12px;opacity:.8">\u0e04\u0e19</div></div><div style="font-size:44px">\ud83d\udc65</div></div>';
+  SH.forEach(function(sh){
+    var mems=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();});
     html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:2px solid '+sh.bd+'">';
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:'+(mems.length?'10px':'0')+'">';
     html+='<div style="display:flex;align-items:center;gap:10px">';
     html+='<div style="width:42px;height:42px;border-radius:12px;background:'+sh.bg+';border:2px solid '+sh.bd+';display:flex;align-items:center;justify-content:center;font-size:20px">'+sh.ic+'</div>';
-    html+='<div><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:'+sh.col+'">'+sh.lbl.replace(/^[^\s]+\s/,'')+'</div>';
-    html+='<div style="font-size:12px;color:#888">'+sh.val+'</div></div></div>';
-    html+='<div style="background:'+sh.col+';color:#fff;font-family:Kanit,sans-serif;font-size:18px;font-weight:800;padding:5px 14px;border-radius:20px">'+mems.length+'</div></div>';
+    html+='<div><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:'+sh.c+'">'+sh.l.replace(/^\S+\s/,'')+'</div>';
+    html+='<div style="font-size:12px;color:#888">'+sh.v+'</div></div></div>';
+    html+='<div style="background:'+sh.c+';color:#fff;font-family:Kanit,sans-serif;font-size:18px;font-weight:800;padding:5px 14px;border-radius:20px">'+mems.length+'</div></div>';
     if(mems.length){
       mems.forEach(function(m,i){
         html+='<div style="display:flex;align-items:center;gap:8px;background:#f8faf8;border-radius:10px;padding:8px 12px;margin-bottom:5px">';
-        html+='<div style="width:24px;height:24px;border-radius:7px;background:'+sh.col+';color:#fff;font-family:Kanit,sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
+        html+='<div style="width:24px;height:24px;border-radius:7px;background:'+sh.c+';color:#fff;font-family:Kanit,sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
         html+='<div style="flex:1;font-size:14px;font-weight:700">'+esc(m.name||'-')+'</div>';
         html+='<div style="font-size:11px;color:#888;background:#eee;border-radius:6px;padding:2px 7px">'+esc(m.zone||'')+'</div>';
         html+='<div style="font-family:Kanit,sans-serif;font-size:11px;color:#aaa">'+esc(m.time||'')+'</div></div>';
       });
     } else {
-      html+='<div style="text-align:center;padding:10px;color:#aaa;font-size:13px">ยังไม่มีคนรายงานตัว</div>';
+      html+='<div style="text-align:center;padding:10px;color:#aaa;font-size:13px">\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e04\u0e19\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27</div>';
     }
     html+='</div>';
   });
-  document.getElementById('d-content').innerHTML=html;
+  document.getElementById('dc').innerHTML=html;
 }
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-// COPY DASHBOARD SUMMARY
-function copyDashCard(){
-  var dateText=document.getElementById('d-today').textContent;
-  var picker=document.getElementById('d-picker');
-  var selDate=picker&&picker.value?picker.value:new Date().toISOString().slice(0,10);
-  showToast('⏳ กำลังสร้างภาพสรุป...','');
-
+// ── COPY DASH ────────────────────────────────────────────
+function cpDash(){
+  var dateStr=document.getElementById('dpk').value||new Date().toISOString().slice(0,10);
+  var dateText=document.getElementById('dtx').textContent;
+  toast('\u23f3 \u0e01\u0e33\u0e25\u0e31\u0e07\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e20\u0e32\u0e1e...','');
   fetch(FB+'/checkins.json')
     .then(function(r){return r.json();})
     .then(function(d){
       var list=d?Object.values(d):[];
-      var todayList=list.filter(function(r){return r.date&&r.date===selDate;});
-      buildDashCanvas(todayList,dateText,function(canvas){
+      var filtered=list.filter(function(r){return r.date===dateStr;});
+      buildDashCanvas(filtered,dateText,function(canvas){
         canvas.toBlob(function(blob){
-          var file=new File([blob],'checkin_summary.png',{type:'image/png'});
-          var isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
-          if(isMob&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-            navigator.share({files:[file],title:'สรุปรายงานตัว',text:'📊 Check-in Summary WFM'})
-              .then(function(){showToast('ส่งสำเร็จ ✓','ok');})
-              .catch(function(){dlBlob(blob);});
-          } else if(navigator.clipboard&&window.ClipboardItem){
-            navigator.clipboard.write([new ClipboardItem({'image/png':blob})])
-              .then(function(){showToast('📋 Copy แล้ว! วางใน Teams/Line ได้เลย','ok');})
-              .catch(function(){dlBlob(blob);});
-          } else {dlBlob(blob);}
+          shareOrDl(blob,'checkin_summary.png','\ud83d\udccb Copy \u0e41\u0e25\u0e49\u0e27! \u0e27\u0e32\u0e07\u0e43\u0e19 Teams/Line \u0e44\u0e14\u0e49\u0e40\u0e25\u0e22');
         },'image/png',1.0);
       });
     });
 }
 
-function buildDashCanvas(todayList,dateText,callback){
-  var W=720;
-  var rowH=70;
-  var shiftH=function(sh){
-    var mems=todayList.filter(function(r){return r.shift&&r.shift.trim()===sh.val.trim();});
-    return 80+(mems.length?mems.length*rowH:50);
-  };
-  var totalH=100+80+SHIFTS.reduce(function(s,sh){return s+shiftH(sh)+12;},0)+40;
-  var H=Math.max(totalH,400);
+// ── EXPORT EXCEL ─────────────────────────────────────────
+function exDash(){
+  var dateStr=document.getElementById('dpk').value||new Date().toISOString().slice(0,10);
+  fetch(FB+'/checkins.json')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var list=d?Object.values(d):[];
+      var filtered=list.filter(function(r){return r.date===dateStr;});
+      filtered.sort(function(a,b){return (a.shift||'').localeCompare(b.shift||'')||(a.time||'').localeCompare(b.time||'');});
+      var rows=[['#','\u0e0a\u0e37\u0e48\u0e2d-\u0e19\u0e32\u0e21\u0e2a\u0e01\u0e38\u0e25','Zone','Shift','\u0e40\u0e27\u0e25\u0e32 Check-in','\u0e27\u0e31\u0e19\u0e17\u0e35\u0e48']];
+      filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr]);});
+      rows.push([]);rows.push(['','','','','รวม',filtered.length+' คน']);
+      var csv='\uFEFF'+rows.map(function(r){return r.map(function(v){var s=String(v==null?'':v);return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\r\n');
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+      a.download='CheckIn_'+dateStr+'.csv';
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){document.body.removeChild(a);},1000);
+      toast('\ud83d\udce5 Export \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 '+filtered.length+' \u0e04\u0e19 \u2713','ok');
+    })
+    .catch(function(){toast('\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e14\u0e36\u0e07\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e44\u0e14\u0e49','err');});
+}
 
+// ── DASH CANVAS ───────────────────────────────────────────
+function buildDashCanvas(list,dateText,callback){
+  var W=1080,PAD=24,GAP=16,RH=52,SHH=72;
+  function shH(sh){
+    var n=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();}).length;
+    return n?SHH+Math.ceil(n/2)*RH+16:SHH+44;
+  }
+  var H=100+80+SH.reduce(function(s,sh){return s+shH(sh)+12;},0)+44;
+  H=Math.max(H,500);
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var ctx=c.getContext('2d');
-
-  // BG
   ctx.fillStyle='#f0f4f0';ctx.fillRect(0,0,W,H);
-
-  // Header
-  var hgrad=ctx.createLinearGradient(0,0,W,80);
-  hgrad.addColorStop(0,'#1B5E20');hgrad.addColorStop(1,'#2E7D32');
-  ctx.fillStyle=hgrad;ctx.fillRect(0,0,W,80);
-  ctx.fillStyle='#fff';ctx.font='800 22px Kanit,sans-serif';ctx.textAlign='left';
-  ctx.fillText('📊  สรุปรายงานตัว',24,36);
-  ctx.font='13px Sarabun,sans-serif';ctx.fillStyle='rgba(255,255,255,0.8)';
-  ctx.fillText('วันที่ '+dateText+' · WFM NOPBIGMAN',24,58);
-
-  // Total box
-  var total=todayList.length;
-  ctx.fillStyle='#1B5E20';
-  roundRect(ctx,20,90,W-40,70,12);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='800 40px Kanit,sans-serif';ctx.textAlign='left';
-  ctx.fillText(String(total),36,143);
-  ctx.font='14px Sarabun,sans-serif';ctx.fillStyle='rgba(255,255,255,0.8)';
-  ctx.fillText('คน  (รายงานตัววันนี้ทั้งหมด)',90,143);
-
-  var y=170;
-  SHIFTS.forEach(function(sh){
-    var mems=todayList.filter(function(r){return r.shift&&r.shift.trim()===sh.val.trim();});
-    var boxH=shiftH(sh);
-    // box bg
-    ctx.fillStyle='#ffffff';
-    roundRect(ctx,20,y,W-40,boxH,12);ctx.fill();
-    ctx.strokeStyle=sh.bd;ctx.lineWidth=2;
-    roundRect(ctx,20,y,W-40,boxH,12);ctx.stroke();
-    // shift header
-    ctx.fillStyle=sh.col;ctx.font='800 16px Kanit,sans-serif';ctx.textAlign='left';
-    ctx.fillText(sh.ic+' '+sh.lbl.replace(/^[^\s]+\s/,''),36,y+30);
-    ctx.fillStyle='#888';ctx.font='12px Sarabun,sans-serif';
-    ctx.fillText(sh.val,36,y+50);
-    // count badge
-    ctx.fillStyle=sh.col;
-    roundRect(ctx,W-80,y+16,48,30,15);ctx.fill();
-    ctx.fillStyle='#fff';ctx.font='800 16px Kanit,sans-serif';ctx.textAlign='center';
-    ctx.fillText(String(mems.length),W-56,y+35);
-
+  var hg=ctx.createLinearGradient(0,0,W,96);hg.addColorStop(0,'#1B5E20');hg.addColorStop(1,'#2E7D32');
+  ctx.fillStyle=hg;ctx.fillRect(0,0,W,96);
+  ctx.fillStyle='#fff';ctx.font='800 26px sans-serif';ctx.textAlign='left';
+  ctx.fillText('\ud83d\udcca  \u0e2a\u0e23\u0e38\u0e1b\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27',PAD,40);
+  ctx.font='15px sans-serif';ctx.fillStyle='rgba(255,255,255,.8)';
+  ctx.fillText('\u0e27\u0e31\u0e19\u0e17\u0e35\u0e48 '+dateText+'  \u00b7  WFM NOPBIGMAN',PAD,68);
+  var total=list.length;
+  ctx.fillStyle='#155215';rr(ctx,PAD,104,W-PAD*2,72,14);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='800 46px sans-serif';ctx.textAlign='left';
+  ctx.fillText(String(total),PAD+20,160);
+  ctx.font='16px sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.fillText('\u0e04\u0e19  \u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14',PAD+80,160);
+  var y=188;
+  SH.forEach(function(sh){
+    var mems=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();});
+    var boxH=shH(sh);
+    var colW=(W-PAD*2-GAP)/2;
+    ctx.fillStyle='#fff';rr(ctx,PAD,y,W-PAD*2,boxH,12);ctx.fill();
+    ctx.strokeStyle=sh.bd;ctx.lineWidth=2.5;rr(ctx,PAD,y,W-PAD*2,boxH,12);ctx.stroke();
+    ctx.fillStyle=sh.bg;rr(ctx,PAD+12,y+12,48,48,10);ctx.fill();
+    ctx.strokeStyle=sh.bd;ctx.lineWidth=1.5;rr(ctx,PAD+12,y+12,48,48,10);ctx.stroke();
+    ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillStyle='#333';
+    ctx.fillText(sh.ic,PAD+36,y+44);
+    ctx.fillStyle=sh.c;ctx.font='800 18px sans-serif';ctx.textAlign='left';
+    ctx.fillText(sh.l.replace(/^\S+\s/,''),PAD+70,y+32);
+    ctx.fillStyle='#999';ctx.font='13px sans-serif';ctx.fillText(sh.v,PAD+70,y+52);
+    ctx.fillStyle=sh.c;rr(ctx,W-PAD-70,y+18,62,36,18);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='800 20px sans-serif';ctx.textAlign='center';
+    ctx.fillText(String(mems.length),W-PAD-39,y+42);
     if(mems.length){
       mems.forEach(function(m,i){
-        var my=y+65+i*rowH;
-        ctx.fillStyle='#f8faf8';
-        roundRect(ctx,32,my,W-64,56,8);ctx.fill();
-        // num
-        ctx.fillStyle=sh.col;
-        roundRect(ctx,44,my+14,28,28,7);ctx.fill();
-        ctx.fillStyle='#fff';ctx.font='800 12px Kanit,sans-serif';ctx.textAlign='center';
-        ctx.fillText(String(i+1),58,my+31);
-        // name
-        ctx.fillStyle='#1a2a1a';ctx.font='700 15px Kanit,sans-serif';ctx.textAlign='left';
-        ctx.fillText(m.name||'-',82,my+25);
-        // zone
-        ctx.fillStyle='#888';ctx.font='12px Sarabun,sans-serif';
-        ctx.fillText(m.zone||'',82,my+44);
-        // time
-        ctx.fillStyle='#aaa';ctx.font='12px Kanit,sans-serif';ctx.textAlign='right';
-        ctx.fillText(m.time||'',W-44,my+31);
+        var col=i%2,row=Math.floor(i/2);
+        var mx=PAD+12+col*(colW+GAP),my=y+SHH+row*RH;
+        ctx.fillStyle=i%4<2?'#f8faf8':'#f1f5f1';rr(ctx,mx,my,colW,RH-4,8);ctx.fill();
+        ctx.fillStyle=sh.c;rr(ctx,mx+8,my+10,30,30,8);ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='800 13px sans-serif';ctx.textAlign='center';
+        ctx.fillText(String(i+1),mx+23,my+29);
+        ctx.fillStyle='#1a2a1a';ctx.font='700 14px sans-serif';ctx.textAlign='left';
+        ctx.save();ctx.beginPath();ctx.rect(mx+46,my,colW-110,RH);ctx.clip();
+        ctx.fillText(m.name||'-',mx+46,my+20);ctx.restore();
+        ctx.fillStyle='#888';ctx.font='12px sans-serif';ctx.textAlign='right';
+        ctx.fillText(m.time||'',mx+colW-8,my+20);
+        ctx.fillStyle='#aaa';ctx.font='11px sans-serif';ctx.textAlign='left';
+        ctx.fillText(m.zone||'',mx+46,my+38);
       });
     } else {
-      ctx.fillStyle='#bbb';ctx.font='13px Sarabun,sans-serif';ctx.textAlign='center';
-      ctx.fillText('ยังไม่มีคนรายงานตัว',W/2,y+72);
+      ctx.fillStyle='#ccc';ctx.font='14px sans-serif';ctx.textAlign='center';
+      ctx.fillText('\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e04\u0e19\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27',W/2,y+SHH+20);
     }
     y+=boxH+12;
   });
-
-  // footer
-  ctx.fillStyle='#aaa';ctx.font='11px Sarabun,sans-serif';ctx.textAlign='center';
-  ctx.fillText('AIS 3BB · WFM System NOPBIGMAN',W/2,H-16);
-
+  ctx.fillStyle='#bbb';ctx.font='12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('AIS 3BB \u00b7 WFM System NOPBIGMAN \u00b7 '+dateText,W/2,H-16);
   callback(c);
 }
 
-function showToast(msg,type){
-  var t=document.getElementById('toast');
+// ── TOAST ─────────────────────────────────────────────────
+function toast(msg,type){
+  var t=document.getElementById('tst');
   t.textContent=msg;t.className='toast show'+(type?' '+type:'');
   setTimeout(function(){t.className='toast';},3000);
 }
