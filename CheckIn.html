@@ -89,7 +89,10 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
       <div class="hdr-t">✅ Check-in</div>
       <div class="hdr-s">บันทึกเวลาเข้างาน</div>
     </div>
-    <a href="WFM_Home.html" class="home-a">🏠 หน้าหลัก</a>
+    <div style="display:flex;gap:8px">
+      <button class="home-a" onclick="opLv()" style="cursor:pointer;font-family:'Sarabun',sans-serif">🏖️ ลา</button>
+      <a href="WFM_Home.html" class="home-a">🏠 หน้าหลัก</a>
+    </div>
   </div>
 </div>
 
@@ -125,8 +128,11 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         <option>วิชัย ทำนุศาสตร์</option><option>อภิสิทธิ์ ศิริกิจ</option><option>ไกรสิทธิ์ เชื้อสมเกียรติ</option>
         <option>กรภัทร จีนอนันต์</option><option>คมกริช สายวงศ์เปียง</option><option>ธนกฤต ดอกดวง</option>
         <option>ประสาร สุพรรณคง</option><option>นพดล เมืองชัย</option><option>ปิยะวัฒน์ ปงกันทา</option>
-        <option>นิธิพันธ์ ศิริโปทา</option><option>อภิรักษ์ จันทร์คำ</option><option>ปิ่นเพชร แก้วเสน่ห์</option>
-        <option>ศุภกิตติ์ สุวรรณ์</option><option>เทวนพ เข่งค้า</option><option>วชิรวุธ เพ็ชรเขียว</option>
+        <option>นิธิพันธ์ ศิริโปทา</option><option>อภิรักษ์ จันทร์คำ</option>
+        <option>ปิ่นเพชร แก้วเสน่ห์</option>
+        <option>ศุภกิตติ์ สุวรรณ์</option>
+        <option>เทวนพ เข่งค้า</option>
+        <option>วชิรวุธ เพ็ชรเขียว</option>
       </select>
       <label class="L">🗺️ MC Zone</label>
       <select class="inp" id="fz">
@@ -148,6 +154,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         <div class="sc" id="sc2" onclick="psh(2)"><div class="sr"><div class="sd"></div></div><div><div class="st">08:30—23:59</div><div class="sl">🌙 Night Shift</div></div></div>
         <div class="sc" id="sc3" onclick="psh(3)"><div class="sr"><div class="sd"></div></div><div><div class="st">20:30—05:30</div><div class="sl">🌙 Night Shift OT</div></div></div>
       </div>
+      <div id="lw" style="display:none;margin-top:12px;background:#fff7ed;border:2px solid #f47920;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;color:#b45309"></div>
     </div>
 
     <div class="card">
@@ -181,7 +188,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         <div class="ci-row"><div class="ci-rl">⏰ เวลา</div><div class="ci-rv" id="ctm">-</div></div>
         <div class="ci-row full"><div class="ci-rl">⏱️ SHIFT</div><div class="ci-rv" id="csh">-</div></div>
       </div>
-      <div class="ci-badge">✅ รายงานตัวเรียบร้อย</div>
+      <div class="ci-badge" id="cbd">✅ รายงานตัวเรียบร้อย</div>
     </div>
     <div class="ag">
       <button class="btn-cp" onclick="cpCard()">📤 ส่ง/Copy การ์ด</button>
@@ -210,6 +217,44 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
   </div>
 </div>
 
+<!-- LEAVE MODAL -->
+<div class="modal-bg" id="lm">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">🏖️ แจ้งลา</div>
+      <button onclick="clLv()" style="background:var(--bg);border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+    </div>
+    <label class="L">👤 ชื่อ-นามสกุล</label>
+    <select class="inp" id="lvn"><option value="">— เลือกชื่อ —</option></select>
+    <div style="display:flex;gap:10px">
+      <div style="flex:1;min-width:0"><label class="L">📅 ตั้งแต่วันที่</label><input type="date" class="inp" id="lvs" onchange="lvDt()"/></div>
+      <div style="flex:1;min-width:0"><label class="L">📅 ถึงวันที่</label><input type="date" class="inp" id="lve" onchange="lvDt()"/></div>
+    </div>
+    <div id="lvc" style="font-size:12px;font-weight:700;color:#0369a1;margin-top:6px">ลา 1 วัน</div>
+    <label class="L">📝 ประเภทการลา</label>
+    <select class="inp" id="lvt"><option>ลาป่วย</option><option>ลากิจ</option><option>ลาพักร้อน</option><option>อื่นๆ</option></select>
+    <label class="L">⏱️ ช่วงเวลา (ลาหลายวัน = เต็มวัน)</label>
+    <select class="inp" id="lvp"><option>เต็มวัน</option><option>ครึ่งเช้า</option><option>ครึ่งบ่าย</option></select>
+    <label class="L">💬 หมายเหตุ (ไม่บังคับ)</label>
+    <input class="inp" id="lvr" maxlength="80" placeholder="เช่น ไปธุระ (ไม่ต้องระบุอาการป่วย)"/>
+    <button class="btn-s" id="lvb" onclick="svLv()" style="margin-top:18px">✅ ยืนยันแจ้งลา</button>
+    <button class="btn-g" onclick="clLv()">ปิด</button>
+    <button onclick="opLc()" style="width:100%;margin-top:10px;background:none;border:none;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;padding:8px">🗑️ ยกเลิกการลา (ต้องใส่รหัส admin)</button>
+  </div>
+</div>
+
+<!-- CANCEL LEAVE MODAL -->
+<div class="modal-bg" id="lcm">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">🗑️ ยกเลิกการลา</div>
+      <button onclick="clLc()" style="background:var(--bg);border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+    </div>
+    <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">แสดงรายการลาที่ยังไม่สิ้นสุด (วันนี้เป็นต้นไป)</div>
+    <div id="lcl"></div>
+  </div>
+</div>
+
 <div class="toast-w"><div class="toast" id="tst"></div></div>
 
 <script>
@@ -223,7 +268,70 @@ var SH=[
   {v:'08:30 - 23:59',l:'🌙 Night Shift',  ic:'🌙',c:'#003087',bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
   {v:'20:30 - 05:30',l:'🌙 Night Shift OT',ic:'🌙',c:'#7c3aed',bg:'rgba(124,58,237,.08)',bd:'rgba(124,58,237,.3)'}
 ];
-var si=-1,ph=null,lnm='',lzn='',ldt='',ltm='',lsh='';
+var si=-1,ph=null,lnm='',lzn='',ldt='',ltm='',lsh='',lst={late:false,min:0};
+
+// ── LATE RULE ─────────────────────────────────────────────
+var GRACE_MIN=5; // เผื่อเวลา (นาที) หลังเวลาเริ่มกะ ก่อนนับว่าสาย
+function shStart(i){return i===3?(20*60+30)*60:(8*60+30)*60;} // วินาทีของเวลาเริ่มกะ
+function secOf(t){var p=String(t||'').split(':');return (+p[0]||0)*3600+(+p[1]||0)*60+(+p[2]||0);}
+function lateOf(i,t){
+  var s=secOf(t);
+  if(i===3&&s<43200)s+=86400;
+  var d=s-shStart(i);
+  return {late:d>GRACE_MIN*60,min:d>0?Math.floor(d/60):0};
+}
+function shIdxOf(v){
+  for(var k=0;k<SH.length;k++){if(SH[k].v.trim()===String(v||'').trim())return k;}
+  return 0;
+}
+function hhmm(s){return String(s||'').slice(0,5);}
+function getRoster(){
+  return Array.prototype.slice.call(document.querySelectorAll('#fn option')).map(function(o){return o.value;}).filter(function(v){return v&&v.trim();});
+}
+function todayStr(){var n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());}
+function lvS(l){return l.startDate||l.date;}
+function lvE(l){return l.endDate||lvS(l);}
+function inRange(l,d){return lvS(l)<=d&&d<=lvE(l);}
+function dayDiff(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function leaveLbl(l){
+  var s=lvS(l),e=lvE(l);
+  if(e&&s&&e!==s){var q=e.split('-');return 'ลา ถึง '+(+q[2])+' '+MO[+q[1]-1];}
+  return l.period||'เต็มวัน';
+}
+function toArr(d){return d&&typeof d==='object'?Object.values(d):[];}
+function fetchDay(dateStr,cb){
+  Promise.all([
+    fetch(FB+'/checkins.json').then(function(r){return r.json();}).catch(function(){return {};}),
+    fetch(FB+'/leaves.json').then(function(r){return r.json();}).catch(function(){return {};})
+  ]).then(function(a){
+    cb(toArr(a[0]).filter(function(r){return r.date===dateStr;}),toArr(a[1]).filter(function(r){return inRange(r,dateStr);}));
+  });
+}
+function dashStats(list,leaves){
+  leaves=leaves||[];
+  var done={},lv={},late=[],ok=0;
+  leaves.forEach(function(l){lv[l.name]=l;});
+  list.forEach(function(r){
+    done[r.name]=1;
+    var li=lateOf(shIdxOf(r.shift),r.time);
+    if(lv[r.name]&&lv[r.name].period==='ครึ่งเช้า')li={late:false,min:0};
+    r._late=li.late;r._min=li.min;
+    if(li.late)late.push(r);else ok++;
+  });
+  late.sort(function(a,b){return b._min-a._min;});
+  var missing=getRoster().filter(function(n){return !done[n]&&!lv[n];});
+  return {ok:ok,late:late,missing:missing,leaves:leaves};
+}
+function updWarn(){
+  var w=document.getElementById('lw');if(!w)return;
+  if(si<0){w.style.display='none';return;}
+  var n=new Date();
+  var li=lateOf(si,pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds()));
+  if(li.late){
+    w.style.display='block';
+    w.textContent='⏰ เลยเวลาเริ่มกะ '+hhmm(pad(Math.floor(shStart(si)/3600))+':'+pad(Math.floor(shStart(si)%3600/60)))+' น. แล้ว (เผื่อ '+GRACE_MIN+' นาที) — การรายงานตัวครั้งนี้จะถูกบันทึกว่า "สาย"';
+  } else {w.style.display='none';}
+}
 
 function pad(v){return String(v).padStart(2,'0');}
 
@@ -247,13 +355,14 @@ function tick(){
   document.getElementById('fd').value=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
   document.getElementById('ft').value=h+':'+m+':'+s;
 }
-setInterval(tick,1000);tick();
+setInterval(tick,1000);tick();setInterval(updWarn,1000);
 
 // ── SHIFT ─────────────────────────────────────────────────
 function psh(i){
   si=i;
   for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
   document.getElementById('sc'+i).classList.add('on');
+  updWarn();
 }
 
 // ── PHOTO ─────────────────────────────────────────────────
@@ -297,7 +406,7 @@ function doci(){
   var dd=pad(n.getDate()),mm=pad(n.getMonth()+1),yyyy=n.getFullYear();
   var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(yyyy+543);
   var timeTxt=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
-  lnm=name;lzn=zone;ldt=dateThai;ltm=timeTxt;lsh=sh.l;
+  lnm=name;lzn=zone;ldt=dateThai;ltm=timeTxt;lsh=sh.l;lst=lateOf(si,timeTxt);
   var btn=document.getElementById('bsb');
   btn.textContent='⏳ กำลังตรวจสอบ...';btn.disabled=true;
   // Check duplicate
@@ -307,15 +416,33 @@ function doci(){
       var list=d&&typeof d==='object'?Object.values(d):[];
       var dup=list.some(function(r){return r.date===today&&r.name===name;});
       if(dup){btn.textContent='✅ Check-in เลย!';btn.disabled=false;toast('⚠️ '+name+' Check-in แล้ววันนี้!','err');return;}
-      doSave(name,zone,sh,today,dateThai,timeTxt,btn);
+      fetch(FB+'/leaves.json').then(function(r){return r.json();}).then(function(lv){
+        var onLeave=toArr(lv).some(function(r){return inRange(r,today)&&r.name===name&&r.period==='เต็มวัน';});
+        if(onLeave&&!confirm(name+' แจ้งลาเต็มวันของวันนี้ไว้แล้ว\nต้องการ Check-in ต่อหรือไม่?')){btn.textContent='✅ Check-in เลย!';btn.disabled=false;return;}
+        doSave(name,zone,sh,today,dateThai,timeTxt,btn);
+      }).catch(function(){doSave(name,zone,sh,today,dateThai,timeTxt,btn);});
     })
     .catch(function(){doSave(name,zone,sh,today,dateThai,timeTxt,btn);});
 }
 function doSave(name,zone,sh,today,dateThai,timeTxt,btn){
   btn.textContent='⏳ กำลังบันทึก...';
-  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now()};
+  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now(),sa:{'.sv':'timestamp'}};
   fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
-    .then(function(){
+    .then(function(r){return r.json();})
+    .then(function(res){
+      // ใช้เวลาจาก server (กันปรับเวลาเครื่อง) — เวลาไทย UTC+7
+      var upd={};
+      if(res&&res.sa){
+        var d=new Date(res.sa+7*3600000);
+        timeTxt=pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds());
+        today=d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());
+        dateThai=d.getUTCDate()+' '+MO[d.getUTCMonth()]+' '+(d.getUTCFullYear()+543);
+        ltm=timeTxt;ldt=dateThai;
+        upd.time=timeTxt;upd.date=today;upd.dateThai=dateThai;
+      }
+      lst=lateOf(si,timeTxt);
+      upd.late=lst.late;upd.lateMin=lst.min;
+      fetch(FB+'/checkins/'+rec.id+'.json',{method:'PATCH',body:JSON.stringify(upd)}).catch(function(){});
       // Background: Google Sheets
       var p='action=checkin&name='+encodeURIComponent(name)+'&zone='+encodeURIComponent(zone)+'&date='+encodeURIComponent(dateThai)+'&time='+encodeURIComponent(timeTxt)+'&shift='+encodeURIComponent(sh.v);
       var cb='cb'+Date.now();
@@ -334,6 +461,14 @@ function showSuc(ok,btn){
   document.getElementById('cdt').textContent=ldt;
   document.getElementById('ctm').textContent=ltm;
   document.getElementById('csh').textContent=lsh+(si>=0?' '+SH[si].v:'');
+  var b=document.getElementById('cbd');
+  if(lst.late){
+    b.textContent='⏰ รายงานตัวสาย '+lst.min+' นาที';
+    b.style.background='rgba(220,38,38,.4)';b.style.borderColor='rgba(252,165,165,.9)';
+  } else {
+    b.textContent='✅ รายงานตัวตรงเวลา';
+    b.style.background='rgba(141,198,63,.25)';b.style.borderColor='rgba(141,198,63,.6)';
+  }
   var cph=document.getElementById('cph');
   if(ph){cph.src=ph;cph.style.display='block';}else{cph.style.display='none';}
   document.getElementById('ff').style.display='none';
@@ -345,7 +480,7 @@ function rst(){
   document.getElementById('fn').value='';
   document.getElementById('fz').value='';
   for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
-  si=-1;ph=null;
+  si=-1;ph=null;updWarn();
   var box=document.getElementById('phb');
   box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
   box.onclick=function(){document.getElementById('phf').click();};
@@ -366,8 +501,9 @@ function cpCard(){
 function buildCard(cb){
   var W=720,PAD=28;
   var PH=ph?520:0;
+  var TOP=ph?0:44;
   var IH=300;
-  var H=PH+IH;
+  var H=PH+IH+TOP;
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var ctx=c.getContext('2d');
   // BG
@@ -384,7 +520,7 @@ function buildCard(cb){
   ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='11px sans-serif';ctx.textAlign='left';
   ctx.fillText('AIS 3BB  \u00b7  WFM NOPBIGMAN',PAD,PAD+14);
   function drawInfo(){
-    var y=PH;
+    var y=PH+TOP;
     ctx.fillStyle='#fff';ctx.font='800 36px sans-serif';ctx.textAlign='left';
     ctx.fillText(lnm||'-',PAD,y+46);
     ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='16px sans-serif';
@@ -394,10 +530,12 @@ function buildCard(cb){
     drawIB(ctx,PAD+rw+14,ry,rw,rh,'\u23f0  \u0e40\u0e27\u0e25\u0e32',ltm||'-');
     drawIB(ctx,PAD,ry+rh+10,W-PAD*2,rh,'\u23f1\ufe0f  SHIFT',lsh+(si>=0?' '+SH[si].v:''));
     var by=ry+rh*2+22;
-    ctx.fillStyle='rgba(244,121,32,.25)';rr(ctx,PAD,by,230,36,18);ctx.fill();
-    ctx.strokeStyle='rgba(244,121,32,.5)';ctx.lineWidth=1.5;rr(ctx,PAD,by,230,36,18);ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='left';
-    ctx.fillText('\u2705  \u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22',PAD+14,by+23);
+    var bt=lst.late?'\u23f0  \u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e2a\u0e32\u0e22 '+lst.min+' \u0e19\u0e32\u0e17\u0e35':'\u2705  \u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e15\u0e23\u0e07\u0e40\u0e27\u0e25\u0e32';
+    var bw=lst.late?290:250;
+    ctx.fillStyle=lst.late?'rgba(220,38,38,.55)':'rgba(141,198,63,.3)';rr(ctx,PAD,by,bw,36,18);ctx.fill();
+    ctx.strokeStyle=lst.late?'rgba(252,165,165,.95)':'rgba(141,198,63,.7)';ctx.lineWidth=1.5;rr(ctx,PAD,by,bw,36,18);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.textAlign='left';
+    ctx.fillText(bt,PAD+14,by+23);
     cb(c);
   }
   if(ph){
@@ -455,21 +593,31 @@ function fetchDash(dateStr){
   var d=new Date(dateStr+'T12:00:00');
   document.getElementById('dtx').textContent=d.getDate()+' '+MO[d.getMonth()]+' '+(d.getFullYear()+543);
   document.getElementById('dc').innerHTML='<div style="text-align:center;padding:30px;color:#888;font-size:14px">\u23f3 \u0e01\u0e33\u0e25\u0e31\u0e07\u0e42\u0e2b\u0e25\u0e14...</div>';
-  fetch(FB+'/checkins.json')
-    .then(function(r){return r.json();})
-    .then(function(data){
-      var list=data&&typeof data==='object'?Object.values(data):[];
-      var filtered=list.filter(function(r){return r.date===dateStr;});
-      renderDash(filtered);
-    })
-    .catch(function(){renderDash([]);});
+  fetchDay(dateStr,function(c,l){renderDash(c,l);});
 }
-function renderDash(list){
+function renderDash(list,leaves){
   var total=list.length;
+  var st=dashStats(list,leaves);
   var html='<div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:14px;padding:14px 18px;color:#fff;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">'
     +'<div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14</div>'
     +'<div style="font-family:Kanit,sans-serif;font-size:44px;font-weight:800;line-height:1">'+total+'</div>'
     +'<div style="font-size:12px;opacity:.8">\u0e04\u0e19</div></div><div style="font-size:44px">\ud83d\udc65</div></div>';
+  function chip(n,lb,c,bg){return '<div style="flex:1;background:'+bg+';border:2px solid '+c+';border-radius:12px;padding:8px 6px;text-align:center"><div style="font-family:Kanit,sans-serif;font-size:24px;font-weight:800;color:'+c+';line-height:1.1">'+n+'</div><div style="font-size:11px;color:'+c+';font-weight:700">'+lb+'</div></div>';}
+  html+='<div style="display:flex;gap:8px;margin-bottom:12px">'+chip(st.ok,'✅ ตรงเวลา','#2E7D32','#f1f8e9')+chip(st.late.length,'⏰ สาย','#dc2626','#fef2f2')+chip(st.leaves.length,'🏖️ ลา','#0369a1','#f0f9ff')+chip(st.missing.length,'❓ ยังไม่ลง','#b45309','#fff7ed')+'</div>';
+  if(st.late.length){
+    html+='<div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:2px solid #fca5a5"><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#dc2626;margin-bottom:8px">⏰ มาสาย ('+st.late.length+' คน) · เผื่อ '+GRACE_MIN+' นาที</div>';
+    st.late.forEach(function(r){
+      html+='<div style="display:flex;align-items:center;gap:8px;background:#fef2f2;border-radius:10px;padding:7px 12px;margin-bottom:5px"><div style="flex:1;font-size:14px;font-weight:700">'+esc(r.name||'-')+'</div><div style="font-size:11px;color:#888">'+esc(hhmm(r.time))+'</div><div style="background:#dc2626;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">สาย '+r._min+' น.</div></div>';
+    });
+    html+='</div>';
+  }
+  if(st.leaves.length){
+    html+='<div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:2px solid #7dd3fc"><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#0369a1;margin-bottom:8px">🏖️ ลา ('+st.leaves.length+' คน)</div>';
+    st.leaves.forEach(function(l){
+      html+='<div style="display:flex;align-items:center;gap:8px;background:#f0f9ff;border-radius:10px;padding:7px 12px;margin-bottom:5px"><div style="flex:1;font-size:14px;font-weight:700">'+esc(l.name||'-')+'</div><div style="background:#0369a1;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">'+esc(leaveLbl(l))+'</div></div>';
+    });
+    html+='</div>';
+  }
   SH.forEach(function(sh){
     var mems=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();});
     html+='<div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;border:2px solid '+sh.bd+'">';
@@ -485,6 +633,7 @@ function renderDash(list){
         html+='<div style="width:24px;height:24px;border-radius:7px;background:'+sh.c+';color:#fff;font-family:Kanit,sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
         html+='<div style="flex:1;font-size:14px;font-weight:700">'+esc(m.name||'-')+'</div>';
         html+='<div style="font-size:11px;color:#888;background:#eee;border-radius:6px;padding:2px 7px">'+esc(m.zone||'')+'</div>';
+        if(m._late)html+='<div style="background:#dc2626;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">สาย '+m._min+' น.</div>';
         html+='<div style="font-family:Kanit,sans-serif;font-size:11px;color:#aaa">'+esc(m.time||'')+'</div></div>';
       });
     } else {
@@ -500,50 +649,48 @@ function cpDash(){
   var dateStr=document.getElementById('dpk').value||new Date().toISOString().slice(0,10);
   var dateText=document.getElementById('dtx').textContent;
   toast('\u23f3 \u0e01\u0e33\u0e25\u0e31\u0e07\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e20\u0e32\u0e1e...','');
-  fetch(FB+'/checkins.json')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var list=d?Object.values(d):[];
-      var filtered=list.filter(function(r){return r.date===dateStr;});
-      buildDashCanvas(filtered,dateText,function(canvas){
-        canvas.toBlob(function(blob){
-          shareOrDl(blob,'checkin_summary.png','\ud83d\udccb Copy \u0e41\u0e25\u0e49\u0e27! \u0e27\u0e32\u0e07\u0e43\u0e19 Teams/Line \u0e44\u0e14\u0e49\u0e40\u0e25\u0e22');
-        },'image/png',1.0);
-      });
-    });
+  fetchDay(dateStr,function(c,l){
+    buildDashCanvas(c,dateText,function(canvas){
+      canvas.toBlob(function(blob){
+        shareOrDl(blob,'checkin_summary.png','\ud83d\udccb Copy \u0e41\u0e25\u0e49\u0e27! \u0e27\u0e32\u0e07\u0e43\u0e19 Teams/Line \u0e44\u0e14\u0e49\u0e40\u0e25\u0e22');
+      },'image/png',1.0);
+    },l);
+  });
 }
 
 // ── EXPORT EXCEL ─────────────────────────────────────────
 function exDash(){
   var dateStr=document.getElementById('dpk').value||new Date().toISOString().slice(0,10);
-  fetch(FB+'/checkins.json')
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var list=d?Object.values(d):[];
-      var filtered=list.filter(function(r){return r.date===dateStr;});
-      filtered.sort(function(a,b){return (a.shift||'').localeCompare(b.shift||'')||(a.time||'').localeCompare(b.time||'');});
-      var rows=[['#','\u0e0a\u0e37\u0e48\u0e2d-\u0e19\u0e32\u0e21\u0e2a\u0e01\u0e38\u0e25','Zone','Shift','\u0e40\u0e27\u0e25\u0e32 Check-in','\u0e27\u0e31\u0e19\u0e17\u0e35\u0e48']];
-      filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr]);});
-      rows.push([]);rows.push(['','','','','รวม',filtered.length+' คน']);
-      var csv='\uFEFF'+rows.map(function(r){return r.map(function(v){var s=String(v==null?'':v);return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\r\n');
-      var a=document.createElement('a');
-      a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-      a.download='CheckIn_'+dateStr+'.csv';
-      document.body.appendChild(a);a.click();
-      setTimeout(function(){document.body.removeChild(a);},1000);
-      toast('\ud83d\udce5 Export \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 '+filtered.length+' \u0e04\u0e19 \u2713','ok');
-    })
-    .catch(function(){toast('\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e14\u0e36\u0e07\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e44\u0e14\u0e49','err');});
+  fetchDay(dateStr,function(filtered,leaves){
+    var st=dashStats(filtered,leaves);
+    filtered.sort(function(a,b){return (a.shift||'').localeCompare(b.shift||'')||(a.time||'').localeCompare(b.time||'');});
+    var rows=[['#','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','วันที่','สถานะ','สายกี่นาที']];
+    filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr,r._late?'สาย':'ตรงเวลา',r._late?r._min:0]);});
+    rows.push([]);rows.push(['','','','','รวม',filtered.length+' คน']);
+    rows.push(['','','','','ตรงเวลา',st.ok+' คน']);rows.push(['','','','','สาย',st.late.length+' คน']);
+    rows.push(['','','','','ลา',st.leaves.length+' คน']);rows.push(['','','','','ยังไม่รายงานตัว',st.missing.length+' คน']);
+    if(st.leaves.length){rows.push([]);rows.push(['รายชื่อคนลา']);rows.push(['#','ชื่อ-นามสกุล','ประเภทการลา','วันเริ่ม','วันสิ้นสุด','จำนวนวัน','ช่วงเวลา','หมายเหตุ']);st.leaves.forEach(function(l,i){rows.push([i+1,l.name||'-',l.type||'-',lvS(l),lvE(l),dayDiff(lvS(l),lvE(l))+1,l.period||'-',l.note||'']);});}
+    if(st.missing.length){rows.push([]);rows.push(['ยังไม่รายงานตัว']);st.missing.forEach(function(n,i){rows.push([i+1,n]);});}
+    var csv='\uFEFF'+rows.map(function(r){return r.map(function(v){var s=String(v==null?'':v);return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\r\n');
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download='CheckIn_'+dateStr+'.csv';
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){document.body.removeChild(a);},1000);
+    toast('📥 Export สำเร็จ '+filtered.length+' คน ✓','ok');
+  });
 }
 
 // ── DASH CANVAS ───────────────────────────────────────────
-function buildDashCanvas(list,dateText,callback){
+function buildDashCanvas(list,dateText,callback,leaves){
   var W=1080,PAD=24,GAP=16,RH=52,SHH=72;
   function shH(sh){
     var n=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();}).length;
     return n?SHH+Math.ceil(n/2)*RH+16:SHH+44;
   }
-  var H=100+80+SH.reduce(function(s,sh){return s+shH(sh)+12;},0)+44;
+  var st=dashStats(list,leaves);
+  function lcH(n){return n?44+Math.ceil(n/2)*34+14:0;}
+  var H=100+80+76+(st.late.length?lcH(st.late.length)+12:0)+(st.leaves.length?lcH(st.leaves.length)+12:0)+SH.reduce(function(s,sh){return s+shH(sh)+12;},0)+44;
   H=Math.max(H,500);
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var ctx=c.getContext('2d');
@@ -561,10 +708,37 @@ function buildDashCanvas(list,dateText,callback){
   ctx.font='16px sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.fillText('\u0e04\u0e19  \u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14',PAD+80,160);
   var y=188;
+  (function(){
+    var bw=(W-PAD*2-GAP*3)/4;
+    [[st.ok,'\u0e15\u0e23\u0e07\u0e40\u0e27\u0e25\u0e32','#2E7D32','#f1f8e9'],[st.late.length,'\u0e2a\u0e32\u0e22','#dc2626','#fef2f2'],[st.leaves.length,'\u0e25\u0e32','#0369a1','#f0f9ff'],[st.missing.length,'\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27','#b45309','#fff7ed']].forEach(function(b,i){
+      var bx=PAD+i*(bw+GAP);
+      ctx.fillStyle=b[3];rr(ctx,bx,y,bw,64,12);ctx.fill();
+      ctx.strokeStyle=b[2];ctx.lineWidth=2.5;rr(ctx,bx,y,bw,64,12);ctx.stroke();
+      ctx.fillStyle=b[2];ctx.font='800 34px sans-serif';ctx.textAlign='left';ctx.fillText(String(b[0]),bx+18,y+44);
+      ctx.font='700 16px sans-serif';ctx.textAlign='right';ctx.fillText(b[1],bx+bw-16,y+38);
+    });
+    y+=76;
+  })();
+  function listCard(title,col,bd,rows){
+    var h=lcH(rows.length),colW=(W-PAD*2-GAP-24)/2;
+    ctx.fillStyle='#fff';rr(ctx,PAD,y,W-PAD*2,h,12);ctx.fill();
+    ctx.strokeStyle=bd;ctx.lineWidth=2.5;rr(ctx,PAD,y,W-PAD*2,h,12);ctx.stroke();
+    ctx.fillStyle=col;ctx.font='800 18px sans-serif';ctx.textAlign='left';ctx.fillText(title,PAD+16,y+28);
+    rows.forEach(function(r,i){
+      var cx=PAD+12+(i%2)*(colW+GAP),cy=y+44+Math.floor(i/2)*34;
+      ctx.fillStyle=i%4<2?'#f8faf8':'#f1f5f1';rr(ctx,cx,cy,colW,30,8);ctx.fill();
+      ctx.fillStyle='#1a2a1a';ctx.font='700 14px sans-serif';ctx.textAlign='left';
+      ctx.save();ctx.beginPath();ctx.rect(cx+8,cy,colW-(r[1]?150:16),30);ctx.clip();ctx.fillText(r[0],cx+10,cy+20);ctx.restore();
+      if(r[1]){ctx.fillStyle=col;ctx.font='800 13px sans-serif';ctx.textAlign='right';ctx.fillText(r[1],cx+colW-10,cy+20);}
+    });
+    y+=h+12;
+  }
+  if(st.late.length)listCard('\u23f0  \u0e21\u0e32\u0e2a\u0e32\u0e22 ('+st.late.length+' \u0e04\u0e19)  \u00b7  \u0e40\u0e1c\u0e37\u0e48\u0e2d '+GRACE_MIN+' \u0e19\u0e32\u0e17\u0e35','#dc2626','#fca5a5',st.late.map(function(r){return [r.name||'-','\u0e2a\u0e32\u0e22 '+r._min+' \u0e19.  '+hhmm(r.time)];}));
+  if(st.leaves.length)listCard('\ud83c\udfd6\ufe0f  \u0e25\u0e32 ('+st.leaves.length+' \u0e04\u0e19)','#0369a1','#7dd3fc',st.leaves.map(function(l){return [l.name||'-',leaveLbl(l)];}));
   SH.forEach(function(sh){
     var mems=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();});
     var boxH=shH(sh);
-    var colW=(W-PAD*2-GAP)/2;
+    var colW=(W-PAD*2-GAP-24)/2;
     ctx.fillStyle='#fff';rr(ctx,PAD,y,W-PAD*2,boxH,12);ctx.fill();
     ctx.strokeStyle=sh.bd;ctx.lineWidth=2.5;rr(ctx,PAD,y,W-PAD*2,boxH,12);ctx.stroke();
     ctx.fillStyle=sh.bg;rr(ctx,PAD+12,y+12,48,48,10);ctx.fill();
@@ -588,8 +762,8 @@ function buildDashCanvas(list,dateText,callback){
         ctx.fillStyle='#1a2a1a';ctx.font='700 14px sans-serif';ctx.textAlign='left';
         ctx.save();ctx.beginPath();ctx.rect(mx+46,my,colW-110,RH);ctx.clip();
         ctx.fillText(m.name||'-',mx+46,my+20);ctx.restore();
-        ctx.fillStyle='#888';ctx.font='12px sans-serif';ctx.textAlign='right';
-        ctx.fillText(m.time||'',mx+colW-8,my+20);
+        if(m._late){ctx.fillStyle='#dc2626';ctx.font='800 12px sans-serif';ctx.textAlign='right';ctx.fillText('\u0e2a\u0e32\u0e22 '+m._min+' \u0e19.  '+(m.time||''),mx+colW-8,my+20);}
+        else{ctx.fillStyle='#888';ctx.font='12px sans-serif';ctx.textAlign='right';ctx.fillText(m.time||'',mx+colW-8,my+20);}
         ctx.fillStyle='#aaa';ctx.font='11px sans-serif';ctx.textAlign='left';
         ctx.fillText(m.zone||'',mx+46,my+38);
       });
@@ -602,6 +776,97 @@ function buildDashCanvas(list,dateText,callback){
   ctx.fillStyle='#bbb';ctx.font='12px sans-serif';ctx.textAlign='center';
   ctx.fillText('AIS 3BB \u00b7 WFM System NOPBIGMAN \u00b7 '+dateText,W/2,H-16);
   callback(c);
+}
+
+// ── LEAVE ─────────────────────────────────────────────────
+var ADMIN_PW='560225'; // รหัส admin เดียวกับ Work Error Log (ถ้าเปลี่ยนรหัสต้องแก้ทั้งสองไฟล์)
+function lvDt(){
+  var s=document.getElementById('lvs'),e=document.getElementById('lve'),pp=document.getElementById('lvp');
+  if(!s.value)s.value=todayStr();
+  if(!e.value||e.value<s.value)e.value=s.value;
+  var d=dayDiff(s.value,e.value)+1;
+  document.getElementById('lvc').textContent='ลา '+d+' วัน';
+  if(d>1){pp.value='เต็มวัน';pp.disabled=true;}else{pp.disabled=false;}
+}
+function opLv(){
+  var sel=document.getElementById('lvn');
+  if(sel.options.length<2){
+    sel.innerHTML='<option value="">— เลือกชื่อ —</option>'+getRoster().map(function(n){return '<option>'+esc(n)+'</option>';}).join('');
+  }
+  var t=todayStr();
+  document.getElementById('lvs').min=t;document.getElementById('lve').min=t;
+  document.getElementById('lvs').value=t;document.getElementById('lve').value=t;
+  lvDt();
+  document.getElementById('lm').style.display='block';
+}
+function clLv(){
+  document.getElementById('lm').style.display='none';
+  document.getElementById('lvn').value='';
+  document.getElementById('lvt').selectedIndex=0;
+  document.getElementById('lvp').selectedIndex=0;
+  document.getElementById('lvp').disabled=false;
+  document.getElementById('lvr').value='';
+}
+function svLv(){
+  var name=document.getElementById('lvn').value;
+  var type=document.getElementById('lvt').value;
+  var per=document.getElementById('lvp').value;
+  var note=document.getElementById('lvr').value.trim();
+  var sd=document.getElementById('lvs').value,ed=document.getElementById('lve').value;
+  var today=todayStr();
+  if(!name){toast('กรุณาเลือกชื่อ','err');return;}
+  if(!sd||!ed||ed<sd){toast('กรุณาเลือกวันที่ให้ถูกต้อง','err');return;}
+  if(sd<today){toast('ลาย้อนหลังไม่ได้','err');return;}
+  if(sd!==ed)per='เต็มวัน';
+  var btn=document.getElementById('lvb');
+  btn.disabled=true;btn.textContent='⏳ กำลังบันทึก...';
+  function fin(){btn.disabled=false;btn.textContent='✅ ยืนยันแจ้งลา';}
+  Promise.all([
+    fetch(FB+'/checkins.json').then(function(r){return r.json();}),
+    fetch(FB+'/leaves.json').then(function(r){return r.json();})
+  ]).then(function(a){
+    var overlap=toArr(a[1]).filter(function(l){return l.name===name&&lvS(l)<=ed&&sd<=lvE(l);})[0];
+    if(overlap){fin();toast('⚠️ '+name+' มีรายการลาช่วงนี้อยู่แล้ว ('+lvS(overlap)+(lvE(overlap)!==lvS(overlap)?' ถึง '+lvE(overlap):'')+')','err');return;}
+    var hasCi=toArr(a[0]).some(function(r){return r.date===today&&r.name===name;});
+    if(hasCi&&per==='เต็มวัน'&&sd<=today&&today<=ed){fin();toast('⚠️ '+name+' Check-in แล้ววันนี้ ลาเต็มวันที่รวมวันนี้ไม่ได้ (เริ่มลาพรุ่งนี้แทน)','err');return;}
+    var dt=sd.split('-');
+    var rec={id:String(Date.now()),name:name,type:type,period:per,note:note,date:sd,startDate:sd,endDate:ed,dateThai:(+dt[2])+' '+MO[+dt[1]-1]+' '+(+dt[0]+543),ca:Date.now(),sa:{'.sv':'timestamp'}};
+    return fetch(FB+'/leaves/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
+      .then(function(r){return r.json();})
+      .then(function(){
+        var d=dayDiff(sd,ed)+1;
+        fin();clLv();toast('🏖️ แจ้งลาเรียบร้อย: '+name+(d>1?' ('+d+' วัน)':''),'ok');
+      });
+  }).catch(function(){fin();toast('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง','err');});
+}
+// ── CANCEL LEAVE (admin) ──────────────────────────────────
+function opLc(){
+  if(!ADMIN_PW){toast('ยังไม่ได้ตั้งรหัส admin ในไฟล์','err');return;}
+  var pw=prompt('ใส่รหัส admin เพื่อยกเลิกการลา');
+  if(pw===null)return;
+  if(pw!==ADMIN_PW){toast('รหัสไม่ถูกต้อง','err');return;}
+  document.getElementById('lm').style.display='none';
+  document.getElementById('lcm').style.display='block';
+  ldLc();
+}
+function clLc(){document.getElementById('lcm').style.display='none';}
+function ldLc(){
+  var box=document.getElementById('lcl');
+  box.innerHTML='<div style="text-align:center;padding:16px;color:#888">⏳ กำลังโหลด...</div>';
+  fetch(FB+'/leaves.json').then(function(r){return r.json();}).then(function(d){
+    var t=todayStr();
+    var arr=toArr(d).filter(function(l){return lvE(l)>=t;}).sort(function(a,b){return lvS(a).localeCompare(lvS(b));});
+    if(!arr.length){box.innerHTML='<div style="text-align:center;padding:16px;color:#aaa">ไม่มีรายการลาที่ต้องยกเลิก</div>';return;}
+    box.innerHTML=arr.map(function(l){
+      var rg=lvS(l)===lvE(l)?lvS(l):lvS(l)+' ถึง '+lvE(l);
+      return '<div style="display:flex;align-items:center;gap:8px;background:#f0f9ff;border-radius:10px;padding:9px 12px;margin-bottom:6px"><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">'+esc(l.name||'-')+'</div><div style="font-size:11px;color:#666">'+esc(rg)+' · '+esc(l.period||'เต็มวัน')+'</div></div><button data-id="'+esc(l.id)+'" data-n="'+esc(l.name||'')+'" onclick="dlLv(this)" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">ยกเลิก</button></div>';
+    }).join('');
+  }).catch(function(){box.innerHTML='<div style="text-align:center;padding:16px;color:#dc2626">โหลดไม่สำเร็จ</div>';});
+}
+function dlLv(b){
+  var id=b.getAttribute('data-id'),n=b.getAttribute('data-n');
+  if(!confirm('ยกเลิกการลาของ '+n+' ?'))return;
+  fetch(FB+'/leaves/'+id+'.json',{method:'DELETE'}).then(function(){toast('🗑️ ยกเลิกการลาของ '+n+' แล้ว','ok');ldLc();}).catch(function(){toast('ยกเลิกไม่สำเร็จ','err');});
 }
 
 // ── TOAST ─────────────────────────────────────────────────
