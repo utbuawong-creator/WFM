@@ -309,18 +309,19 @@ function fetchDay(dateStr,cb){
 }
 function dashStats(list,leaves){
   leaves=leaves||[];
-  var done={},lv={},late=[],ok=0;
+  var done={},lv={},late=[],ok=0,okL=[];
   leaves.forEach(function(l){lv[l.name]=l;});
   list.forEach(function(r){
     done[r.name]=1;
     var li=lateOf(shIdxOf(r.shift),r.time);
     if(lv[r.name]&&lv[r.name].period==='ครึ่งเช้า')li={late:false,min:0};
     r._late=li.late;r._min=li.min;
-    if(li.late)late.push(r);else ok++;
+    if(li.late)late.push(r);else{ok++;okL.push(r);}
   });
   late.sort(function(a,b){return b._min-a._min;});
+  okL.sort(function(a,b){return (a.time||'').localeCompare(b.time||'');});
   var missing=getRoster().filter(function(n){return !done[n]&&!lv[n];});
-  return {ok:ok,late:late,missing:missing,leaves:leaves};
+  return {ok:ok,okList:okL,late:late,missing:missing,leaves:leaves};
 }
 function updWarn(){
   var w=document.getElementById('lw');if(!w)return;
@@ -595,28 +596,44 @@ function fetchDash(dateStr){
   document.getElementById('dc').innerHTML='<div style="text-align:center;padding:30px;color:#888;font-size:14px">\u23f3 \u0e01\u0e33\u0e25\u0e31\u0e07\u0e42\u0e2b\u0e25\u0e14...</div>';
   fetchDay(dateStr,function(c,l){renderDash(c,l);});
 }
+var dOpen={ok:false,late:true,leave:true,miss:false},lastDash=null;
+function tgD(k){
+  dOpen[k]=!dOpen[k];
+  if(!lastDash)return;
+  var mb=document.querySelector('#dm .modal-box'),y=mb?mb.scrollTop:0;
+  renderDash(lastDash.list,lastDash.leaves);
+  if(mb)mb.scrollTop=y;
+}
 function renderDash(list,leaves){
+  lastDash={list:list,leaves:leaves};
   var total=list.length;
   var st=dashStats(list,leaves);
   var html='<div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:14px;padding:14px 18px;color:#fff;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">'
     +'<div><div style="font-size:11px;opacity:.8;font-family:Kanit,sans-serif;letter-spacing:2px">\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e15\u0e31\u0e27\u0e27\u0e31\u0e19\u0e19\u0e35\u0e49\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14</div>'
     +'<div style="font-family:Kanit,sans-serif;font-size:44px;font-weight:800;line-height:1">'+total+'</div>'
     +'<div style="font-size:12px;opacity:.8">\u0e04\u0e19</div></div><div style="font-size:44px">\ud83d\udc65</div></div>';
-  function chip(n,lb,c,bg){return '<div style="flex:1;background:'+bg+';border:2px solid '+c+';border-radius:12px;padding:8px 6px;text-align:center"><div style="font-family:Kanit,sans-serif;font-size:24px;font-weight:800;color:'+c+';line-height:1.1">'+n+'</div><div style="font-size:11px;color:'+c+';font-weight:700">'+lb+'</div></div>';}
-  html+='<div style="display:flex;gap:8px;margin-bottom:12px">'+chip(st.ok,'✅ ตรงเวลา','#2E7D32','#f1f8e9')+chip(st.late.length,'⏰ สาย','#dc2626','#fef2f2')+chip(st.leaves.length,'🏖️ ลา','#0369a1','#f0f9ff')+chip(st.missing.length,'❓ ยังไม่ลง','#b45309','#fff7ed')+'</div>';
-  if(st.late.length){
-    html+='<div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:2px solid #fca5a5"><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#dc2626;margin-bottom:8px">⏰ มาสาย ('+st.late.length+' คน) · เผื่อ '+GRACE_MIN+' นาที</div>';
-    st.late.forEach(function(r){
-      html+='<div style="display:flex;align-items:center;gap:8px;background:#fef2f2;border-radius:10px;padding:7px 12px;margin-bottom:5px"><div style="flex:1;font-size:14px;font-weight:700">'+esc(r.name||'-')+'</div><div style="font-size:11px;color:#888">'+esc(hhmm(r.time))+'</div><div style="background:#dc2626;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">สาย '+r._min+' น.</div></div>';
-    });
-    html+='</div>';
+  function chip(k,n,lb,c,bg){
+    var on=dOpen[k];
+    return '<div onclick="tgD(\''+k+'\')" style="flex:1;cursor:pointer;background:'+bg+';border:'+(on?'3':'2')+'px solid '+c+';border-radius:12px;padding:8px 4px;text-align:center;'+(on?'box-shadow:0 3px 0 '+c+';':'')+'"><div style="font-family:Kanit,sans-serif;font-size:24px;font-weight:800;color:'+c+';line-height:1.1">'+n+'</div><div style="font-size:11px;color:'+c+';font-weight:700">'+lb+'</div><div style="font-size:9px;color:'+c+';opacity:.7">'+(on?'▲ ซ่อน':'▼ ดูรายชื่อ')+'</div></div>';
   }
-  if(st.leaves.length){
-    html+='<div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:2px solid #7dd3fc"><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#0369a1;margin-bottom:8px">🏖️ ลา ('+st.leaves.length+' คน)</div>';
-    st.leaves.forEach(function(l){
-      html+='<div style="display:flex;align-items:center;gap:8px;background:#f0f9ff;border-radius:10px;padding:7px 12px;margin-bottom:5px"><div style="flex:1;font-size:14px;font-weight:700">'+esc(l.name||'-')+'</div><div style="background:#0369a1;color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">'+esc(leaveLbl(l))+'</div></div>';
-    });
-    html+='</div>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:12px">'+chip('ok',st.ok,'✅ ตรงเวลา','#2E7D32','#f1f8e9')+chip('late',st.late.length,'⏰ สาย','#dc2626','#fef2f2')+chip('leave',st.leaves.length,'🏖️ ลา','#0369a1','#f0f9ff')+chip('miss',st.missing.length,'❓ ยังไม่ลง','#b45309','#fff7ed')+'</div>';
+  function panel(title,col,bd,body,n){
+    return '<div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;border:2px solid '+bd+'"><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:'+col+';margin-bottom:8px">'+title+'</div>'+(n?body:'<div style="text-align:center;padding:8px;color:#aaa;font-size:13px">ไม่มีรายการ</div>')+'</div>';
+  }
+  function row(bg,name,mid,tag,tagBg){
+    return '<div style="display:flex;align-items:center;gap:8px;background:'+bg+';border-radius:10px;padding:7px 12px;margin-bottom:5px"><div style="flex:1;font-size:14px;font-weight:700">'+esc(name||'-')+'</div>'+(mid?'<div style="font-size:11px;color:#888">'+esc(mid)+'</div>':'')+(tag?'<div style="background:'+tagBg+';color:#fff;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">'+esc(tag)+'</div>':'')+'</div>';
+  }
+  if(dOpen.ok){
+    html+=panel('✅ ตรงเวลา ('+st.ok+' คน)','#2E7D32','#8dc63f',st.okList.map(function(r){return row('#f7fbf0',r.name,(r.zone||'')+' · '+hhmm(r.time),'','');}).join(''),st.ok);
+  }
+  if(dOpen.late){
+    html+=panel('⏰ มาสาย ('+st.late.length+' คน) · เผื่อ '+GRACE_MIN+' นาที','#dc2626','#fca5a5',st.late.map(function(r){return row('#fef2f2',r.name,hhmm(r.time),'สาย '+r._min+' น.','#dc2626');}).join(''),st.late.length);
+  }
+  if(dOpen.leave){
+    html+=panel('🏖️ ลา ('+st.leaves.length+' คน)','#0369a1','#7dd3fc',st.leaves.map(function(l){return row('#f0f9ff',l.name,'',leaveLbl(l),'#0369a1');}).join(''),st.leaves.length);
+  }
+  if(dOpen.miss){
+    html+=panel('❓ ยังไม่รายงานตัว ('+st.missing.length+' คน)','#b45309','#fdba74','<div style="display:flex;flex-wrap:wrap;gap:5px">'+st.missing.map(function(n){return '<div style="background:#fff7ed;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:700;color:#7c2d12">'+esc(n)+'</div>';}).join('')+'</div>',st.missing.length);
   }
   SH.forEach(function(sh){
     var mems=list.filter(function(r){return r.shift&&r.shift.trim()===sh.v.trim();});
