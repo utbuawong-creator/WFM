@@ -113,6 +113,18 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
 .app-card-wide.blue { border-color: var(--3bb-blue); box-shadow: 0 6px 0 #001f5c; background: linear-gradient(160deg,#f0f5ff,#fff); }
 .app-card-wide.teal { border-color: #0891b2; box-shadow: 0 6px 0 #065d78; background: linear-gradient(160deg,#f0fbff,#fff); }
 
+.app-card-wide.amber { border-color: #d97706; box-shadow: 0 6px 0 #92400e; background: linear-gradient(160deg,#fff9eb,#fff); }
+.app-icon.a { background: linear-gradient(135deg,#f59e0b,#d97706); box-shadow: 0 3px 0 #92400e; }
+.eq-alert {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff;
+  background: linear-gradient(135deg,#b91c1c,#e8001d); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 16px; box-shadow: 0 5px 0 #7f1d1d;
+  font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 700; animation: alertpulse 1.6s infinite;
+}
+.eq-alert .eq-go { margin-left: auto; font-size: 12px; font-weight: 600; opacity: .9; white-space: nowrap; }
+.eq-alert:active { transform: translateY(4px); box-shadow: 0 1px 0 #7f1d1d; }
+@keyframes alertpulse { 0%,100%{box-shadow:0 5px 0 #7f1d1d,0 0 0 0 rgba(232,0,29,.5)} 50%{box-shadow:0 5px 0 #7f1d1d,0 0 0 8px rgba(232,0,29,0)} }
+
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .stat-card {
   border-radius: 14px; padding: 16px 14px;
@@ -156,6 +168,13 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
     <div class="online-dot"><div class="dot"></div> ระบบออนไลน์</div>
   </div>
 
+  <!-- แจ้งเตือนอุปกรณ์ชำรุด (แสดงเมื่อวันนี้มีคนติ๊กชำรุด) -->
+  <a class="eq-alert" id="eq-alert" href="equipment_check.html#sum" style="display:none">
+    <span style="font-size:22px">🚨</span>
+    <span id="eq-alert-t">วันนี้พบอุปกรณ์ชำรุด</span>
+    <span class="eq-go">ดูรายละเอียด ›</span>
+  </a>
+
   <div class="sec-lbl">แอปพลิเคชัน</div>
 
   <!-- ROW 1: รายงานตัว + Work Error Log -->
@@ -172,21 +191,21 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
     </a>
   </div>
 
+  <!-- เช็คเครื่องมือ wide -->
+  <a class="app-card-wide amber" href="equipment_check.html">
+    <div class="app-icon a" style="flex-shrink:0;">🧰</div>
+    <div>
+      <div class="app-name">เช็คเครื่องมือ</div>
+      <div class="app-desc">ตรวจเครื่องมือ · อุปกรณ์ประจำวัน · แจ้งชำรุด</div>
+    </div>
+  </a>
+
   <!-- Dashboard wide -->
   <a class="app-card-wide blue" href="WFM_Dashboard.html">
     <div class="app-icon b" style="flex-shrink:0;">📊</div>
     <div>
       <div class="app-name">Dashboard รายงาน</div>
       <div class="app-desc">กราฟ · สรุปผลงาน · Export Excel</div>
-    </div>
-  </a>
-
-  <!-- Cable Optic Tracker wide -->
-  <a class="app-card-wide teal" href="cable_optic_tracker.html">
-    <div class="app-icon t" style="flex-shrink:0;">🔌</div>
-    <div>
-      <div class="app-name">Cable Optic Tracker</div>
-      <div class="app-desc">เบิกสายเคเบิล · บันทึก LM · รายงาน</div>
     </div>
   </a>
 
@@ -213,9 +232,9 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
       <div class="stat-num" id="s-breach">-</div>
       <div class="stat-lbl">เกิน SLA 🚨</div>
     </div>
-    <div class="stat-card s4" onclick="window.location='cable_optic_tracker.html'">
-      <div class="stat-num" id="s-cable">-</div>
-      <div class="stat-lbl">เบิก Cable วันนี้ 🔌</div>
+    <div class="stat-card s4" onclick="window.location='equipment_check.html'">
+      <div class="stat-num" id="s-equip">-</div>
+      <div class="stat-lbl">เช็คเครื่องมือวันนี้ 🧰</div>
     </div>
   </div>
   <!-- Error stat -->
@@ -224,9 +243,9 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
       <div class="stat-num" id="s-error">-</div>
       <div class="stat-lbl">งานผิดพลาดวันนี้ ⚠️</div>
     </div>
-    <div class="stat-card" style="background:linear-gradient(135deg,#fff8f3,#fff);border:2px solid #e8001d;box-shadow:0 5px 0 #9a0012;cursor:pointer" onclick="window.location='work_error_log.html'">
-      <div class="stat-num" style="color:#9a0012;font-size:28px">📋</div>
-      <div class="stat-lbl" style="color:#b02020">Work Error Log</div>
+    <div class="stat-card s3" onclick="window.location='equipment_check.html#sum'">
+      <div class="stat-num" id="s-damaged">-</div>
+      <div class="stat-lbl">อุปกรณ์ชำรุดวันนี้ 🚨</div>
     </div>
   </div>
 
@@ -291,18 +310,35 @@ function loadStats() {
     }
   });
 
-  // Cable Optic: load from Firebase
+  // เช็คเครื่องมือ: load from Firebase
   try {
-    const FB_DB = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
-    const today = new Date().toISOString().slice(0,10);
-    fetch(FB_DB + '/records.json')
+    const FB_EQ = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+    const dn = new Date();
+    const todayL = dn.getFullYear() + '-' + String(dn.getMonth()+1).padStart(2,'0') + '-' + String(dn.getDate()).padStart(2,'0');
+    fetch(FB_EQ + '/equipment.json')
       .then(r => r.json())
       .then(d => {
-        if(!d){ document.getElementById('s-cable').textContent = '0'; return; }
-        const todayRecs = Object.values(d).filter(r => r.dt && r.dt.startsWith(today));
-        document.getElementById('s-cable').textContent = todayRecs.length;
-      }).catch(() => document.getElementById('s-cable').textContent = '-');
-  } catch(e) { document.getElementById('s-cable').textContent = '-'; }
+        const recs = d ? Object.values(d).filter(r => r.date === todayL) : [];
+        const bad = recs.filter(r => r.badCount > 0);
+        const items = bad.reduce((s, r) => s + (r.badCount || 0), 0);
+        document.getElementById('s-equip').textContent = recs.length;
+        document.getElementById('s-damaged').textContent = items;
+        const al = document.getElementById('eq-alert');
+        if (items > 0) {
+          document.getElementById('eq-alert-t').textContent =
+            'วันนี้พบอุปกรณ์ชำรุด ' + items + ' รายการ (' + bad.length + ' คนแจ้ง)';
+          al.style.display = 'flex';
+        } else {
+          al.style.display = 'none';
+        }
+      }).catch(() => {
+        document.getElementById('s-equip').textContent = '-';
+        document.getElementById('s-damaged').textContent = '-';
+      });
+  } catch(e) {
+    document.getElementById('s-equip').textContent = '-';
+    document.getElementById('s-damaged').textContent = '-';
+  }
 
   // Work Error Log: load from Firebase
   try {
