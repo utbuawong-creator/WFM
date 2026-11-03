@@ -220,9 +220,9 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
 
   <div class="sec-lbl">สรุปวันนี้</div>
   <div class="stat-grid">
-    <div class="stat-card s1" onclick="window.location='WFM_ToolSurvey.html'">
+    <div class="stat-card s1" onclick="window.location='CheckIn.html#sum'">
       <div class="stat-num" id="s-checkin">-</div>
-      <div class="stat-lbl">มาทำงาน 👤</div>
+      <div class="stat-lbl">Check-in วันนี้ 👤</div>
     </div>
     <div class="stat-card s2" onclick="window.location='WFM_JobTracker.html'">
       <div class="stat-num" id="s-job">-</div>
@@ -284,13 +284,18 @@ function callAPI(params, callback) {
 }
 
 function loadStats() {
-  callAPI({ action: 'getSummary' }, (err, data) => {
-    if (!err && data.success) {
-      document.getElementById('s-checkin').textContent = data.checkin || 0;
-    } else {
-      document.getElementById('s-checkin').textContent = '-';
-    }
-  });
+  // Check-in วันนี้: load from Firebase
+  try {
+    const FB_CI = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+    const dc = new Date();
+    const todayC = dc.getFullYear() + '-' + String(dc.getMonth()+1).padStart(2,'0') + '-' + String(dc.getDate()).padStart(2,'0');
+    fetch(FB_CI + '/checkins.json')
+      .then(r => r.json())
+      .then(d => {
+        const n = d ? Object.values(d).filter(r => r.date === todayC).length : 0;
+        document.getElementById('s-checkin').textContent = n;
+      }).catch(() => { document.getElementById('s-checkin').textContent = '-'; });
+  } catch(e) { document.getElementById('s-checkin').textContent = '-'; }
 
   callAPI({ action: 'getJobs' }, (err, data) => {
     if (!err && data.success) {
