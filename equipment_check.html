@@ -169,6 +169,14 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
       <div id="eql"></div>
     </div>
 
+    <div class="card">
+      <div class="ch"><div class="cb" style="background:#0369a1"></div><div class="ct">➕ อุปกรณ์อื่นที่มี (นอกเหนือจากรายการ)</div></div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">ถ้ามีเครื่องมือ/อุปกรณ์อื่นที่ใช้งานจริง พิมพ์เพิ่มได้ หัวหน้าจะพิจารณาว่าควรเพิ่มเข้ารายการหลักต่อไปหรือไม่</div>
+      <datalist id="xdl"></datalist>
+      <div id="xtl"></div>
+      <button type="button" class="btn-all" style="color:#0369a1;border-color:#0369a1;background:#f0f9ff;margin-bottom:0" onclick="addX()">➕ เพิ่มอุปกรณ์อื่นที่มี</button>
+    </div>
+
     <div class="card" id="phc" style="display:none">
       <div class="ch"><div class="cb" style="background:#dc2626"></div><div class="ct">📸 รูปอุปกรณ์ที่ชำรุด (บังคับ 1 รูป)</div></div>
       <div class="pb" id="phb" onclick="document.getElementById('phf').click()">
@@ -183,6 +191,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
     <button class="btn-g" onclick="rst()">ล้างข้อมูล</button>
     <button class="btn-db" onclick="ldDash()">📊 ดูสรุปเช็คเครื่องมือวันนี้</button>
     <button class="btn-iss" id="bis" onclick="ldIssues()">🚨 เรื่องอุปกรณ์ชำรุดที่ค้างอยู่</button>
+    <button class="btn-iss" id="bsg" onclick="ldSug()" style="background:#f0f9ff;color:#0369a1;border-color:#0369a1">🧩 อุปกรณ์ที่ทีมเสนอเพิ่ม / จัดการรายการ</button>
   </div>
 
   <!-- SUCCESS -->
@@ -213,6 +222,19 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
   </div>
 </div>
 
+<!-- SUGGEST MODAL (หัวหน้าพิจารณาอุปกรณ์ที่ทีมเสนอเพิ่ม) -->
+<div class="modal-bg" id="sm">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">🧩 อุปกรณ์ที่ทีมเสนอเพิ่ม</div>
+      <button onclick="clSug()" style="background:var(--bg);border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px"><button class="itab on" id="stab-pending" onclick="sgTab('pending')" style="font-size:12px"></button><button class="itab dn" id="stab-added" onclick="sgTab('added')" style="font-size:12px"></button><button class="itab" id="stab-rejected" onclick="sgTab('rejected')" style="font-size:12px"></button></div>
+    <div style="font-size:11px;color:var(--tx2);margin-bottom:10px">หัวหน้ากด "เพิ่มเข้ารายการหลัก" แล้วทุกคนจะเห็นรายการนี้ในฟอร์มเช็คเครื่องมือทันที หรือกด "ไม่ต้องมี" เพื่อซ่อนจากรายการรอพิจารณา (ต้องใส่รหัส admin)</div>
+    <div id="sl"></div>
+  </div>
+</div>
+
 <!-- ISSUES MODAL (หัวหน้าติดตามเรื่อง) -->
 <div class="modal-bg" id="im">
   <div class="modal-box">
@@ -237,22 +259,31 @@ var MO=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย
 var DA=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 
 // ── รายการเครื่องมือ/อุปกรณ์ (แก้ไขรายการได้ที่นี่: k = รหัสไม่ซ้ำ, t = ชื่อที่แสดง) ──
-var EQUIP=[
-  {k:'e1', t:'ไฟฉาย / ไฟส่องสว่าง'},
-  {k:'e2', t:'Power Meter'},
-  {k:'e3', t:'OTDR'},
-  {k:'e4', t:'VFL (ปากกาแสง)'},
-  {k:'e5', t:'Fusion Splicer'},
-  {k:'e6', t:'Fiber Cleaver'},
-  {k:'e7', t:'Fiber Stripper'},
-  {k:'e8', t:'ชุดทำความสะอาดหัวไฟเบอร์'},
-  {k:'e9', t:'บันได'},
-  {k:'e10',t:'อุปกรณ์ PPE (หมวก / ถุงมือ / เข็มขัดนิรภัย)'},
-  {k:'e11',t:'มือถือ / แท็บเล็ตสำหรับทำงาน'},
-  {k:'e12',t:'ยานพาหนะ'}
+var EQUIP_BASE=[
+  {k:'f1', t:'Fusion Splicer'},
+  {k:'f2', t:'Fiber Cleaver'},
+  {k:'f3', t:'OTDR'},
+  {k:'f4', t:'Optical Power Meter'},
+  {k:'f5', t:'Optical Fiber Identifier'},
+  {k:'f6', t:'Tool Kit (ไขควงแฉก/แบน คีมตัด/จับ)'},
+  {k:'f7', t:'Laptop'},
+  {k:'f8', t:'Aluminium Ladder (บันไดอลูมิเนียม)'},
+  {k:'f9', t:'Bamboo Ladder (บันไดไม้ไผ่)'},
+  {k:'f10',t:'Red Signal Cloth (ผ้าแดงปลายบันได)'},
+  {k:'f11',t:'Safety Helmet (หมวกนิรภัย)'},
+  {k:'f12',t:'Safety Shoes (รองเท้านิรภัย)'},
+  {k:'f13',t:'Safety Belt/Harness (เข็มขัดนิรภัย หรือชุด lifeline)'},
+  {k:'f14',t:'Voltage Alert (อุปกรณ์วัดแรงดันไฟฟ้า)'},
+  {k:'f15',t:'Safety Vest (เสื้อสะท้อนแสง)'},
+  {k:'f16',t:'Cut-resistant Gloves (ถุงมือกันบาด)'},
+  {k:'f17',t:'Electrical Safety Gloves (ชุดถุงมือกันไฟฟ้า)'},
+  {k:'f18',t:'Traffic Baton (กระบองไฟจราจร)'},
+  {k:'f19',t:'Traffic Cone (กรวยจราจร)'}
 ];
+// รายการที่หัวหน้าเพิ่มเข้ารายการหลักภายหลัง (เก็บใน Firebase /equip_config/items) จะถูกต่อท้ายอัตโนมัติ
+var EQUIP=EQUIP_BASE.slice();
 var LB={ok:'✅ ปกติ',bad:'❌ ชำรุด',na:'➖ ไม่มี'};
-var RES={},NOTE={},ph=null,last=null,dashData=null;
+var RES={},NOTE={},XT=[],ph=null,last=null,dashData=null;
 
 function pad(v){return String(v).padStart(2,'0');}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -274,7 +305,8 @@ function tick(){
 setInterval(tick,1000);tick();
 
 // ── CHECKLIST ─────────────────────────────────────────────
-function anyBad(){return EQUIP.some(function(e){return RES[e.k]==='bad';});}
+function anyBad(){return EQUIP.some(function(e){return RES[e.k]==='bad';})||XT.some(function(x){return x.n.trim()&&x.s==='bad';});}
+function updPhc(){document.getElementById('phc').style.display=anyBad()?'block':'none';}
 function renderList(){
   var h='',done=0;
   EQUIP.forEach(function(e,i){
@@ -291,6 +323,18 @@ function renderList(){
 function pk(k,v){RES[k]=v;if(v!=='bad')delete NOTE[k];renderList();}
 function allOk(){EQUIP.forEach(function(e){if(RES[e.k]!=='bad')RES[e.k]='ok';});renderList();toast('✅ ตั้งเป็นปกติทั้งหมดแล้ว แตะ "ชำรุด" เฉพาะข้อที่เสีย','ok');}
 renderList();
+
+// ── อุปกรณ์อื่นที่ทีมเพิ่มเอง ───────────────────────────
+function addX(){if(XT.length>=10){toast('เพิ่มได้สูงสุด 10 รายการ','err');return;}XT.push({n:'',s:'ok',t:''});renderExtras();}
+function delX(i){XT.splice(i,1);renderExtras();updPhc();}
+function setXs(i,v){XT[i].s=v;renderExtras();updPhc();}
+function renderExtras(){
+  document.getElementById('xtl').innerHTML=XT.map(function(x,i){
+    return '<div class="eq'+(x.s==='bad'?' bad':'')+'"><div style="display:flex;gap:8px"><input class="inp" list="xdl" maxlength="60" placeholder="ชื่อเครื่องมือ/อุปกรณ์" value="'+esc(x.n)+'" oninput="XT['+i+'].n=this.value;updPhc()" style="flex:1"/><button type="button" class="eb" style="width:auto;padding:0 14px" onclick="delX('+i+')">🗑️</button></div>'+
+      '<div class="eq-b" style="grid-template-columns:1fr 1fr;margin-top:8px">'+['ok','bad'].map(function(v){return '<button type="button" class="eb '+v+(x.s===v?' on':'')+'" onclick="setXs('+i+',\''+v+'\')">'+LB[v]+'</button>';}).join('')+'</div>'+
+      (x.s==='bad'?'<input class="inp" maxlength="100" placeholder="อาการ / รายละเอียดที่ชำรุด (บังคับ)" value="'+esc(x.t)+'" oninput="XT['+i+'].t=this.value" style="margin-top:8px"/>':'')+'</div>';
+  }).join('');
+}
 
 // ── PHOTO ─────────────────────────────────────────────────
 function ldph(inp){
@@ -329,7 +373,10 @@ function submitEq(){
   if(un.length){toast('ยังไม่ได้ตอบ '+un.length+' รายการ','err');return;}
   var bads=EQUIP.filter(function(e){return RES[e.k]==='bad';});
   for(var i=0;i<bads.length;i++){if(!(NOTE[bads[i].k]||'').trim()){toast('กรุณาใส่อาการ: '+bads[i].t,'err');return;}}
-  if(bads.length&&!ph){toast('กรุณาแนบรูปอุปกรณ์ที่ชำรุด','err');return;}
+  var xs=XT.filter(function(x){return x.n.trim();});
+  var xBad=xs.filter(function(x){return x.s==='bad';});
+  for(var j=0;j<xBad.length;j++){if(!xBad[j].t.trim()){toast('กรุณาใส่อาการ: '+xBad[j].n,'err');return;}}
+  if((bads.length||xBad.length)&&!ph){toast('กรุณาแนบรูปอุปกรณ์ที่ชำรุด','err');return;}
   var n=new Date();
   var today=todayStr();
   var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
@@ -346,8 +393,10 @@ function submitEq(){
       if(v==='bad')badList.push({k:e.k,label:e.t,note:(NOTE[e.k]||'').trim()});
       else if(v==='ok')okN++;else naN++;
     });
+    xs.forEach(function(x,i){if(x.s==='bad')badList.push({k:'x'+(i+1),label:x.n.trim(),note:x.t.trim(),extra:true});});
     var rec={id:String(Date.now()),name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now(),sa:{'.sv':'timestamp'},results:results,badCount:badList.length,okCount:okN,naCount:naN,hasPhoto:!!(badList.length&&ph)};
     if(badList.length)rec.bad=badList;
+    if(xs.length)rec.extras=xs.map(function(x){return {name:x.n.trim(),status:x.s,note:x.t.trim()};});
     return fetch(FB+'/equipment/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
       .then(function(r){return r.json();})
       .then(function(res){
@@ -366,7 +415,8 @@ function submitEq(){
         }
         var r2={id:rec.id,name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:rec.ca,hasPhoto:rec.hasPhoto};
         var iPromise=Promise.all(badList.map(function(b){return putIssue(mkIssue(r2,b));}));
-        return Promise.all([pPromise,iPromise]).then(function(){
+        var sPromise=Promise.all(xs.map(function(x){return putSuggest(x.n.trim(),rec.id,name);}));
+        return Promise.all([pPromise,iPromise,sPromise]).then(function(){
           last={name:name,zone:zone,dateThai:dateThai,time:timeTxt,bad:badList,photo:ph};
           fin();showSuc();
         });
@@ -388,7 +438,7 @@ function showSuc(){
   window.scrollTo(0,0);
 }
 function rst(back){
-  RES={};NOTE={};ph=null;resetPhotoBox();renderList();
+  RES={};NOTE={};XT=[];ph=null;resetPhotoBox();renderList();renderExtras();
   document.getElementById('fn').value='';document.getElementById('fz').value='';
   if(back){document.getElementById('sf').style.display='none';document.getElementById('ff').style.display='block';window.scrollTo(0,0);}
 }
@@ -643,11 +693,11 @@ function buildSumCanvas(st,dateText,cb){
 function exDash(){
   if(!dashData)return;
   var st=dashData,ds=document.getElementById('dpk').value;
-  var head=['#','ชื่อ-นามสกุล','Zone','วันที่','เวลา','สถานะ','จำนวนชำรุด'].concat(EQUIP.map(function(e){return e.t;}));
+  var head=['#','ชื่อ-นามสกุล','Zone','วันที่','เวลา','สถานะ','จำนวนชำรุด'].concat(EQUIP.map(function(e){return e.t;})).concat(['อุปกรณ์อื่น (ทีมเพิ่มเอง)']);
   var rows=[head];
   st.recs.forEach(function(r,i){
     var res=r.results||{},bm={};toArr(r.bad).forEach(function(b){bm[b.k]=b.note;});
-    rows.push([i+1,r.name||'-',r.zone||'-',r.dateThai||ds,r.time||'-',r.badCount>0?'ชำรุด':'ปกติ',r.badCount||0].concat(EQUIP.map(function(e){var v=res[e.k];return v==='ok'?'ปกติ':v==='bad'?'ชำรุด: '+(bm[e.k]||''):v==='na'?'ไม่มี':'-';})));
+    rows.push([i+1,r.name||'-',r.zone||'-',r.dateThai||ds,r.time||'-',r.badCount>0?'ชำรุด':'ปกติ',r.badCount||0].concat(EQUIP.map(function(e){var v=res[e.k];return v==='ok'?'ปกติ':v==='bad'?'ชำรุด: '+(bm[e.k]||''):v==='na'?'ไม่มี':'-';})).concat([toArr(r.extras).map(function(x){return x.name+(x.status==='bad'?' (ชำรุด: '+x.note+')':' (ปกติ)');}).join(' | ')]));
   });
   rows.push([]);rows.push(['','','','','','เช็คแล้ว',st.recs.length+' คน']);rows.push(['','','','','','พบชำรุด',st.bad.length+' คน ('+st.items+' รายการ)']);rows.push(['','','','','','มาแล้วยังไม่เช็ค',st.pend.length+' คน']);
   if(st.pend.length){rows.push([]);rows.push(['มาแล้วยังไม่เช็คเครื่องมือ']);st.pend.forEach(function(n,i){rows.push([i+1,n]);});}
@@ -769,6 +819,78 @@ function isAct(act,btn){
   }
 }
 
+// ── ข้อเสนออุปกรณ์เพิ่ม / จัดการรายการหลัก ─────────────────
+// /equip_suggest/<key> = {name,status:pending|added|rejected,reports:{recId:{by,ca}}}
+// /equip_config/items/<key> = รายการที่หัวหน้าเพิ่มเข้ารายการหลัก
+var SG={items:[],tab:'pending'};
+function nrm(x){return String(x||'').toLowerCase().replace(/\s+/g,' ').trim();}
+function hk(x){var h=5381;x=nrm(x);for(var i=0;i<x.length;i++){h=((h<<5)+h+x.charCodeAt(i))|0;}return 'x'+(h>>>0).toString(36);}
+function putSuggest(nm,recId,by){
+  var key=hk(nm);
+  if(EQUIP.some(function(e){return nrm(e.t)===nrm(nm);}))return Promise.resolve();
+  return fetch(FB+'/equip_suggest/'+key+'/reports/'+recId+'.json',{method:'PUT',body:JSON.stringify({by:by,ca:Date.now()})})
+    .then(function(){return fetch(FB+'/equip_suggest/'+key+'/name.json',{method:'PUT',body:JSON.stringify(nm)});})
+    .catch(function(){});
+}
+function initCfg(){
+  Promise.all([fj('/equip_config/items').catch(function(){return null;}),fj('/equip_suggest').catch(function(){return null;})]).then(function(a){
+    var items=toArr(a[0]);
+    EQUIP=EQUIP_BASE.concat(items.map(function(i){return {k:i.k,t:i.t};}));
+    renderList();
+    var sg=toArr(a[1]).filter(function(x){return x.name;});
+    document.getElementById('xdl').innerHTML=sg.filter(function(x){return x.status!=='rejected';}).map(function(x){return '<option value="'+esc(x.name)+'">';}).join('');
+    var pend=sg.filter(function(x){return !x.status||x.status==='pending';}).length;
+    document.getElementById('bsg').textContent='🧩 อุปกรณ์ที่ทีมเสนอเพิ่ม / จัดการรายการ'+(pend?' ('+pend+' รอพิจารณา)':'');
+  });
+}
+function ldSug(){
+  document.getElementById('sm').style.display='block';
+  document.getElementById('sl').innerHTML='<div style="text-align:center;padding:24px;color:#888">⏳ กำลังโหลด...</div>';
+  fj('/equip_suggest').then(function(d){
+    var m=d&&typeof d==='object'?d:{};
+    SG.items=Object.keys(m).map(function(k){var o=m[k];o.key=k;o.status=o.status||'pending';o.rp=toArr(o.reports);return o;}).filter(function(o){return o.name;});
+    renderSug();
+  }).catch(function(){document.getElementById('sl').innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">โหลดไม่สำเร็จ</div>';});
+}
+function clSug(){document.getElementById('sm').style.display='none';initCfg();}
+function sgTab(t){SG.tab=t;renderSug();}
+function renderSug(){
+  var by={pending:[],added:[],rejected:[]};
+  SG.items.forEach(function(o){(by[o.status]||by.pending).push(o);});
+  by.pending.sort(function(a,b){return b.rp.length-a.rp.length;});
+  document.getElementById('stab-pending').textContent='🕐 รอพิจารณา ('+by.pending.length+')';
+  document.getElementById('stab-added').textContent='✅ อยู่ในรายการ ('+by.added.length+')';
+  document.getElementById('stab-rejected').textContent='🚫 ไม่ต้องมี ('+by.rejected.length+')';
+  ['pending','added','rejected'].forEach(function(t){document.getElementById('stab-'+t).className='itab'+(t==='added'?' dn':'')+(SG.tab===t?' on':'');});
+  var list=by[SG.tab];
+  if(!list.length){document.getElementById('sl').innerHTML='<div style="text-align:center;padding:28px;color:#aaa">ไม่มีรายการ</div>';return;}
+  document.getElementById('sl').innerHTML=list.map(function(o){
+    var people={};o.rp.forEach(function(r){people[r.by]=1;});
+    var btns='';
+    if(o.status==='pending')btns='<button class="ib" style="background:#2e7d32" data-k="'+esc(o.key)+'" onclick="sgAct(\'add\',this)">➕ เพิ่มเข้ารายการหลัก</button><button class="ib" style="background:#6b7280" data-k="'+esc(o.key)+'" onclick="sgAct(\'rej\',this)">🚫 ไม่ต้องมี</button>';
+    else if(o.status==='added')btns='<button class="ib" style="background:#dc2626" data-k="'+esc(o.key)+'" onclick="sgAct(\'rm\',this)">↩️ นำออกจากรายการหลัก</button>';
+    else btns='<button class="ib" style="background:#0369a1" data-k="'+esc(o.key)+'" onclick="sgAct(\'back\',this)">↩️ นำกลับไปพิจารณา</button>';
+    return '<div style="background:#f0f9ff;border:2px solid #7dd3fc;border-radius:14px;padding:12px 14px;margin-bottom:10px"><div style="font-family:Kanit,sans-serif;font-size:15px;font-weight:800;color:#0369a1">'+esc(o.name)+'</div><div style="font-size:12px;color:#555;margin:3px 0 8px">ทีมแจ้งว่ามี '+o.rp.length+' ครั้ง · '+Object.keys(people).length+' คน</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+btns+'</div></div>';
+  }).join('');
+}
+function sgAct(act,btn){
+  var key=btn.getAttribute('data-k');
+  var o=SG.items.filter(function(x){return x.key===key;})[0];
+  if(!o||!needAdmin())return;
+  var st=function(v){return fetch(FB+'/equip_suggest/'+key+'/status.json',{method:'PUT',body:JSON.stringify(v)});};
+  var done=function(v,msg){o.status=v;toast(msg,'ok');renderSug();};
+  var fail=function(){toast('บันทึกไม่สำเร็จ','err');};
+  if(act==='add'){
+    fetch(FB+'/equip_config/items/c'+key+'.json',{method:'PUT',body:JSON.stringify({k:'c'+key,t:o.name,ca:Date.now()})}).then(function(r){if(!r.ok)throw 0;return st('added');}).then(function(){done('added','➕ เพิ่มเข้ารายการหลักแล้ว');}).catch(fail);
+  } else if(act==='rm'){
+    fetch(FB+'/equip_config/items/c'+key+'.json',{method:'DELETE'}).then(function(){return st('pending');}).then(function(){done('pending','นำออกจากรายการหลักแล้ว');}).catch(fail);
+  } else if(act==='rej'){
+    st('rejected').then(function(){done('rejected','ซ่อนจากรายการรอพิจารณาแล้ว');}).catch(fail);
+  } else if(act==='back'){
+    st('pending').then(function(){done('pending','นำกลับไปรอพิจารณาแล้ว');}).catch(fail);
+  }
+}
+
 function toast(msg,type){
   var t=document.getElementById('tst');
   t.textContent=msg;t.className='toast show'+(type?' '+type:'');
@@ -777,6 +899,7 @@ function toast(msg,type){
 if(location.hash==='#sum')ldDash();
 if(location.hash==='#issues')ldIssues();
 updIssueBtn();
+initCfg();
 </script>
 </body>
 </html>
