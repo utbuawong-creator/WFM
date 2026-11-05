@@ -90,6 +90,13 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
 .eb.bad.on{background:#dc2626;border-color:#dc2626;color:#fff}
 .eb.na.on{background:#6b7280;border-color:#6b7280;color:#fff}
 .btn-all{width:100%;background:#f1f8e9;color:#2e7d32;border:2px solid #8dc63f;border-radius:12px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;margin-bottom:12px}
+@keyframes ipulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.45)}50%{box-shadow:0 0 0 7px rgba(220,38,38,0)}}
+.btn-iss{width:100%;background:#fef2f2;color:#b91c1c;border:2px solid #dc2626;border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;margin-top:10px}
+.btn-iss.has{animation:ipulse 1.6s infinite}
+.itab{flex:1;border:2px solid var(--bd);background:#fff;border-radius:10px;padding:9px 4px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Kanit',sans-serif;color:var(--tx2)}
+.itab.on{background:#dc2626;border-color:#dc2626;color:#fff}
+.itab.on.dn{background:#2e7d32;border-color:#2e7d32}
+.ib{border:none;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Sarabun',sans-serif;color:#fff}
 #pv{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:400;align-items:center;justify-content:center;padding:12px}
 #pv img{max-width:100%;max-height:100%;border-radius:10px}
 </style>
@@ -175,6 +182,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
     <button class="btn-s" id="bsb" onclick="submitEq()">✅ ส่งผลการเช็ค</button>
     <button class="btn-g" onclick="rst()">ล้างข้อมูล</button>
     <button class="btn-db" onclick="ldDash()">📊 ดูสรุปเช็คเครื่องมือวันนี้</button>
+    <button class="btn-iss" id="bis" onclick="ldIssues()">🚨 เรื่องอุปกรณ์ชำรุดที่ค้างอยู่</button>
   </div>
 
   <!-- SUCCESS -->
@@ -202,6 +210,19 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
     <div id="dtx" style="font-size:12px;color:var(--tx2);margin:6px 0 12px"></div>
     <div id="db"></div>
     <div class="ag" style="margin-top:12px"><button class="btn-cp" onclick="cpDash()">📋 คัดลอกภาพ</button><button class="btn-nw" onclick="exDash()">📥 Export Excel</button></div>
+  </div>
+</div>
+
+<!-- ISSUES MODAL (หัวหน้าติดตามเรื่อง) -->
+<div class="modal-bg" id="im">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">🚨 เรื่องอุปกรณ์ชำรุด</div>
+      <button onclick="clIssues()" style="background:var(--bg);border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px"><button class="itab on" id="itab-open" onclick="isTab('open')"></button><button class="itab dn" id="itab-done" onclick="isTab('done')"></button></div>
+    <div style="font-size:11px;color:var(--tx2);margin-bottom:10px">หัวหน้ากดรับเรื่อง / ปิดเรื่อง ได้ (ต้องใส่รหัส admin ครั้งแรกครั้งเดียวต่อการเปิดหน้า)</div>
+    <div id="il"></div>
   </div>
 </div>
 
@@ -316,8 +337,8 @@ function submitEq(){
   var btn=document.getElementById('bsb');
   btn.disabled=true;btn.textContent='⏳ กำลังตรวจสอบ...';
   function fin(){btn.disabled=false;btn.textContent='✅ ส่งผลการเช็ค';}
-  fetch(FB+'/equipment.json').then(function(r){return r.json();}).then(function(d){
-    if(toArr(d).some(function(r){return r.date===today&&r.name===name;})){fin();toast('⚠️ '+name+' เช็คเครื่องมือวันนี้แล้ว','err');return;}
+  fjDate('/equipment',today).then(function(d){
+    if(d.some(function(r){return r.date===today&&r.name===name;})){fin();toast('⚠️ '+name+' เช็คเครื่องมือวันนี้แล้ว','err');return;}
     btn.textContent='⏳ กำลังบันทึก...';
     var results={},badList=[],okN=0,naN=0;
     EQUIP.forEach(function(e){
@@ -343,7 +364,9 @@ function submitEq(){
         if(rec.hasPhoto){
           pPromise=fetch(FB+'/equipment_photos/'+rec.id+'.json',{method:'PUT',body:JSON.stringify({p:ph})}).catch(function(){toast('⚠️ บันทึกรูปไม่สำเร็จ แต่ผลเช็คบันทึกแล้ว','err');});
         }
-        return pPromise.then(function(){
+        var r2={id:rec.id,name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:rec.ca,hasPhoto:rec.hasPhoto};
+        var iPromise=Promise.all(badList.map(function(b){return putIssue(mkIssue(r2,b));}));
+        return Promise.all([pPromise,iPromise]).then(function(){
           last={name:name,zone:zone,dateThai:dateThai,time:timeTxt,bad:badList,photo:ph};
           fin();showSuc();
         });
@@ -477,12 +500,11 @@ function pkDate(v){if(v)fetchEq(v);}
 function dateTxt(ds){var d=new Date(ds+'T12:00:00');return 'วัน'+DA[d.getDay()]+'ที่ '+d.getDate()+' '+MO[d.getMonth()]+' '+(d.getFullYear()+543);}
 function fetchDay(ds,cb){
   Promise.all([
-    fetch(FB+'/equipment.json').then(function(r){return r.json();}).catch(function(){return {};}),
-    fetch(FB+'/checkins.json').then(function(r){return r.json();}).catch(function(){return {};})
+    fjDate('/equipment',ds).catch(function(){return [];}),
+    fjDate('/checkins',ds).catch(function(){return [];})
   ]).then(function(a){
-    var recs=toArr(a[0]).filter(function(r){return r.date===ds;}).sort(function(x,y){return (x.time||'').localeCompare(y.time||'');});
-    var cis=toArr(a[1]).filter(function(r){return r.date===ds;});
-    cb(eqStats(recs,cis));
+    var recs=a[0].sort(function(x,y){return (x.time||'').localeCompare(y.time||'');});
+    cb(eqStats(recs,a[1]));
   });
 }
 function eqStats(recs,cis){
@@ -531,10 +553,12 @@ function delRec(id,name){
   var pw=prompt('ใส่รหัส admin เพื่อลบรายการของ '+name);
   if(pw===null)return;
   if(pw!==ADMIN_PW){toast('รหัสไม่ถูกต้อง','err');return;}
+  var rc=(dashData&&dashData.recs||[]).filter(function(r){return r.id===id;})[0];
+  var ik=rc?toArr(rc.bad).map(function(b){return rc.id+'_'+b.k;}):[];
   Promise.all([
     fetch(FB+'/equipment/'+id+'.json',{method:'DELETE'}),
     fetch(FB+'/equipment_photos/'+id+'.json',{method:'DELETE'})
-  ]).then(function(){toast('🗑️ ลบรายการของ '+name+' แล้ว','ok');fetchEq(document.getElementById('dpk').value);})
+  ].concat(ik.map(function(k){return fetch(FB+'/equip_open/'+k+'.json',{method:'DELETE'});})).concat(ik.map(function(k){return fetch(FB+'/equip_done/'+k+'.json',{method:'DELETE'});}))).then(function(){toast('🗑️ ลบรายการของ '+name+' แล้ว','ok');fetchEq(document.getElementById('dpk').value);})
     .catch(function(){toast('ลบไม่สำเร็จ','err');});
 }
 
@@ -636,12 +660,123 @@ function exDash(){
   toast('📥 Export สำเร็จ '+st.recs.length+' คน ✓','ok');
 }
 
+// ── helpers: ดึงเฉพาะวัน (ถ้า Firebase ไม่รองรับ query จะ fallback ดึงทั้งหมดแล้วกรอง) ──
+function fj(p){return fetch(FB+p+'.json').then(function(r){return r.json();});}
+function fjDate(p,ds){
+  return fetch(FB+p+'.json?orderBy=%22date%22&equalTo=%22'+ds+'%22').then(function(r){return r.json();})
+    .then(function(d){if(d&&d.error)throw 0;return d;})
+    .catch(function(){return fj(p);})
+    .then(function(d){return toArr(d).filter(function(r){return r.date===ds;});});
+}
+
+// ── ระบบติดตามเรื่องอุปกรณ์ชำรุด ──────────────────────────
+// /equip_open/<id> = เรื่องที่ยังค้าง (ใหม่/รับเรื่องแล้ว), /equip_done/<id> = เรื่องที่ปิดแล้ว
+var IS={open:[],done:[],tab:'open'},adm=false;
+function mkIssue(r,b){return {id:r.id+'_'+b.k,recId:r.id,k:b.k,label:b.label,note:b.note||'',name:r.name,zone:r.zone,date:r.date,dateThai:r.dateThai,time:r.time,ca:r.ca||Date.now(),hasPhoto:!!r.hasPhoto,status:'new'};}
+function putIssue(i){
+  function go(){return fetch(FB+'/equip_open/'+i.id+'.json',{method:'PUT',body:JSON.stringify(i)}).then(function(r){if(!r.ok)throw 0;});}
+  return go().catch(function(){return go();}).catch(function(){toast('⚠️ ส่งเรื่องเข้าระบบติดตามไม่สำเร็จ กรุณาคัดลอกการ์ดส่งหัวหน้า','err');});
+}
+function migrate(){
+  return fj('/equip_meta/migrated').then(function(m){
+    if(m===true)return;
+    return Promise.all([fj('/equipment'),fj('/equip_open'),fj('/equip_done')]).then(function(a){
+      var have={};toArr(a[1]).concat(toArr(a[2])).forEach(function(i){have[i.id]=1;});
+      var puts=[];
+      toArr(a[0]).forEach(function(r){
+        if(!(r.badCount>0))return;
+        toArr(r.bad).forEach(function(b){
+          var i=mkIssue(r,b);if(have[i.id])return;
+          puts.push(fetch(FB+'/equip_open/'+i.id+'.json',{method:'PUT',body:JSON.stringify(i)}));
+        });
+      });
+      return Promise.all(puts);
+    }).then(function(){return fetch(FB+'/equip_meta/migrated.json',{method:'PUT',body:'true'});});
+  });
+}
+function needAdmin(){
+  if(adm)return true;
+  var pw=prompt('ใส่รหัส admin');
+  if(pw===null)return false;
+  if(pw!==ADMIN_PW){toast('รหัสไม่ถูกต้อง','err');return false;}
+  adm=true;return true;
+}
+function updIssueBtn(){
+  migrate().then(function(){return fj('/equip_open');}).then(function(d){
+    var n=toArr(d).length,b=document.getElementById('bis');
+    b.textContent=n?'🚨 เรื่องอุปกรณ์ชำรุดที่ค้างอยู่ ('+n+')':'✅ ไม่มีเรื่องอุปกรณ์ชำรุดค้าง';
+    b.className='btn-iss'+(n?' has':'');
+  }).catch(function(){});
+}
+function ldIssues(){
+  document.getElementById('im').style.display='block';
+  document.getElementById('il').innerHTML='<div style="text-align:center;padding:24px;color:#888">⏳ กำลังโหลด...</div>';
+  migrate().then(function(){return Promise.all([fj('/equip_open'),fj('/equip_done')]);}).then(function(a){
+    IS.open=toArr(a[0]).sort(function(x,y){return (x.ca||0)-(y.ca||0);});
+    IS.done=toArr(a[1]).sort(function(x,y){return (y.ct||0)-(x.ct||0);}).slice(0,30);
+    renderIssues();
+  }).catch(function(){document.getElementById('il').innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">โหลดไม่สำเร็จ ลองใหม่อีกครั้ง</div>';});
+}
+function clIssues(){document.getElementById('im').style.display='none';if(location.hash==='#issues')history.replaceState(null,'',location.pathname);updIssueBtn();}
+function isTab(t){IS.tab=t;renderIssues();}
+function dayDiff(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function renderIssues(){
+  var t=todayStr();
+  document.getElementById('itab-open').textContent='🔴 ค้างดำเนินการ ('+IS.open.length+')';
+  document.getElementById('itab-done').textContent='🟢 ปิดแล้ว ('+IS.done.length+')';
+  document.getElementById('itab-open').className='itab'+(IS.tab==='open'?' on':'');
+  document.getElementById('itab-done').className='itab dn'+(IS.tab==='done'?' on':'');
+  var list=IS.tab==='open'?IS.open:IS.done;
+  if(!list.length){document.getElementById('il').innerHTML='<div style="text-align:center;padding:28px;color:#aaa">'+(IS.tab==='open'?'🎉 ไม่มีเรื่องค้างดำเนินการ':'ยังไม่มีเรื่องที่ปิดแล้ว')+'</div>';return;}
+  document.getElementById('il').innerHTML=list.map(function(i){
+    var age=dayDiff(i.date,t);
+    var ageTag=IS.tab==='done'?'':(age>=2?'<span style="background:#7f1d1d;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">⏰ ค้าง '+age+' วัน</span>':'<span style="background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">'+(age===1?'เมื่อวาน':'วันนี้')+'</span>');
+    var st=i.status==='done'?'<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">🟢 แก้ไขแล้ว</span>':(i.status==='ack'?'<span style="background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">🟡 รับเรื่องแล้ว</span>':'<span style="background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">🔴 ใหม่</span>');
+    var btns='';
+    if(i.hasPhoto)btns+='<button class="ib" style="background:#0369a1" onclick="vwPh(\''+esc(i.recId)+'\')">📷 ดูรูป</button>';
+    if(i.status==='new')btns+='<button class="ib" style="background:#d97706" data-id="'+esc(i.id)+'" onclick="isAct(\'ack\',this)">🟡 รับเรื่อง</button>';
+    if(i.status==='new'||i.status==='ack')btns+='<button class="ib" style="background:#2e7d32" data-id="'+esc(i.id)+'" onclick="isAct(\'done\',this)">✅ ปิดเรื่อง</button>';
+    if(i.status==='done')btns+='<button class="ib" style="background:#6b7280" data-id="'+esc(i.id)+'" onclick="isAct(\'reopen\',this)">↩️ เปิดเรื่องใหม่</button>';
+    return '<div style="background:'+(i.status==='done'?'#f7fbf0':'#fef2f2')+';border:2px solid '+(i.status==='done'?'#8dc63f':'#fca5a5')+';border-radius:14px;padding:12px 14px;margin-bottom:10px">'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px">'+st+ageTag+'</div>'+
+      '<div style="font-family:Kanit,sans-serif;font-size:15px;font-weight:800;color:#b91c1c">'+esc(i.label)+'</div>'+
+      '<div style="font-size:13px;margin:3px 0 6px">'+esc(i.note)+'</div>'+
+      '<div style="font-size:11px;color:#777">แจ้งโดย '+esc(i.name)+' · '+esc(i.zone)+' · '+esc(i.dateThai||i.date)+' '+esc(hhmm(i.time))+' น.</div>'+
+      (i.hnote?'<div style="font-size:12px;margin-top:6px;background:#fff;border-radius:8px;padding:6px 10px">📝 '+esc(i.hnote)+'</div>':'')+
+      (i.ct?'<div style="font-size:11px;color:#777;margin-top:4px">ปิดเรื่องเมื่อ '+esc(new Date(i.ct).toLocaleString('th-TH'))+'</div>':'')+
+      (btns?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">'+btns+'</div>':'')+'</div>';
+  }).join('');
+}
+function isAct(act,btn){
+  var id=btn.getAttribute('data-id');
+  var i=IS.open.filter(function(x){return x.id===id;})[0]||IS.done.filter(function(x){return x.id===id;})[0];
+  if(!i||!needAdmin())return;
+  var now=Date.now();
+  if(act==='ack'){
+    fetch(FB+'/equip_open/'+id+'.json',{method:'PATCH',body:JSON.stringify({status:'ack',ut:now})}).then(function(){i.status='ack';i.ut=now;toast('🟡 รับเรื่องแล้ว','ok');renderIssues();}).catch(function(){toast('บันทึกไม่สำเร็จ','err');});
+  } else if(act==='done'){
+    var hn=prompt('หมายเหตุการแก้ไข (เช่น ส่งซ่อมแล้ว / เปลี่ยนใหม่) — ไม่ใส่ก็ได้');
+    if(hn===null)return;
+    var rec=Object.assign({},i,{status:'done',hnote:hn.trim(),ct:now,ut:now});
+    fetch(FB+'/equip_done/'+id+'.json',{method:'PUT',body:JSON.stringify(rec)}).then(function(r){if(!r.ok)throw 0;return fetch(FB+'/equip_open/'+id+'.json',{method:'DELETE'});}).then(function(){
+      IS.open=IS.open.filter(function(x){return x.id!==id;});IS.done.unshift(rec);toast('✅ ปิดเรื่องแล้ว','ok');renderIssues();
+    }).catch(function(){toast('บันทึกไม่สำเร็จ','err');});
+  } else if(act==='reopen'){
+    var r2=Object.assign({},i,{status:'new',ut:now});delete r2.hnote;delete r2.ct;
+    fetch(FB+'/equip_open/'+id+'.json',{method:'PUT',body:JSON.stringify(r2)}).then(function(r){if(!r.ok)throw 0;return fetch(FB+'/equip_done/'+id+'.json',{method:'DELETE'});}).then(function(){
+      IS.done=IS.done.filter(function(x){return x.id!==id;});IS.open.push(r2);IS.open.sort(function(x,y){return (x.ca||0)-(y.ca||0);});toast('↩️ เปิดเรื่องใหม่แล้ว','ok');renderIssues();
+    }).catch(function(){toast('บันทึกไม่สำเร็จ','err');});
+  }
+}
+
 function toast(msg,type){
   var t=document.getElementById('tst');
   t.textContent=msg;t.className='toast show'+(type?' '+type:'');
   clearTimeout(window._tt);window._tt=setTimeout(function(){t.className='toast';},2800);
 }
 if(location.hash==='#sum')ldDash();
+if(location.hash==='#issues')ldIssues();
+updIssueBtn();
 </script>
 </body>
 </html>

@@ -169,7 +169,7 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
   </div>
 
   <!-- แจ้งเตือนอุปกรณ์ชำรุด (แสดงเมื่อวันนี้มีคนติ๊กชำรุด) -->
-  <a class="eq-alert" id="eq-alert" href="equipment_check.html#sum" style="display:none">
+  <a class="eq-alert" id="eq-alert" href="equipment_check.html#issues" style="display:none">
     <span style="font-size:22px">🚨</span>
     <span id="eq-alert-t">วันนี้พบอุปกรณ์ชำรุด</span>
     <span class="eq-go">ดูรายละเอียด ›</span>
@@ -243,9 +243,9 @@ html, body { min-height: 100%; font-family: 'Sarabun', sans-serif; background: v
       <div class="stat-num" id="s-error">-</div>
       <div class="stat-lbl">งานผิดพลาดวันนี้ ⚠️</div>
     </div>
-    <div class="stat-card s3" onclick="window.location='equipment_check.html#sum'">
+    <div class="stat-card s3" id="c-damaged" onclick="window.location='equipment_check.html#issues'">
       <div class="stat-num" id="s-damaged">-</div>
-      <div class="stat-lbl">อุปกรณ์ชำรุดวันนี้ 🚨</div>
+      <div class="stat-lbl">อุปกรณ์ชำรุดค้าง 🚨</div>
     </div>
   </div>
 
@@ -284,6 +284,99 @@ function callAPI(params, callback) {
 }
 
 function loadStats() {
+  // Check-in วันนี้: load from Firebase
+  try {
+    const FB_CI = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+    const dc = new Date();
+    const todayC = dc.getFullYear() + '-' + String(dc.getMonth()+1).padStart(2,'0') + '-' + String(dc.getDate()).padStart(2,'0');
+    fetch(FB_CI + '/checkins.json')
+      .then(r => r.json())
+      .then(d => {
+        const n = d ? Object.values(d).filter(r => r.date === todayC).length : 0;
+        document.getElementById('s-checkin').textContent = n;
+      }).catch(() => { document.getElementById('s-checkin').textContent = '-'; });
+  } catch(e) { document.getElementById('s-checkin').textContent = '-'; }
+
+  callAPI({ action: 'getJobs' }, (err, data) => {
+    if (!err && data.success) {
+      const jobs = data.jobs || [];
+      const SLA = { Critical: 3, Major: 10, Minor: 24, Other: 24 };
+      const active = jobs.filter(j => j.status === 'active').length;
+      const breach = jobs.filter(j => {
+        const start = j.startTime ? new Date(j.startTime) : null;
+        if (!start) return false;
+        return (Date.now() - start) / 3600000 > (SLA[j.priority] || 24);
+      }).length;
+      document.getElementById('s-job').textContent = active;
+      document.getElementById('s-breach').textContent = breach;
+    } else {
+      document.getElementById('s-job').textContent = '-';
+      document.getElementById('s-breach').textContent = '-';
+    }
+  });
+
+  // เช็คเครื่องมือ + เรื่องอุปกรณ์ชำรุดค้าง: load from Firebase
+  try {
+    const FB_EQ = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
+    const dn = new Date();
+    const todayL = dn.getFullYear() + '-' + String(dn.getMonth()+1).padStart(2,'0') + '-' + String(dn.getDate()).padStart(2,'0');
+    const arr = d => (d && typeof d === 'object' && !d.error) ? Object.values(d) : [];
+    const fj = p => fetch(FB_EQ + p + '.json').then(r => r.json());
+
+    // จำนวนคนที่เช็คเครื่องมือวันนี้ (ลองดึงเฉพาะวัน ถ้าไม่ได้ fallback ดึงทั้งหมด)
+    fetch(FB_EQ + '/equipment.json?orderBy=%22date%22&equalTo=%22' + todayL + '%22')
+      .then(r => r.json())
+      .then(d => { if (d && d.error) throw 0; return d; })
+      .catch(() => fj('/equipment'))
+      .then(d => { document.getElementById('s-equip').textContent = arr(d).filter(r => r.date === todayL).length; })
+      .catch(() => { document.getElementById('s-equip').textContent = '-'; });
+
+    // ดึงรายการเก่าที่ยังไม่เข้าระบบติดตามเรื่อง (ทำครั้งเดียว)
+    const migrate = () => fj('/equip_meta/migrated').then(m => {
+      if (m === true) return;
+      return Promise.all([fj('/equipment'), fj('/equip_open'), fj('/equip_done')]).then(a => {
+        const have = {}; arr(a[1]).concat(arr(a[2])).forEach(i => have[i.id] = 1);
+        const puts = [];
+        arr(a[0]).forEach(r => {
+          if (!(r.badCount > 0)) return;
+          arr(r.bad).forEach(b => {
+            const id = r.id + '_' + b.k; if (have[id]) return;
+            const i = {id, recId:r.id, k:b.k, label:b.label, note:b.note||'', name:r.name, zone:r.zone, date:r.date, dateThai:r.dateThai, time:r.time, ca:r.ca||Date.now(), hasPhoto:!!r.hasPhoto, status:'new'};
+            puts.push(fetch(FB_EQ + '/equip_open/' + id + '.json', {method:'PUT', body:JSON.stringify(i)}));
+          });
+        });
+        return Promise.all(puts);
+      }).then(() => fetch(FB_EQ + '/equip_meta/migrated.json', {method:'PUT', body:'true'}));
+    });
+
+    migrate().then(() => fj('/equip_open')).then(d => {
+      const open = arr(d);
+      const diff = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+      const newToday = open.filter(i => i.date === todayL).length;
+      const old = open.filter(i => diff(i.date, todayL) >= 2).length;
+      document.getElementById('s-damaged').textContent = open.length;
+      if (open.length === 0) {
+        const c = document.getElementById('c-damaged');
+        c.classList.remove('s3'); c.classList.add('s1');
+      }
+      const al = document.getElementById('eq-alert');
+      if (open.length > 0) {
+        let t = 'อุปกรณ์ชำรุดค้างดำเนินการ ' + open.length + ' รายการ';
+        const extra = [];
+        if (newToday) extra.push('ใหม่วันนี้ ' + newToday);
+        if (old) extra.push('ค้างนาน ' + old);
+        if (extra.length) t += ' (' + extra.join(' · ') + ')';
+        document.getElementById('eq-alert-t').textContent = t;
+        al.style.display = 'flex';
+      } else {
+        al.style.display = 'none';
+      }
+    }).catch(() => { document.getElementById('s-damaged').textContent = '-'; });
+  } catch(e) {
+    document.getElementById('s-equip').textContent = '-';
+    document.getElementById('s-damaged').textContent = '-';
+  }
+
   // Check-in วันนี้: load from Firebase
   try {
     const FB_CI = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebasedatabase.app';
