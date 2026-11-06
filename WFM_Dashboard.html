@@ -142,10 +142,10 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
 <div class="tab-wrap">
   <div class="tab-inner">
     <button class="tab-btn on" onclick="switchTab('overview')" id="tab-overview">🏠 ภาพรวม</button>
-    <button class="tab-btn" onclick="switchTab('checkin')" id="tab-checkin">✅ Check-in</button>
+    <button class="tab-btn" onclick="switchTab('checkin')" id="tab-checkin">✅ Check-in · ลา</button>
     <button class="tab-btn" onclick="switchTab('error')" id="tab-error">⚠️ Work Error Log</button>
     <button class="tab-btn" onclick="switchTab('job')" id="tab-job">🔧 Job Tracker</button>
-    <button class="tab-btn" onclick="switchTab('cable')" id="tab-cable">🔌 Cable Optic</button>
+    <button class="tab-btn" onclick="switchTab('equip')" id="tab-equip">🧰 เช็คเครื่องมือ</button>
   </div>
 </div>
 
@@ -153,15 +153,19 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
 
   <!-- ══ OVERVIEW ══ -->
   <div class="tab-pane on" id="pane-overview">
+    <div id="ov-eq-alert" onclick="switchTab('equip')" style="display:none;cursor:pointer;align-items:center;gap:10px;background:linear-gradient(135deg,#b91c1c,#e8001d);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:16px;font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;box-shadow:0 4px 0 #7f1d1d">
+      <span style="font-size:22px">🚨</span><span id="ov-eq-alert-t"></span><span style="margin-left:auto;font-size:12px;font-weight:600;opacity:.9">ดูรายละเอียด ›</span>
+    </div>
     <div class="app-overview-grid">
       <div class="app-overview-card" onclick="switchTab('checkin')" style="border-color:var(--org)">
         <div class="app-ov-hdr">
           <div class="app-ov-ic" style="background:linear-gradient(135deg,#f47920,#e8670a)">✅</div>
           <div><div class="app-ov-title">Check-in</div><div class="app-ov-sub">รายงานตัวเข้างาน</div></div>
         </div>
-        <div class="app-ov-stats">
+        <div class="app-ov-stats" style="grid-template-columns:1fr 1fr 1fr">
           <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--org)" id="ov-ci-today">-</div><div class="app-ov-stat-lbl">วันนี้</div></div>
-          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--text2)" id="ov-ci-total">-</div><div class="app-ov-stat-lbl">ทั้งหมด</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--red)" id="ov-ci-late">-</div><div class="app-ov-stat-lbl">สาย</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:#0369a1" id="ov-ci-leave">-</div><div class="app-ov-stat-lbl">ลา</div></div>
         </div>
       </div>
       <div class="app-overview-card" onclick="switchTab('error')" style="border-color:var(--red)">
@@ -184,14 +188,14 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
           <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--red)" id="ov-job-breach">-</div><div class="app-ov-stat-lbl">เกิน SLA</div></div>
         </div>
       </div>
-      <div class="app-overview-card" onclick="switchTab('cable')" style="border-color:#0891b2">
+      <div class="app-overview-card" onclick="switchTab('equip')" style="border-color:#d97706">
         <div class="app-ov-hdr">
-          <div class="app-ov-ic" style="background:linear-gradient(135deg,#0891b2,#0369a1)">🔌</div>
-          <div><div class="app-ov-title">Cable Optic</div><div class="app-ov-sub">เบิกสายเคเบิล</div></div>
+          <div class="app-ov-ic" style="background:linear-gradient(135deg,#f59e0b,#d97706)">🧰</div>
+          <div><div class="app-ov-title">เช็คเครื่องมือ</div><div class="app-ov-sub">ตรวจอุปกรณ์ประจำวัน</div></div>
         </div>
         <div class="app-ov-stats">
-          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:#0891b2" id="ov-cab-today">-</div><div class="app-ov-stat-lbl">วันนี้</div></div>
-          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--text2)" id="ov-cab-meter">-</div><div class="app-ov-stat-lbl">เมตรรวม</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:#d97706" id="ov-eq-today">-</div><div class="app-ov-stat-lbl">เช็คแล้ววันนี้</div></div>
+          <div class="app-ov-stat"><div class="app-ov-stat-num" style="color:var(--red)" id="ov-eq-bad">-</div><div class="app-ov-stat-lbl">ชำรุดวันนี้</div></div>
         </div>
       </div>
     </div>
@@ -220,13 +224,25 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
       <div class="chart-card"><div class="chart-title">📅 Check-in รายวัน</div><div class="chart-wrap"><canvas id="ci-chart-daily"></canvas></div></div>
       <div class="chart-card"><div class="chart-title">🗺️ แยกตาม Zone</div><div class="chart-wrap"><canvas id="ci-chart-zone"></canvas></div></div>
     </div>
-    <div class="chart-card" style="margin-bottom:16px"><div class="chart-title">⏱️ แยกตาม Shift</div><div class="chart-wrap" style="height:200px"><canvas id="ci-chart-shift"></canvas></div></div>
+    <div class="charts-grid">
+      <div class="chart-card"><div class="chart-title">⏱️ แยกตาม Shift</div><div class="chart-wrap"><canvas id="ci-chart-shift"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">⏰ มาสายบ่อย (Top 10)</div><div class="chart-wrap"><canvas id="ci-chart-late"></canvas></div></div>
+    </div>
     <div class="table-card">
       <div class="table-title"><span>📋 รายการ Check-in</span><span style="font-size:12px;color:var(--text2)" id="ci-count"></span></div>
       <div style="overflow-x:auto">
         <table class="data-table">
-          <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>วันที่</th><th>เวลา Check-in</th><th>Zone</th><th>Shift</th></tr></thead>
+          <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>วันที่</th><th>เวลา Check-in</th><th>Zone</th><th>Shift</th><th>สถานะ</th></tr></thead>
           <tbody id="ci-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="table-card" style="margin-top:16px">
+      <div class="table-title"><span>🏖️ รายการลา</span><span style="font-size:12px;color:var(--text2)" id="lv-count"></span></div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>วันที่เริ่ม</th><th>วันที่สิ้นสุด</th><th>จำนวนวัน</th><th>ช่วงเวลา</th><th>สถานะ</th></tr></thead>
+          <tbody id="lv-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -294,36 +310,43 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text)}
     </div>
   </div>
 
-  <!-- ══ CABLE OPTIC ══ -->
-  <div class="tab-pane" id="pane-cable">
+  <!-- ══ เช็คเครื่องมือ ══ -->
+  <div class="tab-pane" id="pane-equip">
     <div class="filter-row">
       <span style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:var(--text2)">📅 ช่วงเวลา:</span>
-      <select class="filter-sel" id="cab-period" onchange="renderCable()">
+      <select class="filter-sel" id="eq-period" onchange="renderEquip()">
         <option value="today">วันนี้</option>
         <option value="week">7 วันล่าสุด</option>
         <option value="month" selected>30 วันล่าสุด</option>
         <option value="all">ทั้งหมด</option>
       </select>
-      <button class="btn-load" onclick="renderCable()">🔄 โหลด</button>
-      <button class="btn-export" onclick="exportCable()">📥 Export</button>
+      <select class="filter-sel" id="eq-status" onchange="renderEquip()">
+        <option value="">ทุกสถานะ</option>
+        <option value="bad">เฉพาะที่พบชำรุด</option>
+        <option value="ok">เฉพาะปกติ</option>
+      </select>
+      <button class="btn-load" onclick="renderEquip()">🔄 โหลด</button>
+      <button class="btn-export" onclick="exportEquip()">📥 Export</button>
     </div>
-    <div class="kpi-grid" id="cab-kpi"></div>
+    <div class="kpi-grid" id="eq-kpi"></div>
     <div class="charts-grid">
-      <div class="chart-card"><div class="chart-title">🏆 Top ผู้เบิก (เมตร)</div><div class="chart-wrap"><canvas id="cab-chart-staff"></canvas></div></div>
-      <div class="chart-card"><div class="chart-title">🥁 ดั้มที่ใช้งาน</div><div class="chart-wrap"><canvas id="cab-chart-drum"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">🔧 อุปกรณ์ที่ชำรุดบ่อย</div><div class="chart-wrap"><canvas id="eq-chart-item"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">📅 เช็ค / พบชำรุด รายวัน</div><div class="chart-wrap"><canvas id="eq-chart-daily"></canvas></div></div>
     </div>
     <div class="table-card">
-      <div class="table-title"><span>📋 รายการเบิก Cable</span><span style="font-size:12px;color:var(--text2)" id="cab-count"></span></div>
+      <div class="table-title"><span>📋 รายการเช็คเครื่องมือ</span><span style="font-size:12px;color:var(--text2)" id="eq-count"></span></div>
       <div style="overflow-x:auto">
         <table class="data-table">
-          <thead><tr><th>#</th><th>ชื่อผู้เบิก</th><th>วันที่-เวลา</th><th>เลขดั้ม</th><th>LM เริ่ม</th><th>LM สิ้นสุด</th><th>ระยะ (ม.)</th></tr></thead>
-          <tbody id="cab-tbody"></tbody>
+          <thead><tr><th>#</th><th>วันที่</th><th>เวลา</th><th>ชื่อ-นามสกุล</th><th>Zone</th><th>สถานะ</th><th>รายการชำรุด</th><th>รูป</th></tr></thead>
+          <tbody id="eq-tbody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
 </div>
+
+<div id="pv" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;align-items:center;justify-content:center;padding:12px"><img id="pvi" alt="" style="max-width:100%;max-height:100%;border-radius:10px"></div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────
@@ -332,7 +355,8 @@ const FB_DB  = 'https://fiberoptic-tracker-default-rtdb.asia-southeast1.firebase
 const SLA_H  = {Critical:3,Major:10,Minor:24,Other:24};
 
 // ── DATA STORES ───────────────────────────────────────────
-var ciData=[], errData=[], jobData=[], cabData=[];
+var ciData=[], lvData=[], errData=[], jobData=[], eqData=[];
+const GRACE_MIN=5; // เผื่อเวลา (นาที) เหมือนหน้า CheckIn
 var charts={};
 
 // ── CLOCK ────────────────────────────────────────────────
@@ -357,7 +381,23 @@ function showLoad(msg){document.getElementById('loading').style.display='flex';d
 function hideLoad(){document.getElementById('loading').style.display='none';}
 
 // ── DATE HELPERS ──────────────────────────────────────────
-function today(){return new Date().toISOString().slice(0,10);}
+function dstr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function today(){return dstr(new Date());}
+function toArr(d){return d&&typeof d==='object'&&!d.error?Object.values(d):[];}
+function lvS(l){return l.startDate||l.date;}
+function lvE(l){return l.endDate||lvS(l);}
+function dayDiff(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function leaveFor(name,d){for(var i=0;i<lvData.length;i++){var l=lvData[i];if(l.name===name&&lvS(l)<=d&&d<=lvE(l))return l;}return null;}
+function secOf(t){var p=String(t||'').split(':');return (+p[0]||0)*3600+(+p[1]||0)*60+(+p[2]||0);}
+function lateInfo(r){
+  var st=String(r.shift||'').trim().startsWith('20:30')?73800:30600;
+  var s=secOf(r.time);
+  if(st===73800&&s<43200)s+=86400;
+  var d=s-st,late=d>GRACE_MIN*60;
+  var lv=leaveFor(r.name,r.date);
+  if(lv&&lv.period==='ครึ่งเช้า')late=false;
+  return {late:late,min:d>0?Math.floor(d/60):0};
+}
 function filterByPeriod(list,dtFn,period){
   var now=new Date(),cut;
   if(period==='today') cut=new Date(now.toDateString());
@@ -399,23 +439,24 @@ function fetchFB(path,cb){
 function loadAll(){
   showLoad('กำลังโหลดข้อมูลทุก App...');
   var done=0;
-  function check(){done++;if(done>=3)hideLoad();}
+  function check(){done++;if(done>=4)hideLoad();}
 
-  // Check-in (Google Sheets)
-  callGS({action:'getCheckin'},function(err,data){
-    if(!err&&data&&data.checkins) ciData=data.checkins;
-    else ciData=[];
+  // Check-in / ลา / เช็คเครื่องมือ / Work Error Log (Firebase)
+  fetchFB('/checkins',function(err,data){
+    ciData=toArr(data);
     renderCheckin(); updateOverview(); check();
   });
-
-  // Work Error Log + Cable (Firebase)
-  fetchFB('/errors',function(err,data){
-    errData=data&&!data.error?Object.values(data):[];
-    renderError(); check();
+  fetchFB('/leaves',function(err,data){
+    lvData=toArr(data);
+    renderCheckin(); updateOverview(); check();
   });
-  fetchFB('/records',function(err,data){
-    cabData=data&&!data.error?Object.values(data).map(function(r){return{...r,f:parseFloat(r.f)||0,t:parseFloat(r.t)||0,m:parseFloat(r.m)||0};}):[];
-    renderCable(); check();
+  fetchFB('/equipment',function(err,data){
+    eqData=toArr(data);
+    renderEquip(); updateOverview(); check();
+  });
+  fetchFB('/errors',function(err,data){
+    errData=toArr(data);
+    renderError(); updateOverview(); check();
   });
 
   // Job Tracker (Google Sheets)
@@ -429,17 +470,26 @@ function loadAll(){
 // ── OVERVIEW ──────────────────────────────────────────────
 function updateOverview(){
   var t=today();
-  document.getElementById('ov-ci-today').textContent=ciData.filter(function(r){return r.date&&r.date.includes&&r.date.includes(t.slice(0,10));}).length||'-';
-  document.getElementById('ov-ci-total').textContent=ciData.length||'-';
+  var ciToday=ciData.filter(function(r){return r.date===t;});
+  document.getElementById('ov-ci-today').textContent=ciToday.length;
+  document.getElementById('ov-ci-late').textContent=ciToday.filter(function(r){return lateInfo(r).late;}).length;
+  document.getElementById('ov-ci-leave').textContent=lvData.filter(function(l){return lvS(l)<=t&&t<=lvE(l);}).length;
   document.getElementById('ov-err-today').textContent=errData.filter(function(r){return r.dt&&r.dt.startsWith(t);}).length;
   document.getElementById('ov-err-total').textContent=errData.length;
   var active=jobData.filter(function(j){return j.status==='active';}).length;
   var breach=jobData.filter(function(j){return isBreach(j);}).length;
   document.getElementById('ov-job-active').textContent=active||'-';
   document.getElementById('ov-job-breach').textContent=breach||'-';
-  var cabToday=cabData.filter(function(r){return r.dt&&r.dt.startsWith(t);});
-  document.getElementById('ov-cab-today').textContent=cabToday.length;
-  document.getElementById('ov-cab-meter').textContent=cabData.reduce(function(s,r){return s+r.m;},0).toLocaleString('th');
+  var eqToday=eqData.filter(function(r){return r.date===t;});
+  var eqBad=eqToday.filter(function(r){return r.badCount>0;});
+  var eqItems=eqBad.reduce(function(s,r){return s+(r.badCount||0);},0);
+  document.getElementById('ov-eq-today').textContent=eqToday.length;
+  document.getElementById('ov-eq-bad').textContent=eqItems;
+  var al=document.getElementById('ov-eq-alert');
+  if(eqItems>0){
+    document.getElementById('ov-eq-alert-t').textContent='วันนี้พบอุปกรณ์ชำรุด '+eqItems+' รายการ ('+eqBad.length+' คนแจ้ง)';
+    al.style.display='flex';
+  } else al.style.display='none';
 }
 
 // ── CHART HELPER ──────────────────────────────────────────
@@ -456,14 +506,19 @@ function renderCheckin(){
   var zone=document.getElementById('ci-zone')?.value||'';
   var list=filterByPeriod(ciData,function(r){return r.date;},period);
   if(zone) list=list.filter(function(r){return r.zone===zone;});
+  list.forEach(function(r){var li=lateInfo(r);r._late=li.late;r._min=li.min;});
 
   // KPI
   var t=today();
-  var todayCt=list.filter(function(r){return r.date&&r.date.includes(t.slice(8,10));}).length;
+  var todayCt=list.filter(function(r){return r.date===t;}).length;
+  var lateCt=list.filter(function(r){return r._late;}).length;
+  var pct=list.length?Math.round(lateCt*100/list.length)+'% ของทั้งหมด':'';
+  var lvToday=lvData.filter(function(l){return lvS(l)<=t&&t<=lvE(l);}).length;
   document.getElementById('ci-kpi').innerHTML=
     kpiBox('orange',list.length,'Check-in ทั้งหมด','')+
     kpiBox('teal',todayCt,'วันนี้','')+
-    kpiBox('blue',[...new Set(list.map(function(r){return r.zone;}))].length,'Zone','')+
+    kpiBox('red',lateCt,'มาสาย',pct)+
+    kpiBox('purple',lvToday,'ลาวันนี้','')+
     kpiBox('green',[...new Set(list.map(function(r){return r.name;}))].length,'คนทั้งหมด','');
 
   // Daily chart
@@ -482,12 +537,32 @@ function renderCheckin(){
   list.forEach(function(r){var s=r.shift||'ไม่ระบุ';shiftMap[s]=(shiftMap[s]||0)+1;});
   mkChart('ci-chart-shift','bar',Object.keys(shiftMap),[{label:'คน',data:Object.values(shiftMap),backgroundColor:['#003087','#f47920','#e8001d','#0891b2'],borderRadius:5}],{plugins:{legend:{display:false}}});
 
+  // Late Top 10
+  var lateMap={};
+  list.forEach(function(r){if(r._late)lateMap[r.name||'ไม่ระบุ']=(lateMap[r.name||'ไม่ระบุ']||0)+1;});
+  var lateKeys=Object.keys(lateMap).sort(function(a,b){return lateMap[b]-lateMap[a];}).slice(0,10);
+  mkChart('ci-chart-late','bar',lateKeys.length?lateKeys:['ไม่มีคนมาสาย'],[{label:'ครั้ง',data:lateKeys.length?lateKeys.map(function(k){return lateMap[k];}):[0],backgroundColor:'#e8001d',borderRadius:5}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}});
+
   // Table
   document.getElementById('ci-count').textContent='พบ '+list.length+' รายการ';
-  var sorted=[...list].sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  var sorted=[...list].sort(function(a,b){return((b.date||'')+(b.time||'')).localeCompare((a.date||'')+(a.time||''));});
   document.getElementById('ci-tbody').innerHTML=sorted.length?sorted.map(function(r,i){
-    return '<tr><td>'+(i+1)+'</td><td style="font-weight:700">'+esc(r.name||'-')+'</td><td>'+esc(r.date||'-')+'</td><td>'+esc(r.time||'-')+'</td><td>'+esc(r.zone||'-')+'</td><td>'+esc(r.shift||'-')+'</td></tr>';
-  }).join(''):'<tr><td colspan="6" class="empty-state">ไม่มีข้อมูล</td></tr>';
+    var st=r._late?'<span class="pill pill-red">⏰ สาย '+r._min+' น.</span>':'<span class="pill pill-grn">✅ ตรงเวลา</span>';
+    return '<tr><td>'+(i+1)+'</td><td style="font-weight:700">'+esc(r.name||'-')+'</td><td>'+esc(r.dateThai||r.date||'-')+'</td><td>'+esc(r.time||'-')+'</td><td>'+esc(r.zone||'-')+'</td><td>'+esc(r.shift||'-')+'</td><td>'+st+'</td></tr>';
+  }).join(''):'<tr><td colspan="7" class="empty-state">ไม่มีข้อมูล</td></tr>';
+
+  // Leave table (ไม่แสดงประเภทลา/หมายเหตุ เพื่อความเป็นส่วนตัว)
+  var cut='';
+  if(period==='today')cut=t;
+  else if(period==='week'){var a=new Date();a.setDate(a.getDate()-7);cut=dstr(a);}
+  else if(period==='month'){var b=new Date();b.setDate(b.getDate()-30);cut=dstr(b);}
+  var ll=lvData.filter(function(l){return !cut||lvE(l)>=cut;}).sort(function(a,b){return lvS(b).localeCompare(lvS(a));});
+  document.getElementById('lv-count').textContent='พบ '+ll.length+' รายการ';
+  document.getElementById('lv-tbody').innerHTML=ll.length?ll.map(function(l,i){
+    var s=lvS(l),e=lvE(l),n=dayDiff(s,e)+1;
+    var stt=e<t?'<span class="pill pill-gray">สิ้นสุดแล้ว</span>':(s>t?'<span class="pill pill-blue">ลาล่วงหน้า</span>':'<span class="pill pill-org">🏖️ กำลังลา</span>');
+    return '<tr><td>'+(i+1)+'</td><td style="font-weight:700">'+esc(l.name||'-')+'</td><td>'+esc(s)+'</td><td>'+esc(e)+'</td><td>'+n+' วัน</td><td>'+esc(n>1?'เต็มวัน':(l.period||'เต็มวัน'))+'</td><td>'+stt+'</td></tr>';
+  }).join(''):'<tr><td colspan="7" class="empty-state">ไม่มีข้อมูล</td></tr>';
 }
 
 // ── WORK ERROR LOG ────────────────────────────────────────
@@ -581,38 +656,48 @@ function renderJob(){
   }).join(''):'<tr><td colspan="10" class="empty-state">ไม่มีข้อมูล</td></tr>';
 }
 
-// ── CABLE OPTIC ───────────────────────────────────────────
-function renderCable(){
-  var period=document.getElementById('cab-period')?.value||'month';
-  var list=filterByPeriod(cabData,function(r){return r.dt;},period);
-  var tot=list.reduce(function(s,r){return s+r.m;},0);
+// ── เช็คเครื่องมือ ────────────────────────────────────────
+function renderEquip(){
+  var period=document.getElementById('eq-period')?.value||'month';
+  var sf=document.getElementById('eq-status')?.value||'';
+  var base=filterByPeriod(eqData,function(r){return r.date;},period);
+  var bad=base.filter(function(r){return r.badCount>0;});
+  var items=bad.reduce(function(s,r){return s+(r.badCount||0);},0);
   var t=today();
-  var todayCt=list.filter(function(r){return r.dt&&r.dt.startsWith(t);}).length;
+  document.getElementById('eq-kpi').innerHTML=
+    kpiBox('teal',base.length,'เช็คแล้ว','')+
+    kpiBox('red',bad.length,'พบชำรุด (คน)','')+
+    kpiBox('orange',items,'รายการชำรุด','')+
+    kpiBox('blue',base.filter(function(r){return r.date===t;}).length,'วันนี้เช็คแล้ว','');
 
-  document.getElementById('cab-kpi').innerHTML=
-    kpiBox('teal',list.length,'รายการทั้งหมด','')+
-    kpiBox('blue',todayCt,'วันนี้','')+
-    kpiBox('orange',tot.toLocaleString('th'),'เมตรรวม','ม.')+
-    kpiBox('green',[...new Set(list.map(function(r){return r.d;}))].length,'ดั้มที่ใช้','');
+  var itemMap={};
+  bad.forEach(function(r){toArr(r.bad).forEach(function(b){itemMap[b.label]=(itemMap[b.label]||0)+1;});});
+  var ik=Object.keys(itemMap).sort(function(a,b){return itemMap[b]-itemMap[a];}).slice(0,10);
+  mkChart('eq-chart-item','bar',ik.length?ik:['ไม่พบชำรุด'],[{label:'ครั้ง',data:ik.length?ik.map(function(k){return itemMap[k];}):[0],backgroundColor:'#dc2626',borderRadius:5}],{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}});
 
-  var staffMap={};
-  list.forEach(function(r){var n=r.n||'ไม่ระบุ';staffMap[n]=(staffMap[n]||0)+r.m;});
-  var staffKeys=Object.keys(staffMap).sort(function(a,b){return staffMap[b]-staffMap[a];}).slice(0,8);
-  mkChart('cab-chart-staff','bar',staffKeys,[{label:'เมตร',data:staffKeys.map(function(k){return staffMap[k];}),backgroundColor:'#0891b2',borderRadius:5}],{plugins:{legend:{display:false}}});
+  var dm={};
+  base.forEach(function(r){var d=r.date||'';dm[d]=dm[d]||{ok:0,bad:0};if(r.badCount>0)dm[d].bad++;else dm[d].ok++;});
+  var dk=Object.keys(dm).sort().slice(-14);
+  mkChart('eq-chart-daily','bar',dk,[
+    {label:'ปกติ',data:dk.map(function(d){return dm[d].ok;}),backgroundColor:'#00a651',borderRadius:4},
+    {label:'พบชำรุด',data:dk.map(function(d){return dm[d].bad;}),backgroundColor:'#e8001d',borderRadius:4}
+  ],{plugins:{legend:{display:true}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1}}}});
 
-  var drumMap={};
-  list.forEach(function(r){var d=r.d||'ไม่ระบุ';drumMap[d]=(drumMap[d]||0)+r.m;});
-  var drumKeys=Object.keys(drumMap).sort(function(a,b){return drumMap[b]-drumMap[a];}).slice(0,8);
-  mkChart('cab-chart-drum','bar',drumKeys,[{label:'เมตร',data:drumKeys.map(function(k){return drumMap[k];}),backgroundColor:'#7c3aed',borderRadius:5}],{plugins:{legend:{display:false}}});
-
-  document.getElementById('cab-count').textContent='พบ '+list.length+' รายการ · รวม '+tot.toLocaleString('th')+' ม.';
-  var sorted=[...list].sort(function(a,b){return new Date(b.dt)-new Date(a.dt);});
-  document.getElementById('cab-tbody').innerHTML=sorted.length?sorted.map(function(r,i){
-    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.n||'-')+'</td><td>'+esc(fmtDT(r.dt))+'</td>'+
-      '<td style="font-family:Kanit,sans-serif;font-weight:700">'+esc(r.d||'-')+'</td>'+
-      '<td>'+r.f.toLocaleString('th')+'</td><td>'+r.t.toLocaleString('th')+'</td>'+
-      '<td style="font-weight:700;color:#0891b2">'+r.m.toLocaleString('th')+'</td></tr>';
-  }).join(''):'<tr><td colspan="7" class="empty-state">ไม่มีข้อมูล</td></tr>';
+  var list=base.filter(function(r){return sf==='bad'?r.badCount>0:sf==='ok'?!(r.badCount>0):true;});
+  document.getElementById('eq-count').textContent='พบ '+list.length+' รายการ';
+  var sorted=[...list].sort(function(a,b){return(b.ca||0)-(a.ca||0);});
+  document.getElementById('eq-tbody').innerHTML=sorted.length?sorted.map(function(r,i){
+    var st=r.badCount>0?'<span class="pill pill-red">🚨 ชำรุด '+r.badCount+'</span>':'<span class="pill pill-grn">✅ ปกติ</span>';
+    var bl=toArr(r.bad).map(function(b){return '<div style="margin-bottom:3px"><span class="pill pill-red">'+esc(b.label)+'</span> <span style="font-size:11px;color:var(--text2)">'+esc(b.note||'')+'</span>'+(b.pk?' <button class="btn-load" style="padding:2px 8px;font-size:11px" onclick="vwEqPh(\''+esc(b.pk)+'\')">📷</button>':'')+'</div>';}).join('')||'-';
+    var ph=(r.hasPhoto&&!toArr(r.bad).some(function(b){return b.pk;}))?'<button class="btn-load" style="padding:4px 10px;font-size:12px" onclick="vwEqPh(\''+esc(r.id)+'\')">📷 ดู</button>':'-';
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.dateThai||r.date||'-')+'</td><td>'+esc((r.time||'-').slice(0,5))+'</td><td style="font-weight:700">'+esc(r.name||'-')+'</td><td>'+esc(r.zone||'-')+'</td><td>'+st+'</td><td style="font-size:12px;min-width:180px">'+bl+'</td><td>'+ph+'</td></tr>';
+  }).join(''):'<tr><td colspan="8" class="empty-state">ไม่มีข้อมูล</td></tr>';
+}
+function vwEqPh(id){
+  fetchFB('/equipment_photos/'+id,function(err,d){
+    if(err||!d||!d.p){alert('ไม่พบรูป');return;}
+    document.getElementById('pvi').src=d.p;document.getElementById('pv').style.display='flex';
+  });
 }
 
 // ── KPI BOX HELPER ────────────────────────────────────────
@@ -629,8 +714,8 @@ function csvDown(rows,fname){
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download=fname;a.click();
 }
 function exportCheckin(){
-  var rows=[['#','ชื่อ','วันที่','เวลา','Zone','Shift']];
-  ciData.forEach(function(r,i){rows.push([i+1,r.name,r.date,r.time,r.zone,r.shift]);});
+  var rows=[['#','ชื่อ','วันที่','เวลา','Zone','Shift','สถานะ','สายกี่นาที']];
+  ciData.forEach(function(r,i){var li=lateInfo(r);rows.push([i+1,r.name,r.dateThai||r.date,r.time,r.zone,r.shift,li.late?'สาย':'ตรงเวลา',li.late?li.min:0]);});
   csvDown(rows,'CheckIn_'+today()+'.csv');
 }
 function exportError(){
@@ -643,10 +728,10 @@ function exportJob(){
   jobData.forEach(function(j,i){rows.push([i+1,j.jobNum,j.team,j.name,j.zone,j.priority,fmtDT(j.startTime),j.status==='active'?'กำลังทำ':'เสร็จ',isBreach(j)?'เกิน SLA':'ปกติ']);});
   csvDown(rows,'JobTracker_'+today()+'.csv');
 }
-function exportCable(){
-  var rows=[['#','ชื่อผู้เบิก','วันที่-เวลา','เลขดั้ม','LM เริ่ม','LM สิ้นสุด','ระยะ (ม.)']];
-  cabData.forEach(function(r,i){rows.push([i+1,r.n,fmtDT(r.dt),r.d,r.f,r.t,r.m]);});
-  csvDown(rows,'CableOptic_'+today()+'.csv');
+function exportEquip(){
+  var rows=[['#','วันที่','เวลา','ชื่อ','Zone','สถานะ','จำนวนชำรุด','รายการชำรุด']];
+  eqData.slice().sort(function(a,b){return(a.ca||0)-(b.ca||0);}).forEach(function(r,i){rows.push([i+1,r.dateThai||r.date,r.time,r.name,r.zone,r.badCount>0?'ชำรุด':'ปกติ',r.badCount||0,toArr(r.bad).map(function(b){return b.label+': '+(b.note||'');}).join(' | ')]);});
+  csvDown(rows,'Equipment_'+today()+'.csv');
 }
 
 // ── INIT ─────────────────────────────────────────────────

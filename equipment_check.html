@@ -124,7 +124,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
     <div class="card">
       <div class="ch"><div class="cb"></div><div class="ct">ข้อมูลผู้ตรวจ</div></div>
       <label class="L">👤 ชื่อ-นามสกุล</label>
-      <select class="inp" id="fn">
+      <select class="inp" id="fn" onchange="loadMine()">
         <option value="">— เลือกชื่อ —</option>
         <option>โพธิยา มหาชัย</option><option>จักรพงษ์ บัวประทะ</option><option>เอกรินทร์ โสภา</option>
         <option>วัชริศ ปินใจ</option><option>อัมพวัฒน์ พัชรพัฒนชัย</option><option>เมธาศิษฎ์ เศรษฐจ์วุฒิภัทร</option>
@@ -163,6 +163,12 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
       <input class="inp inp-ro" id="ft" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
     </div>
 
+    <div class="card" id="oib" style="display:none;border:2px solid #dc2626">
+      <div class="ch"><div class="cb" style="background:#dc2626"></div><div class="ct">🔴 เรื่องชำรุดค้างของคุณ</div></div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">อุปกรณ์เหล่านี้ที่เคยแจ้งไว้ ยังไม่ได้ปิดเรื่อง ไม่ต้องแจ้งใหม่ แค่ยืนยันสถานะวันนี้</div>
+      <div id="oil"></div>
+    </div>
+
     <div class="card">
       <div class="ch"><div class="cb"></div><div class="ct">🧰 รายการเครื่องมือและอุปกรณ์</div><div id="prog" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--tx2)"></div></div>
       <button class="btn-all" onclick="allOk()">✅ ปกติทั้งหมด (แล้วค่อยแก้เฉพาะที่ชำรุด)</button>
@@ -177,15 +183,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
       <button type="button" class="btn-all" style="color:#0369a1;border-color:#0369a1;background:#f0f9ff;margin-bottom:0" onclick="addX()">➕ เพิ่มอุปกรณ์อื่นที่มี</button>
     </div>
 
-    <div class="card" id="phc" style="display:none">
-      <div class="ch"><div class="cb" style="background:#dc2626"></div><div class="ct">📸 รูปอุปกรณ์ที่ชำรุด (บังคับ 1 รูป)</div></div>
-      <div class="pb" id="phb" onclick="document.getElementById('phf').click()">
-        <div class="ph-ic">📷</div>
-        <div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div>
-        <div class="ph-sub">รูปจะแนบในการ์ดแจ้งชำรุด</div>
-      </div>
-      <input type="file" id="phf" accept="image/*" capture="environment" onchange="ldph(this)" style="display:none">
-    </div>
+    <input type="file" id="phf" accept="image/*" capture="environment" onchange="ldph(this)" style="display:none">
 
     <button class="btn-s" id="bsb" onclick="submitEq()">✅ ส่งผลการเช็ค</button>
     <button class="btn-g" onclick="rst()">ล้างข้อมูล</button>
@@ -283,7 +281,7 @@ var EQUIP_BASE=[
 // รายการที่หัวหน้าเพิ่มเข้ารายการหลักภายหลัง (เก็บใน Firebase /equip_config/items) จะถูกต่อท้ายอัตโนมัติ
 var EQUIP=EQUIP_BASE.slice();
 var LB={ok:'✅ ปกติ',bad:'❌ ชำรุด',na:'➖ ไม่มี'};
-var RES={},NOTE={},XT=[],ph=null,last=null,dashData=null;
+var RES={},NOTE={},XT=[],PH={},curK=null,XC=0,OI=[],OS={},last=null,dashData=null;
 
 function pad(v){return String(v).padStart(2,'0');}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -305,40 +303,65 @@ function tick(){
 setInterval(tick,1000);tick();
 
 // ── CHECKLIST ─────────────────────────────────────────────
-function anyBad(){return EQUIP.some(function(e){return RES[e.k]==='bad';})||XT.some(function(x){return x.n.trim()&&x.s==='bad';});}
-function updPhc(){document.getElementById('phc').style.display=anyBad()?'block':'none';}
+function visItems(){return EQUIP.filter(function(e){return !OI.some(function(i){return i.k===e.k;});});}
+function phHtml(k){
+  if(PH[k])return '<div style="position:relative;margin-top:8px"><img src="'+PH[k]+'" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;display:block"><button type="button" onclick="dlph(\''+k+'\')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">✕ ลบรูป</button></div>';
+  return '<button type="button" onclick="pickPh(\''+k+'\')" style="width:100%;margin-top:8px;background:#fff;color:#b91c1c;border:2px dashed #dc2626;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:Kanit,sans-serif">📷 แนบรูปอุปกรณ์ที่ชำรุด (บังคับ)</button>';
+}
 function renderList(){
-  var h='',done=0;
-  EQUIP.forEach(function(e,i){
+  var h='',done=0,vis=visItems();
+  vis.forEach(function(e,i){
     var v=RES[e.k];if(v)done++;
     h+='<div class="eq'+(v==='bad'?' bad':v==='ok'?' okk':'')+'"><div class="eq-t">'+(i+1)+'. '+esc(e.t)+'</div><div class="eq-b">'+
       ['ok','bad','na'].map(function(x){return '<button type="button" class="eb '+x+(v===x?' on':'')+'" onclick="pk(\''+e.k+'\',\''+x+'\')">'+LB[x]+'</button>';}).join('')+'</div>'+
-      (v==='bad'?'<input class="inp" maxlength="100" placeholder="อาการ / รายละเอียดที่ชำรุด (บังคับ)" value="'+esc(NOTE[e.k]||'')+'" oninput="NOTE[\''+e.k+'\']=this.value" style="margin-top:8px"/>':'')+
+      (v==='bad'?'<input class="inp" maxlength="100" placeholder="อาการ / รายละเอียดที่ชำรุด (บังคับ)" value="'+esc(NOTE[e.k]||'')+'" oninput="NOTE[\''+e.k+'\']=this.value" style="margin-top:8px"/>'+phHtml(e.k):'')+
       '</div>';
   });
   document.getElementById('eql').innerHTML=h;
-  document.getElementById('prog').textContent='ตอบแล้ว '+done+'/'+EQUIP.length;
-  document.getElementById('phc').style.display=anyBad()?'block':'none';
+  document.getElementById('prog').textContent='ตอบแล้ว '+done+'/'+vis.length;
 }
-function pk(k,v){RES[k]=v;if(v!=='bad')delete NOTE[k];renderList();}
-function allOk(){EQUIP.forEach(function(e){if(RES[e.k]!=='bad')RES[e.k]='ok';});renderList();toast('✅ ตั้งเป็นปกติทั้งหมดแล้ว แตะ "ชำรุด" เฉพาะข้อที่เสีย','ok');}
+function renderOI(){
+  var c=document.getElementById('oib');
+  if(!OI.length){c.style.display='none';return;}
+  c.style.display='block';
+  document.getElementById('oil').innerHTML=OI.map(function(i){
+    var v=OS[i.id];
+    return '<div class="eq'+(v==='still'?' bad':v==='fixed'?' okk':'')+'"><div class="eq-t">'+esc(i.label)+'</div><div style="font-size:12px;color:#555;margin-bottom:8px">'+esc(i.note)+' · แจ้งเมื่อ '+esc(i.dateThai||i.date)+(i.fixedByUser?' · <b style="color:#2e7d32">คุณแจ้งว่าใช้งานได้แล้ว (รอหัวหน้าปิดเรื่อง)</b>':'')+'</div><div class="eq-b" style="grid-template-columns:1fr 1fr"><button type="button" class="eb bad'+(v==='still'?' on':'')+'" onclick="os(\''+i.id+'\',\'still\')">🔴 ยังชำรุดอยู่</button><button type="button" class="eb ok'+(v==='fixed'?' on':'')+'" onclick="os(\''+i.id+'\',\'fixed\')">✅ ใช้งานได้แล้ว</button></div></div>';
+  }).join('');
+}
+function os(id,v){OS[id]=v;renderOI();}
+function loadMine(){
+  var name=document.getElementById('fn').value;
+  OI=[];OS={};
+  if(!name){renderOI();renderList();return;}
+  fj('/equip_open').then(function(d){
+    if(document.getElementById('fn').value!==name)return;
+    OI=toArr(d).filter(function(i){return i.name===name;}).sort(function(a,b){return (a.ca||0)-(b.ca||0);});
+    OI.forEach(function(i){OS[i.id]=i.fixedByUser?'fixed':null;});
+    renderOI();renderList();
+  }).catch(function(){renderOI();renderList();});
+}
+function pk(k,v){RES[k]=v;if(v!=='bad'){delete NOTE[k];delete PH[k];}renderList();}
+function allOk(){visItems().forEach(function(e){if(RES[e.k]!=='bad')RES[e.k]='ok';});renderList();toast('✅ ตั้งเป็นปกติทั้งหมดแล้ว แตะ "ชำรุด" เฉพาะข้อที่เสีย','ok');}
 renderList();
 
 // ── อุปกรณ์อื่นที่ทีมเพิ่มเอง ───────────────────────────
-function addX(){if(XT.length>=10){toast('เพิ่มได้สูงสุด 10 รายการ','err');return;}XT.push({n:'',s:'ok',t:''});renderExtras();}
-function delX(i){XT.splice(i,1);renderExtras();updPhc();}
-function setXs(i,v){XT[i].s=v;renderExtras();updPhc();}
+function addX(){if(XT.length>=10){toast('เพิ่มได้สูงสุด 10 รายการ','err');return;}XT.push({u:'x'+(++XC),n:'',s:'ok',t:''});renderExtras();}
+function delX(i){delete PH[XT[i].u];XT.splice(i,1);renderExtras();}
+function setXs(i,v){XT[i].s=v;if(v!=='bad'){XT[i].t='';delete PH[XT[i].u];}renderExtras();}
 function renderExtras(){
   document.getElementById('xtl').innerHTML=XT.map(function(x,i){
-    return '<div class="eq'+(x.s==='bad'?' bad':'')+'"><div style="display:flex;gap:8px"><input class="inp" list="xdl" maxlength="60" placeholder="ชื่อเครื่องมือ/อุปกรณ์" value="'+esc(x.n)+'" oninput="XT['+i+'].n=this.value;updPhc()" style="flex:1"/><button type="button" class="eb" style="width:auto;padding:0 14px" onclick="delX('+i+')">🗑️</button></div>'+
+    return '<div class="eq'+(x.s==='bad'?' bad':'')+'"><div style="display:flex;gap:8px"><input class="inp" list="xdl" maxlength="60" placeholder="ชื่อเครื่องมือ/อุปกรณ์" value="'+esc(x.n)+'" oninput="XT['+i+'].n=this.value" style="flex:1"/><button type="button" class="eb" style="width:auto;padding:0 14px" onclick="delX('+i+')">🗑️</button></div>'+
       '<div class="eq-b" style="grid-template-columns:1fr 1fr;margin-top:8px">'+['ok','bad'].map(function(v){return '<button type="button" class="eb '+v+(x.s===v?' on':'')+'" onclick="setXs('+i+',\''+v+'\')">'+LB[v]+'</button>';}).join('')+'</div>'+
-      (x.s==='bad'?'<input class="inp" maxlength="100" placeholder="อาการ / รายละเอียดที่ชำรุด (บังคับ)" value="'+esc(x.t)+'" oninput="XT['+i+'].t=this.value" style="margin-top:8px"/>':'')+'</div>';
+      (x.s==='bad'?'<input class="inp" maxlength="100" placeholder="อาการ / รายละเอียดที่ชำรุด (บังคับ)" value="'+esc(x.t)+'" oninput="XT['+i+'].t=this.value" style="margin-top:8px"/>'+phHtml(x.u):'')+'</div>';
   }).join('');
 }
 
-// ── PHOTO ─────────────────────────────────────────────────
+// ── PHOTO (1 รายการชำรุด = 1 รูป) ──────────────────────────
+function pickPh(k){curK=k;document.getElementById('phf').click();}
 function ldph(inp){
-  var f=inp.files&&inp.files[0];if(!f)return;
+  var f=inp.files&&inp.files[0];if(!f||!curK){inp.value='';return;}
+  var k=curK;
   var r=new FileReader();
   r.onload=function(e){
     var img=new Image();
@@ -347,21 +370,14 @@ function ldph(inp){
       var max=900,w=img.width,h=img.height;
       if(w>h&&w>max){h=h*max/w;w=max;}else if(h>=w&&h>max){w=w*max/h;h=max;}
       c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
-      ph=c.toDataURL('image/jpeg',0.72);
-      var box=document.getElementById('phb');
-      box.innerHTML='<img src="'+ph+'"><button class="del-ph" onclick="dlph(event)">✕ ลบรูป</button>';
-      box.onclick=null;
+      PH[k]=c.toDataURL('image/jpeg',0.72);
+      renderList();renderExtras();
     };
     img.src=e.target.result;
   };
   r.readAsDataURL(f);inp.value='';
 }
-function resetPhotoBox(){
-  var box=document.getElementById('phb');
-  box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ดแจ้งชำรุด</div>';
-  box.onclick=function(){document.getElementById('phf').click();};
-}
-function dlph(e){e.stopPropagation();ph=null;resetPhotoBox();}
+function dlph(k){delete PH[k];renderList();renderExtras();}
 
 // ── SUBMIT ────────────────────────────────────────────────
 function submitEq(){
@@ -369,14 +385,22 @@ function submitEq(){
   var zone=document.getElementById('fz').value;
   if(!name){toast('กรุณาเลือกชื่อ','err');return;}
   if(!zone){toast('กรุณาเลือก Zone','err');return;}
-  var un=EQUIP.filter(function(e){return !RES[e.k];});
+  var vis=visItems();
+  var un=vis.filter(function(e){return !RES[e.k];});
   if(un.length){toast('ยังไม่ได้ตอบ '+un.length+' รายการ','err');return;}
-  var bads=EQUIP.filter(function(e){return RES[e.k]==='bad';});
-  for(var i=0;i<bads.length;i++){if(!(NOTE[bads[i].k]||'').trim()){toast('กรุณาใส่อาการ: '+bads[i].t,'err');return;}}
+  var oun=OI.filter(function(i){return !OS[i.id];});
+  if(oun.length){toast('กรุณายืนยันสถานะเรื่องค้าง: '+oun[0].label,'err');return;}
+  var bads=vis.filter(function(e){return RES[e.k]==='bad';});
+  for(var i=0;i<bads.length;i++){
+    if(!(NOTE[bads[i].k]||'').trim()){toast('กรุณาใส่อาการ: '+bads[i].t,'err');return;}
+    if(!PH[bads[i].k]){toast('กรุณาแนบรูป: '+bads[i].t,'err');return;}
+  }
   var xs=XT.filter(function(x){return x.n.trim();});
   var xBad=xs.filter(function(x){return x.s==='bad';});
-  for(var j=0;j<xBad.length;j++){if(!xBad[j].t.trim()){toast('กรุณาใส่อาการ: '+xBad[j].n,'err');return;}}
-  if((bads.length||xBad.length)&&!ph){toast('กรุณาแนบรูปอุปกรณ์ที่ชำรุด','err');return;}
+  for(var j=0;j<xBad.length;j++){
+    if(!xBad[j].t.trim()){toast('กรุณาใส่อาการ: '+xBad[j].n,'err');return;}
+    if(!PH[xBad[j].u]){toast('กรุณาแนบรูป: '+xBad[j].n,'err');return;}
+  }
   var n=new Date();
   var today=todayStr();
   var dateThai=n.getDate()+' '+MO[n.getMonth()]+' '+(n.getFullYear()+543);
@@ -387,16 +411,20 @@ function submitEq(){
   fjDate('/equipment',today).then(function(d){
     if(d.some(function(r){return r.date===today&&r.name===name;})){fin();toast('⚠️ '+name+' เช็คเครื่องมือวันนี้แล้ว','err');return;}
     btn.textContent='⏳ กำลังบันทึก...';
+    var rid=String(Date.now());
     var results={},badList=[],okN=0,naN=0;
-    EQUIP.forEach(function(e){
+    vis.forEach(function(e){
       var v=RES[e.k];results[e.k]=v;
-      if(v==='bad')badList.push({k:e.k,label:e.t,note:(NOTE[e.k]||'').trim()});
+      if(v==='bad')badList.push({k:e.k,label:e.t,note:(NOTE[e.k]||'').trim(),pk:rid+'_'+e.k});
       else if(v==='ok')okN++;else naN++;
     });
-    xs.forEach(function(x,i){if(x.s==='bad')badList.push({k:'x'+(i+1),label:x.n.trim(),note:x.t.trim(),extra:true});});
-    var rec={id:String(Date.now()),name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now(),sa:{'.sv':'timestamp'},results:results,badCount:badList.length,okCount:okN,naCount:naN,hasPhoto:!!(badList.length&&ph)};
+    xs.forEach(function(x){if(x.s==='bad')badList.push({k:x.u,label:x.n.trim(),note:x.t.trim(),extra:true,pk:rid+'_'+x.u});});
+    var cont=OI.map(function(i){return {id:i.id,k:i.k,label:i.label,state:OS[i.id]};});
+    var contStill=cont.filter(function(c){return c.state==='still';}).length;
+    var rec={id:rid,name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now(),sa:{'.sv':'timestamp'},results:results,badCount:badList.length,okCount:okN,naCount:naN,hasPhoto:badList.length>0};
     if(badList.length)rec.bad=badList;
     if(xs.length)rec.extras=xs.map(function(x){return {name:x.n.trim(),status:x.s,note:x.t.trim()};});
+    if(cont.length){rec.cont=cont;rec.contStill=contStill;}
     return fetch(FB+'/equipment/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
       .then(function(r){return r.json();})
       .then(function(res){
@@ -409,20 +437,24 @@ function submitEq(){
           upd={time:timeTxt,date:today,dateThai:dateThai};
           fetch(FB+'/equipment/'+rec.id+'.json',{method:'PATCH',body:JSON.stringify(upd)}).catch(function(){});
         }
-        var pPromise=Promise.resolve();
-        if(rec.hasPhoto){
-          pPromise=fetch(FB+'/equipment_photos/'+rec.id+'.json',{method:'PUT',body:JSON.stringify({p:ph})}).catch(function(){toast('⚠️ บันทึกรูปไม่สำเร็จ แต่ผลเช็คบันทึกแล้ว','err');});
-        }
-        var r2={id:rec.id,name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:rec.ca,hasPhoto:rec.hasPhoto};
+        var pPromise=Promise.all(badList.map(function(b){
+          return fetch(FB+'/equipment_photos/'+b.pk+'.json',{method:'PUT',body:JSON.stringify({p:PH[b.k]})}).catch(function(){toast('⚠️ บันทึกรูปบางรูปไม่สำเร็จ แต่ผลเช็คบันทึกแล้ว','err');});
+        }));
+        var r2={id:rec.id,name:name,zone:zone,date:today,dateThai:dateThai,time:timeTxt,ca:rec.ca};
         var iPromise=Promise.all(badList.map(function(b){return putIssue(mkIssue(r2,b));}));
         var sPromise=Promise.all(xs.map(function(x){return putSuggest(x.n.trim(),rec.id,name);}));
-        return Promise.all([pPromise,iPromise,sPromise]).then(function(){
-          last={name:name,zone:zone,dateThai:dateThai,time:timeTxt,bad:badList,photo:ph};
+        var cPromise=Promise.all(OI.map(function(i){
+          var st=OS[i.id],ts=Date.now();
+          return fetch(FB+'/equip_open/'+i.id+'.json',{method:'PATCH',body:JSON.stringify({lastCheck:today,lastState:st,fixedByUser:st==='fixed',fixedAt:st==='fixed'?(i.fixedAt||ts):null})}).catch(function(){});
+        }));
+        return Promise.all([pPromise,iPromise,sPromise,cPromise]).then(function(){
+          last={name:name,zone:zone,dateThai:dateThai,time:timeTxt,bad:badList.map(function(b){return Object.assign({},b,{ph:PH[b.k]});}),cont:cont};
           fin();showSuc();
         });
       });
   }).catch(function(){fin();toast('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง','err');});
 }
+
 function showSuc(){
   var bl=last.bad;
   document.getElementById('ff').style.display='none';
@@ -432,13 +464,14 @@ function showSuc(){
   t.textContent=bl.length?'พบอุปกรณ์ชำรุด '+bl.length+' รายการ':'ส่งผลการเช็คเรียบร้อย';
   t.style.color=bl.length?'#dc2626':'#2e7d32';
   document.getElementById('ssub').textContent=last.name+' · '+last.zone+' · '+last.dateThai+' '+hhmm(last.time);
-  document.getElementById('sbad').innerHTML=bl.map(function(b){return '<div style="text-align:left;background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:10px 12px;margin-bottom:8px"><div style="font-family:Kanit,sans-serif;font-weight:800;font-size:14px;color:#b91c1c">❌ '+esc(b.label)+'</div><div style="font-size:13px;margin-top:3px">'+esc(b.note)+'</div></div>';}).join('')+(bl.length?'<div style="font-size:12px;color:#b45309;font-weight:700;margin:4px 0 12px">กดคัดลอกการ์ด แล้วส่งให้หัวหน้าใน Teams/Line ได้เลย</div>':'');
+  var cn=(last.cont||[]).map(function(c){return '<div style="text-align:left;font-size:12px;margin-bottom:6px;color:'+(c.state==='fixed'?'#166534':'#b45309')+';font-weight:700">'+(c.state==='fixed'?'✅ แจ้งว่าใช้งานได้แล้ว (รอหัวหน้าปิดเรื่อง): ':'🔴 ยังชำรุดอยู่ (เรื่องเดิม): ')+esc(c.label)+'</div>';}).join('');
+  document.getElementById('sbad').innerHTML=cn+bl.map(function(b){return '<div style="text-align:left;background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:10px 12px;margin-bottom:8px"><div style="font-family:Kanit,sans-serif;font-weight:800;font-size:14px;color:#b91c1c">❌ '+esc(b.label)+'</div><div style="font-size:13px;margin-top:3px">'+esc(b.note)+'</div></div>';}).join('')+(bl.length?'<div style="font-size:12px;color:#b45309;font-weight:700;margin:4px 0 12px">กดคัดลอกการ์ด แล้วส่งให้หัวหน้าใน Teams/Line ได้เลย</div>':'');
   document.getElementById('sag').style.display=bl.length?'grid':'none';
   document.getElementById('snx').style.display=bl.length?'none':'block';
   window.scrollTo(0,0);
 }
 function rst(back){
-  RES={};NOTE={};XT=[];ph=null;resetPhotoBox();renderList();renderExtras();
+  RES={};NOTE={};XT=[];PH={};OI=[];OS={};renderOI();renderList();renderExtras();
   document.getElementById('fn').value='';document.getElementById('fz').value='';
   if(back){document.getElementById('sf').style.display='none';document.getElementById('ff').style.display='block';window.scrollTo(0,0);}
 }
@@ -487,24 +520,26 @@ function cpBad(){
   });
 }
 function buildBadCard(cb){
-  var W=720,PAD=28,PH=last.photo?440:0,TOP=last.photo?0:44;
+  var W=720,PAD=28,TOP=44,TH=150;
   var m=document.createElement('canvas').getContext('2d');
   var boxes=last.bad.map(function(b){
-    m.font='700 22px sans-serif';var tl=wrapTxt(m,b.label,W-PAD*2-90);
-    m.font='500 19px sans-serif';var nl=wrapTxt(m,b.note,W-PAD*2-90);
-    return {t:tl,n:nl,h:22+tl.length*30+nl.length*27+14};
+    var tw=W-PAD*2-90-(b.ph?TH+10:0);
+    m.font='700 22px sans-serif';var tl=wrapTxt(m,b.label,tw);
+    m.font='500 19px sans-serif';var nl=wrapTxt(m,b.note,tw);
+    var th=22+tl.length*30+nl.length*27+14;
+    return {b:b,t:tl,n:nl,h:Math.max(th,b.ph?122:0)};
   });
   var bh=boxes.reduce(function(s,b){return s+b.h+12;},0);
-  var IH=232+bh+60;
-  var H=PH+TOP+IH;
+  var H=TOP+176+bh+56;
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var ctx=c.getContext('2d');
   var g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#7f1d1d');g.addColorStop(.5,'#b91c1c');g.addColorStop(1,'#450a0a');
   ctx.fillStyle=g;rr(ctx,0,0,W,H,28);ctx.fill();
-  function drawInfo(){
-    var y=PH+TOP;
+  var imgs=boxes.map(function(bx){return new Promise(function(res){if(!bx.b.ph){res(null);return;}var im=new Image();im.onload=function(){res(im);};im.onerror=function(){res(null);};im.src=bx.b.ph;});});
+  Promise.all(imgs).then(function(ims){
+    var y=TOP;
     ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='700 15px sans-serif';ctx.textAlign='left';
-    if(!PH)ctx.fillText('AIS 3BB  \u00b7  WFM NOPBIGMAN',PAD,36);
+    ctx.fillText('AIS 3BB  \u00b7  WFM NOPBIGMAN',PAD,36);
     ctx.fillStyle='#fde68a';ctx.font='800 20px sans-serif';ctx.fillText('\ud83d\udea8  \u0e41\u0e08\u0e49\u0e07\u0e2d\u0e38\u0e1b\u0e01\u0e23\u0e13\u0e4c\u0e0a\u0e33\u0e23\u0e38\u0e14  ('+last.bad.length+' \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23)',PAD,y+34);
     ctx.fillStyle='#fff';ctx.font='800 36px sans-serif';
     var nm=last.name;while(ctx.measureText(nm).width>W-PAD*2&&nm.length>4)nm=nm.slice(0,-1);
@@ -512,30 +547,26 @@ function buildBadCard(cb){
     ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='500 20px sans-serif';ctx.fillText(last.zone,PAD,y+116);
     ctx.fillText(last.dateThai+'   '+last.time,PAD,y+148);
     var by=y+176;
-    boxes.forEach(function(b){
-      ctx.fillStyle='rgba(255,255,255,.96)';rr(ctx,PAD,by,W-PAD*2,b.h,14);ctx.fill();
-      ctx.fillStyle='#b91c1c';ctx.font='700 22px sans-serif';
-      b.t.forEach(function(l,i){ctx.fillText((i===0?'\u274c  ':'     ')+l,PAD+16,by+34+i*30);});
+    boxes.forEach(function(bx,bi){
+      ctx.fillStyle='rgba(255,255,255,.96)';rr(ctx,PAD,by,W-PAD*2,bx.h,14);ctx.fill();
+      ctx.fillStyle='#b91c1c';ctx.font='700 22px sans-serif';ctx.textAlign='left';
+      bx.t.forEach(function(l,i){ctx.fillText((i===0?'\u274c  ':'     ')+l,PAD+16,by+34+i*30);});
       ctx.fillStyle='#1a2a1a';ctx.font='500 19px sans-serif';
-      b.n.forEach(function(l,i){ctx.fillText(l,PAD+48,by+34+b.t.length*30-6+i*27+8);});
-      by+=b.h+12;
+      bx.n.forEach(function(l,i){ctx.fillText(l,PAD+48,by+34+bx.t.length*30-6+i*27+8);});
+      var im=ims[bi];
+      if(im){
+        var tx=W-PAD-TH-10,ty=by+8,tw=TH,th=bx.h-16;
+        ctx.save();rr(ctx,tx,ty,tw,th,10);ctx.clip();
+        var sc=Math.max(tw/im.width,th/im.height),dw=im.width*sc,dh=im.height*sc;
+        ctx.drawImage(im,tx+(tw-dw)/2,ty+(th-dh)/2,dw,dh);
+        ctx.restore();
+      }
+      by+=bx.h+12;
     });
     ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='500 14px sans-serif';ctx.textAlign='center';
     ctx.fillText('NOPBIGMAN \u00b7 WFM System \u00b7 AIS 3BB',W/2,H-20);
-  }
-  if(last.photo){
-    var img=new Image();
-    img.onload=function(){
-      ctx.save();rr(ctx,0,0,W,H,28);ctx.clip();ctx.beginPath();ctx.rect(0,0,W,PH);ctx.clip();
-      var sc=Math.max(W/img.width,PH/img.height),dw=img.width*sc,dh=img.height*sc;
-      ctx.drawImage(img,(W-dw)/2,Math.max((PH-dh)/2,(PH-dh)),dw,dh);
-      var ov=ctx.createLinearGradient(0,PH-120,0,PH);ov.addColorStop(0,'rgba(127,29,29,0)');ov.addColorStop(1,'rgba(127,29,29,1)');
-      ctx.fillStyle=ov;ctx.fillRect(0,PH-120,W,120);
-      ctx.restore();
-      drawInfo();cb(c);
-    };
-    img.src=last.photo;
-  } else {drawInfo();cb(c);}
+    cb(c);
+  });
 }
 
 // ── SUMMARY ───────────────────────────────────────────────
@@ -579,16 +610,16 @@ function renderDash(st){
     h+='<div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#dc2626;margin:4px 0 8px">🚨 อุปกรณ์ชำรุด</div>';
     st.bad.forEach(function(r){
       h+='<div style="background:#fef2f2;border:2px solid #fca5a5;border-radius:14px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:800">'+esc(r.name)+'</div><div style="font-size:11px;color:#777">'+esc(r.zone)+' · '+esc(hhmm(r.time))+' น.</div></div>'+
-        (r.hasPhoto?'<button onclick="vwPh(\''+esc(r.id)+'\')" style="background:#0369a1;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">📷 ดูรูป</button>':'')+
+        ((r.hasPhoto&&!toArr(r.bad).some(function(b){return b.pk;}))?'<button onclick="vwPh(\''+esc(r.id)+'\')" style="background:#0369a1;color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">📷 ดูรูป</button>':'')+
         '<button onclick="delRec(\''+esc(r.id)+'\',\''+esc(r.name)+'\')" style="background:#fff;color:#dc2626;border:2px solid #fca5a5;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">🗑️</button></div>'+
-        toArr(r.bad).map(function(b){return '<div style="margin-top:8px;background:#fff;border-radius:10px;padding:8px 10px"><div style="font-weight:800;font-size:13px;color:#b91c1c">❌ '+esc(b.label)+'</div><div style="font-size:13px;margin-top:2px">'+esc(b.note)+'</div></div>';}).join('')+'</div>';
+        toArr(r.bad).map(function(b){return '<div style="margin-top:8px;background:#fff;border-radius:10px;padding:8px 10px"><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;font-weight:800;font-size:13px;color:#b91c1c">❌ '+esc(b.label)+'</div>'+(b.pk?'<button onclick="vwPh(\''+esc(b.pk)+'\')" style="background:#0369a1;color:#fff;border:none;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">📷</button>':'')+'</div><div style="font-size:13px;margin-top:2px">'+esc(b.note)+'</div></div>';}).join('')+'</div>';
     });
   }
   if(st.pend.length){
     h+='<div style="background:#fff;border:2px solid #fdba74;border-radius:14px;padding:12px 14px;margin-bottom:10px"><div style="font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#b45309;margin-bottom:8px">❓ Check-in แล้ว แต่ยังไม่เช็คเครื่องมือ ('+st.pend.length+' คน)</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+st.pend.map(function(n){return '<div style="background:#fff7ed;border-radius:8px;padding:4px 9px;font-size:12px;font-weight:700;color:#7c2d12">'+esc(n)+'</div>';}).join('')+'</div></div>';
   }
   if(st.ok.length){
-    h+='<details style="background:#f7fbf0;border:2px solid #8dc63f;border-radius:14px;padding:10px 14px;margin-bottom:10px"><summary style="cursor:pointer;font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#2E7D32">✅ ปกติทั้งหมด ('+st.ok.length+' คน)</summary><div style="margin-top:8px">'+st.ok.map(function(r){return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #e0e8e0"><div style="flex:1;font-size:13px;font-weight:700">'+esc(r.name)+'</div><div style="font-size:11px;color:#888">'+esc(hhmm(r.time))+'</div><button onclick="delRec(\''+esc(r.id)+'\',\''+esc(r.name)+'\')" style="background:#fff;color:#dc2626;border:2px solid #fca5a5;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">🗑️</button></div>';}).join('')+'</div></details>';
+    h+='<details style="background:#f7fbf0;border:2px solid #8dc63f;border-radius:14px;padding:10px 14px;margin-bottom:10px"><summary style="cursor:pointer;font-family:Kanit,sans-serif;font-size:14px;font-weight:800;color:#2E7D32">✅ ปกติทั้งหมด ('+st.ok.length+' คน)</summary><div style="margin-top:8px">'+st.ok.map(function(r){return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #e0e8e0"><div style="flex:1;font-size:13px;font-weight:700">'+esc(r.name)+'</div>'+(r.contStill>0?'<span style="background:#fee2e2;color:#b91c1c;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:800">🔴 ชำรุดต่อเนื่อง '+r.contStill+'</span>':'')+'<div style="font-size:11px;color:#888">'+esc(hhmm(r.time))+'</div><button onclick="delRec(\''+esc(r.id)+'\',\''+esc(r.name)+'\')" style="background:#fff;color:#dc2626;border:2px solid #fca5a5;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif">🗑️</button></div>';}).join('')+'</div></details>';
   }
   document.getElementById('db').innerHTML=h;
 }
@@ -608,7 +639,7 @@ function delRec(id,name){
   Promise.all([
     fetch(FB+'/equipment/'+id+'.json',{method:'DELETE'}),
     fetch(FB+'/equipment_photos/'+id+'.json',{method:'DELETE'})
-  ].concat(ik.map(function(k){return fetch(FB+'/equip_open/'+k+'.json',{method:'DELETE'});})).concat(ik.map(function(k){return fetch(FB+'/equip_done/'+k+'.json',{method:'DELETE'});}))).then(function(){toast('🗑️ ลบรายการของ '+name+' แล้ว','ok');fetchEq(document.getElementById('dpk').value);})
+  ].concat(rc?toArr(rc.bad).filter(function(b){return b.pk;}).map(function(b){return fetch(FB+'/equipment_photos/'+b.pk+'.json',{method:'DELETE'});}):[]).concat(ik.map(function(k){return fetch(FB+'/equip_open/'+k+'.json',{method:'DELETE'});})).concat(ik.map(function(k){return fetch(FB+'/equip_done/'+k+'.json',{method:'DELETE'});}))).then(function(){toast('🗑️ ลบรายการของ '+name+' แล้ว','ok');fetchEq(document.getElementById('dpk').value);})
     .catch(function(){toast('ลบไม่สำเร็จ','err');});
 }
 
@@ -722,7 +753,7 @@ function fjDate(p,ds){
 // ── ระบบติดตามเรื่องอุปกรณ์ชำรุด ──────────────────────────
 // /equip_open/<id> = เรื่องที่ยังค้าง (ใหม่/รับเรื่องแล้ว), /equip_done/<id> = เรื่องที่ปิดแล้ว
 var IS={open:[],done:[],tab:'open'},adm=false;
-function mkIssue(r,b){return {id:r.id+'_'+b.k,recId:r.id,k:b.k,label:b.label,note:b.note||'',name:r.name,zone:r.zone,date:r.date,dateThai:r.dateThai,time:r.time,ca:r.ca||Date.now(),hasPhoto:!!r.hasPhoto,status:'new'};}
+function mkIssue(r,b){return {id:r.id+'_'+b.k,recId:r.id,k:b.k,label:b.label,note:b.note||'',name:r.name,zone:r.zone,date:r.date,dateThai:r.dateThai,time:r.time,ca:r.ca||Date.now(),hasPhoto:!!(b.pk||r.hasPhoto),pk:b.pk||'',status:'new'};}
 function putIssue(i){
   function go(){return fetch(FB+'/equip_open/'+i.id+'.json',{method:'PUT',body:JSON.stringify(i)}).then(function(r){if(!r.ok)throw 0;});}
   return go().catch(function(){return go();}).catch(function(){toast('⚠️ ส่งเรื่องเข้าระบบติดตามไม่สำเร็จ กรุณาคัดลอกการ์ดส่งหัวหน้า','err');});
@@ -783,7 +814,7 @@ function renderIssues(){
     var ageTag=IS.tab==='done'?'':(age>=2?'<span style="background:#7f1d1d;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">⏰ ค้าง '+age+' วัน</span>':'<span style="background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">'+(age===1?'เมื่อวาน':'วันนี้')+'</span>');
     var st=i.status==='done'?'<span style="background:#dcfce7;color:#166534;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">🟢 แก้ไขแล้ว</span>':(i.status==='ack'?'<span style="background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">🟡 รับเรื่องแล้ว</span>':'<span style="background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">🔴 ใหม่</span>');
     var btns='';
-    if(i.hasPhoto)btns+='<button class="ib" style="background:#0369a1" onclick="vwPh(\''+esc(i.recId)+'\')">📷 ดูรูป</button>';
+    if(i.hasPhoto)btns+='<button class="ib" style="background:#0369a1" onclick="vwPh(\''+esc(i.pk||i.recId)+'\')">📷 ดูรูป</button>';
     if(i.status==='new')btns+='<button class="ib" style="background:#d97706" data-id="'+esc(i.id)+'" onclick="isAct(\'ack\',this)">🟡 รับเรื่อง</button>';
     if(i.status==='new'||i.status==='ack')btns+='<button class="ib" style="background:#2e7d32" data-id="'+esc(i.id)+'" onclick="isAct(\'done\',this)">✅ ปิดเรื่อง</button>';
     if(i.status==='done')btns+='<button class="ib" style="background:#6b7280" data-id="'+esc(i.id)+'" onclick="isAct(\'reopen\',this)">↩️ เปิดเรื่องใหม่</button>';
@@ -792,6 +823,7 @@ function renderIssues(){
       '<div style="font-family:Kanit,sans-serif;font-size:15px;font-weight:800;color:#b91c1c">'+esc(i.label)+'</div>'+
       '<div style="font-size:13px;margin:3px 0 6px">'+esc(i.note)+'</div>'+
       '<div style="font-size:11px;color:#777">แจ้งโดย '+esc(i.name)+' · '+esc(i.zone)+' · '+esc(i.dateThai||i.date)+' '+esc(hhmm(i.time))+' น.</div>'+
+      (i.fixedByUser&&IS.tab==='open'?'<div style="font-size:12px;margin-top:6px;background:#dcfce7;color:#166534;font-weight:800;border-radius:8px;padding:6px 10px">✅ ผู้แจ้งยืนยันว่าใช้งานได้แล้ว — รอหัวหน้าปิดเรื่อง</div>':(i.lastCheck&&IS.tab==='open'?'<div style="font-size:12px;margin-top:6px;color:#92400e;font-weight:700">🔎 ผู้แจ้งตรวจล่าสุด '+esc(i.lastCheck)+' · ยังชำรุดอยู่</div>':''))+
       (i.hnote?'<div style="font-size:12px;margin-top:6px;background:#fff;border-radius:8px;padding:6px 10px">📝 '+esc(i.hnote)+'</div>':'')+
       (i.ct?'<div style="font-size:11px;color:#777;margin-top:4px">ปิดเรื่องเมื่อ '+esc(new Date(i.ct).toLocaleString('th-TH'))+'</div>':'')+
       (btns?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">'+btns+'</div>':'')+'</div>';
