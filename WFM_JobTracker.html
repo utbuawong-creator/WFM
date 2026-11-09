@@ -449,7 +449,7 @@ select.form-control {
 <!-- APPS SCRIPT URL -->
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXUhD0qbQw4DPb4lMj6-FejgYcylzM4vMX5WeQPdBFMO8VLj-gy3PMcur0xXxaQInK9Q/exec';
-const ZONES = ['CMI Zone AB','CMI Zone CD','LPN Zone','MSN Zone'];
+const ZONES = ['CMI Zone AB','CMI Zone CD','LPN Zone','MSN Zone','Assigned Zone'];
 const SLA_HOURS = { Critical: 3, Major: 10, Minor: 24, Other: 24 };
 
 const TEAM_MEMBERS = {
@@ -568,6 +568,7 @@ let pendingJoinJob = null;
             <option value="CMI Zone CD">CMI Zone CD</option>
             <option value="LPN Zone">LPN Zone</option>
             <option value="MSN Zone">MSN Zone</option>
+            <option value="Assigned Zone">Assigned Zone</option>
           </select>
         </div>
         <div class="form-group full">
@@ -699,6 +700,7 @@ let pendingJoinJob = null;
         <option value="CMI Zone CD">CMI Zone CD</option>
         <option value="LPN Zone">LPN Zone</option>
         <option value="MSN Zone">MSN Zone</option>
+        <option value="Assigned Zone">Assigned Zone</option>
                                                                       </select>
       <select class="filter-select" id="r-priority" onchange="filterReport()">
         <option value="">ทุก Priority</option>
