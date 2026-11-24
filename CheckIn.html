@@ -144,6 +144,8 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
       <input class="inp inp-ro" id="fd" readonly/>
       <label class="L">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
       <input class="inp inp-ro" id="ft" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
+      <label class="L">📍 พิกัดตำแหน่ง (จำเป็นต้องมีก่อน Check-in · แตะเพื่อลองจับใหม่)</label>
+      <input class="inp inp-ro" id="fl" readonly value="⏳ กำลังจับพิกัด..." onclick="refLoc()" style="cursor:pointer"/>
     </div>
 
     <div class="card">
@@ -187,6 +189,7 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         <div class="ci-row"><div class="ci-rl">📅 วันที่</div><div class="ci-rv" id="cdt">-</div></div>
         <div class="ci-row"><div class="ci-rl">⏰ เวลา</div><div class="ci-rv" id="ctm">-</div></div>
         <div class="ci-row full"><div class="ci-rl">⏱️ SHIFT</div><div class="ci-rv" id="csh">-</div></div>
+        <div class="ci-row full"><div class="ci-rl">📍 พิกัด</div><div class="ci-rv" id="clc" style="font-size:13px">-</div></div>
       </div>
       <div class="ci-badge" id="cbd">✅ รายงานตัวเรียบร้อย</div>
     </div>
@@ -255,6 +258,34 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
   </div>
 </div>
 
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="xm">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800">📥 Export ข้อมูล Check-in</div>
+      <button onclick="clX()" style="background:var(--bg);border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif">✕ ปิด</button>
+    </div>
+    <label class="L">เลือกช่วงเวลา</label>
+    <div class="sg" style="margin-top:0">
+      <div class="sc" id="xb_day" onclick="setXm('day')"><div class="sr"><div class="sd"></div></div><div><div class="st">รายวัน</div><div class="sl">วันเดียว</div></div></div>
+      <div class="sc" id="xb_week" onclick="setXm('week')"><div class="sr"><div class="sd"></div></div><div><div class="st">รายสัปดาห์</div><div class="sl">จันทร์ – อาทิตย์</div></div></div>
+      <div class="sc" id="xb_month" onclick="setXm('month')"><div class="sr"><div class="sd"></div></div><div><div class="st">รายเดือน</div><div class="sl">ทั้งเดือน</div></div></div>
+      <div class="sc" id="xb_range" onclick="setXm('range')"><div class="sr"><div class="sd"></div></div><div><div class="st">ระบุช่วงวัน</div><div class="sl">เลือกเอง</div></div></div>
+    </div>
+    <div id="xone">
+      <label class="L">📅 เลือกวันที่ (ระบบจะหาสัปดาห์/เดือนที่วันนี้อยู่ให้)</label>
+      <input type="date" class="inp" id="xd" onchange="updXr()"/>
+    </div>
+    <div id="xrng" style="display:none;gap:10px">
+      <div style="flex:1;min-width:0"><label class="L">📅 ตั้งแต่วันที่</label><input type="date" class="inp" id="xf" onchange="updXr()"/></div>
+      <div style="flex:1;min-width:0"><label class="L">📅 ถึงวันที่</label><input type="date" class="inp" id="xt" onchange="updXr()"/></div>
+    </div>
+    <div id="xr" style="margin-top:12px;background:#f0f9ff;border:2px solid #7dd3fc;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;color:#0369a1"></div>
+    <button class="btn-s" onclick="doExport()" style="margin-top:16px">📥 Export (CSV เปิดใน Excel)</button>
+    <button class="btn-g" onclick="clX()">ยกเลิก</button>
+  </div>
+</div>
+
 <div class="toast-w"><div class="toast" id="tst"></div></div>
 
 <script>
@@ -268,6 +299,7 @@ var SH=[
   {v:'08:30 - 23:59',l:'🌙 Night Shift',  ic:'🌙',c:'#003087',bg:'rgba(0,48,135,.08)',   bd:'rgba(0,48,135,.3)'},
   {v:'20:30 - 05:30',l:'🌙 Night Shift OT',ic:'🌙',c:'#7c3aed',bg:'rgba(124,58,237,.08)',bd:'rgba(124,58,237,.3)'}
 ];
+var loc=null;
 var si=-1,ph=null,lnm='',lzn='',ldt='',ltm='',lsh='',lst={late:false,min:0};
 
 // ── LATE RULE ─────────────────────────────────────────────
@@ -339,6 +371,24 @@ function updWarn(){
 
 function pad(v){return String(v).padStart(2,'0');}
 
+// ── LOCATION ─────────────────────────────────────────────
+function getLoc(ok,fail){
+  if(!navigator.geolocation){fail('อุปกรณ์/เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง');return;}
+  navigator.geolocation.getCurrentPosition(function(p){
+    loc={lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6),acc:Math.round(p.coords.accuracy||0)};
+    ok();
+  },function(e){
+    fail(e.code===1?'ไม่ได้รับอนุญาตใช้ตำแหน่ง — เปิดสิทธิ์ตำแหน่งให้เบราว์เซอร์ แล้วลองใหม่':e.code===3?'จับพิกัดไม่ทัน — เปิด GPS / ออกที่โล่ง แล้วลองใหม่':'จับพิกัดไม่ได้ — เปิด GPS แล้วลองใหม่');
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+function locTxt(){return loc?loc.lat+', '+loc.lng+' (±'+loc.acc+' ม.)':'-';}
+function refLoc(){
+  var f=document.getElementById('fl');if(!f)return;
+  f.value='⏳ กำลังจับพิกัด...';
+  getLoc(function(){f.value='✅ '+locTxt();},function(m){f.value='❌ '+m;});
+}
+refLoc();
+
 // ── HELPERS ──────────────────────────────────────────────
 function rr(ctx,x,y,w,h,r){
   ctx.beginPath();
@@ -399,6 +449,22 @@ function dlph(e){
 
 // ── CHECKIN ───────────────────────────────────────────────
 function doci(){
+  var b=document.getElementById('bsb');
+  if(b.disabled)return;
+  if(!document.getElementById('fn').value){toast('กรุณาเลือกชื่อ','err');return;}
+  if(!document.getElementById('fz').value){toast('กรุณาเลือก Zone','err');return;}
+  if(si<0){toast('กรุณาเลือก Shift','err');return;}
+  b.textContent='📍 กำลังจับพิกัด...';b.disabled=true;
+  getLoc(function(){
+    document.getElementById('fl').value='✅ '+locTxt();
+    b.disabled=false;doci2();
+  },function(m){
+    b.textContent='✅ Check-in เลย!';b.disabled=false;
+    document.getElementById('fl').value='❌ '+m;
+    toast('📍 '+m,'err');
+  });
+}
+function doci2(){
   var name=document.getElementById('fn').value;
   var zone=document.getElementById('fz').value;
   if(!name){toast('กรุณาเลือกชื่อ','err');return;}
@@ -430,7 +496,7 @@ function doci(){
 }
 function doSave(name,zone,sh,today,dateThai,timeTxt,btn){
   btn.textContent='⏳ กำลังบันทึก...';
-  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,ca:Date.now(),sa:{'.sv':'timestamp'}};
+  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,lat:loc.lat,lng:loc.lng,acc:loc.acc,ca:Date.now(),sa:{'.sv':'timestamp'}};
   fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
     .then(function(r){return r.json();})
     .then(function(res){
@@ -473,6 +539,7 @@ function showSuc(ok,btn){
     b.textContent='✅ รายงานตัวตรงเวลา';
     b.style.background='rgba(141,198,63,.25)';b.style.borderColor='rgba(141,198,63,.6)';
   }
+  document.getElementById('clc').textContent=locTxt();
   var cph=document.getElementById('cph');
   if(ph){cph.src=ph;cph.style.display='block';}else{cph.style.display='none';}
   document.getElementById('ff').style.display='none';
@@ -484,7 +551,7 @@ function rst(){
   document.getElementById('fn').value='';
   document.getElementById('fz').value='';
   for(var k=0;k<4;k++) document.getElementById('sc'+k).classList.remove('on');
-  si=-1;ph=null;updWarn();
+  si=-1;ph=null;updWarn();refLoc();
   var box=document.getElementById('phb');
   box.innerHTML='<div class="ph-ic">📷</div><div class="ph-tx">แตะเพื่อถ่ายรูป / เลือกรูป</div><div class="ph-sub">รูปจะแนบในการ์ด Check-in</div>';
   box.onclick=function(){document.getElementById('phf').click();};
@@ -506,7 +573,7 @@ function buildCard(cb){
   var W=720,PAD=28;
   var PH=ph?520:0;
   var TOP=ph?0:44;
-  var IH=300;
+  var IH=324;
   var H=PH+IH+TOP;
   var c=document.createElement('canvas');c.width=W;c.height=H;
   var ctx=c.getContext('2d');
@@ -540,6 +607,8 @@ function buildCard(cb){
     ctx.strokeStyle=lst.late?'rgba(252,165,165,.95)':'rgba(141,198,63,.7)';ctx.lineWidth=1.5;rr(ctx,PAD,by,bw,36,18);ctx.stroke();
     ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.textAlign='left';
     ctx.fillText(bt,PAD+14,by+23);
+    ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='14px sans-serif';
+    ctx.fillText('\ud83d\udccd '+locTxt(),PAD,by+62);
     cb(c);
   }
   if(ph){
@@ -556,6 +625,10 @@ function buildCard(cb){
       var ov=ctx.createLinearGradient(0,PH-120,0,PH);
       ov.addColorStop(0,'rgba(27,94,32,0)');ov.addColorStop(1,'rgba(27,94,32,.85)');
       ctx.fillStyle=ov;ctx.fillRect(0,PH-120,W,120);
+      ctx.fillStyle='#fff';ctx.textAlign='left';ctx.font='bold 17px sans-serif';
+      ctx.fillText('\ud83d\udccd '+locTxt(),PAD,PH-40);
+      ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='14px sans-serif';
+      ctx.fillText((ldt||'')+'  '+(ltm||''),PAD,PH-16);
       ctx.restore();drawInfo();
     };
     img.onerror=function(){ph=null;drawInfo();};
@@ -654,6 +727,7 @@ function renderDash(list,leaves){
         html+='<div style="width:24px;height:24px;border-radius:7px;background:'+sh.c+';color:#fff;font-family:Kanit,sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
         html+='<div style="flex:1;font-size:14px;font-weight:700">'+esc(m.name||'-')+'</div>';
         html+='<div style="font-size:11px;color:#888;background:#eee;border-radius:6px;padding:2px 7px">'+esc(m.zone||'')+'</div>';
+        if(m.lat!=null)html+='<a href="https://www.google.com/maps?q='+m.lat+','+m.lng+'" target="_blank" style="text-decoration:none;font-size:15px" title="ดูพิกัด">📍</a>';
         if(m._late)html+='<div style="background:#dc2626;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">สาย '+m._min+' น.</div>';
         html+='<div style="font-family:Kanit,sans-serif;font-size:11px;color:#aaa">'+esc(m.time||'')+'</div></div>';
       });
@@ -680,13 +754,12 @@ function cpDash(){
 }
 
 // ── EXPORT EXCEL ─────────────────────────────────────────
-function exDash(){
-  var dateStr=document.getElementById('dpk').value||new Date().toISOString().slice(0,10);
+function exDay(dateStr){
   fetchDay(dateStr,function(filtered,leaves){
     var st=dashStats(filtered,leaves);
     filtered.sort(function(a,b){return (a.shift||'').localeCompare(b.shift||'')||(a.time||'').localeCompare(b.time||'');});
-    var rows=[['#','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','วันที่','สถานะ','สายกี่นาที']];
-    filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr,r._late?'สาย':'ตรงเวลา',r._late?r._min:0]);});
+    var rows=[['#','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','วันที่','สถานะ','สายกี่นาที','พิกัด (Google Maps)']];
+    filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr,r._late?'สาย':'ตรงเวลา',r._late?r._min:0,r.lat!=null?'https://www.google.com/maps?q='+r.lat+','+r.lng:'-']);});
     rows.push([]);rows.push(['','','','','รวม',filtered.length+' คน']);
     rows.push(['','','','','ตรงเวลา',st.ok+' คน']);rows.push(['','','','','สาย',st.late.length+' คน']);
     rows.push(['','','','','ลา',st.leaves.length+' คน']);rows.push(['','','','','ยังไม่รายงานตัว',st.missing.length+' คน']);
@@ -700,6 +773,111 @@ function exDash(){
     setTimeout(function(){document.body.removeChild(a);},1000);
     toast('📥 Export สำเร็จ '+filtered.length+' คน ✓','ok');
   });
+}
+
+// ── EXPORT (day / week / month / range) ──────────────────
+var xMode='day';
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function addDays(s,n){var d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return ymd(d);}
+function thD(s){var q=s.split('-');return (+q[2])+' '+MO[+q[1]-1]+' '+(+q[0]+543);}
+function exDash(){
+  var v=document.getElementById('dpk').value||todayStr();
+  document.getElementById('xd').value=v;
+  document.getElementById('xf').value=v;
+  document.getElementById('xt').value=v;
+  setXm('day');
+  document.getElementById('xm').style.display='block';
+}
+function clX(){document.getElementById('xm').style.display='none';}
+function setXm(m){
+  xMode=m;
+  ['day','week','month','range'].forEach(function(k){document.getElementById('xb_'+k).classList.toggle('on',k===m);});
+  document.getElementById('xone').style.display=m==='range'?'none':'block';
+  document.getElementById('xrng').style.display=m==='range'?'flex':'none';
+  updXr();
+}
+function xRange(){
+  if(xMode==='range'){
+    var f=document.getElementById('xf').value,t=document.getElementById('xt').value;
+    if(!f||!t||t<f)return null;
+    if(dayDiff(f,t)>366)return null;
+    return {from:f,to:t};
+  }
+  var v=document.getElementById('xd').value;
+  if(!v)return null;
+  if(xMode==='day')return {from:v,to:v};
+  var d=new Date(v+'T12:00:00');
+  if(xMode==='week'){
+    var f2=addDays(v,-((d.getDay()+6)%7));
+    return {from:f2,to:addDays(f2,6)};
+  }
+  var first=new Date(d.getFullYear(),d.getMonth(),1,12),last=new Date(d.getFullYear(),d.getMonth()+1,0,12);
+  return {from:ymd(first),to:ymd(last)};
+}
+function updXr(){
+  var r=xRange(),b=document.getElementById('xr');
+  if(!r){b.textContent='⚠️ กรุณาเลือกวันที่ให้ถูกต้อง (ช่วงวันต้องไม่เกิน 366 วัน)';return;}
+  b.textContent=r.from===r.to?'📆 '+thD(r.from):'📆 '+thD(r.from)+'  ถึง  '+thD(r.to)+'  ('+(dayDiff(r.from,r.to)+1)+' วัน)';
+}
+function doExport(){
+  var r=xRange();
+  if(!r){toast('กรุณาเลือกวันที่ให้ถูกต้อง','err');return;}
+  clX();
+  if(r.from===r.to)exDay(r.from);else exRange(r.from,r.to);
+}
+function dlCsv(rows,fname){
+  var csv='\uFEFF'+rows.map(function(r){return r.map(function(v){var s=String(v==null?'':v);return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\r\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=fname;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);},1000);
+}
+function exRange(from,to){
+  toast('⏳ กำลังรวบรวมข้อมูล...','');
+  Promise.all([
+    fetch(FB+'/checkins.json').then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch(FB+'/leaves.json').then(function(r){return r.json();}).catch(function(){return null;})
+  ]).then(function(a){
+    if(a[0]===null&&a[1]===null){toast('โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง','err');return;}
+    var ci=toArr(a[0]).filter(function(r){return r.date>=from&&r.date<=to;});
+    var lv=toArr(a[1]).filter(function(l){return lvS(l)<=to&&lvE(l)>=from;});
+    ci.sort(function(x,y){return (x.date||'').localeCompare(y.date||'')||(x.shift||'').localeCompare(y.shift||'')||(x.time||'').localeCompare(y.time||'');});
+    var per={};
+    getRoster().forEach(function(n){per[n]={days:0,late:0,min:0,lv:0};});
+    var rows=[['รายงาน Check-in ช่วง '+thD(from)+' ถึง '+thD(to)],[],
+      ['#','วันที่','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','สถานะ','สายกี่นาที','พิกัด (Google Maps)']];
+    var lateN=0;
+    ci.forEach(function(r,i){
+      var half=lv.some(function(l){return l.name===r.name&&l.period==='ครึ่งเช้า'&&inRange(l,r.date);});
+      var li=half?{late:false,min:0}:lateOf(shIdxOf(r.shift),r.time);
+      var p=per[r.name]||(per[r.name]={days:0,late:0,min:0,lv:0});
+      p.days++;
+      if(li.late){p.late++;p.min+=li.min;lateN++;}
+      rows.push([i+1,r.date,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',li.late?'สาย':'ตรงเวลา',li.late?li.min:0,r.lat!=null?'https://www.google.com/maps?q='+r.lat+','+r.lng:'-']);
+    });
+    lv.forEach(function(l){
+      var s1=lvS(l)<from?from:lvS(l),e1=lvE(l)>to?to:lvE(l);
+      var n=dayDiff(s1,e1)+1;
+      if(l.period==='ครึ่งเช้า'||l.period==='ครึ่งบ่าย')n=n*0.5;
+      var p=per[l.name]||(per[l.name]={days:0,late:0,min:0,lv:0});
+      p.lv+=n;
+    });
+    rows.push([]);
+    rows.push(['','','','','รวม Check-in',ci.length+' ครั้ง']);
+    rows.push(['','','','','ตรงเวลา',(ci.length-lateN)+' ครั้ง']);
+    rows.push(['','','','','สาย',lateN+' ครั้ง']);
+    rows.push([]);rows.push(['สรุปรายบุคคล']);
+    rows.push(['#','ชื่อ-นามสกุล','จำนวนวันที่ Check-in','มาสาย (ครั้ง)','สายรวม (นาที)','วันลา (นับตามปฏิทิน)']);
+    Object.keys(per).forEach(function(n,i){var p=per[n];rows.push([i+1,n,p.days,p.late,p.min,p.lv]);});
+    if(lv.length){
+      rows.push([]);rows.push(['รายการลา']);
+      rows.push(['#','ชื่อ-นามสกุล','ประเภทการลา','วันเริ่ม','วันสิ้นสุด','จำนวนวัน','ช่วงเวลา','หมายเหตุ']);
+      lv.sort(function(x,y){return lvS(x).localeCompare(lvS(y));}).forEach(function(l,i){rows.push([i+1,l.name||'-',l.type||'-',lvS(l),lvE(l),dayDiff(lvS(l),lvE(l))+1,l.period||'-',l.note||'']);});
+    }
+    dlCsv(rows,'CheckIn_'+from+'_to_'+to+'.csv');
+    toast('📥 Export สำเร็จ '+ci.length+' รายการ ✓','ok');
+  }).catch(function(){toast('Export ไม่สำเร็จ ลองใหม่อีกครั้ง','err');});
 }
 
 // ── DASH CANVAS ───────────────────────────────────────────
