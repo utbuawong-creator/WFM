@@ -137,16 +137,16 @@ html,body{min-height:100%;font-family:'Sarabun',sans-serif;background:var(--bg);
         <option>ถนอมศักดิ์ วรศิลป์</option>
       </select>
       <label class="L">🗺️ LB Zone</label>
-      <select class="inp" id="fz">
+      <select class="inp" id="fz" onchange="showLoc()">
         <option value="">— เลือก Zone —</option>
-        <option>CMI Zone AB</option><option>CMI Zone CD</option>
-        <option>LPN Zone</option><option>MSN Zone</option><option>DCN</option><option>Assigned Zone</option>
+        <option>CMI Zone AB</option><option>CMI Zone CD</option><option>FNG Zone</option>
+        <option>LPN Zone</option><option>MSN Zone</option><option>DCN Zone</option><option>Assigned Zone</option>
       </select>
       <label class="L">📅 วันที่ปัจจุบัน</label>
       <input class="inp inp-ro" id="fd" readonly/>
       <label class="L">⏰ เวลา Check-in (อัพเดตอัตโนมัติ)</label>
       <input class="inp inp-ro" id="ft" readonly style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px"/>
-      <label class="L">📍 พิกัดตำแหน่ง (จำเป็นต้องมีก่อน Check-in · แตะเพื่อลองจับใหม่)</label>
+      <label class="L">📍 พิกัดตำแหน่ง (ต้องอยู่ในรัศมี 100 ม. จากจุดของ Zone · แตะเพื่อจับใหม่)</label>
       <input class="inp inp-ro" id="fl" readonly value="⏳ กำลังจับพิกัด..." onclick="refLoc()" style="cursor:pointer"/>
     </div>
 
@@ -387,6 +387,28 @@ function updWarn(){
 function pad(v){return String(v).padStart(2,'0');}
 
 // ── LOCATION ─────────────────────────────────────────────
+var ZR=100; // รัศมีที่อนุญาต (เมตร)
+var ZONES={
+  'CMI Zone AB':[18.79786,99.025162],
+  'CMI Zone CD':[18.79786,99.025162],
+  'FNG Zone':[18.899670,99.199680],
+  'LPN Zone':[18.584133,99.006839],
+  'MSN Zone':[19.27568,97.95740],
+  'DCN Zone':[18.79786,99.025162],
+  'Assigned Zone':[18.79786,99.025162]
+};
+function hav(a,b,c,d){
+  var R=6371000,t=Math.PI/180,dl=(c-a)*t,dn=(d-b)*t;
+  var x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a*t)*Math.cos(c*t)*Math.sin(dn/2)*Math.sin(dn/2);
+  return Math.round(2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)));
+}
+function distTo(z){var p=ZONES[z];return (p&&loc)?hav(loc.lat,loc.lng,p[0],p[1]):null;}
+function showLoc(){
+  var f=document.getElementById('fl');if(!f||!loc)return;
+  var z=document.getElementById('fz').value,d=distTo(z),t=locTxt();
+  if(d==null){f.value='✅ '+t;return;}
+  f.value=(d-loc.acc>ZR?'❌ ':(d>ZR?'⚠️ ':'✅ '))+t+' · ห่างจุด '+d+' ม.';
+}
 function getLoc(ok,fail){
   if(!navigator.geolocation){fail('อุปกรณ์/เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง');return;}
   navigator.geolocation.getCurrentPosition(function(p){
@@ -407,7 +429,7 @@ function locTxt(){return loc?loc.lat+', '+loc.lng+' (±'+loc.acc+' ม.)':'-';}
 function refLoc(){
   var f=document.getElementById('fl');if(!f)return;
   f.value='⏳ กำลังจับพิกัด...';
-  getLoc(function(){f.value='✅ '+locTxt();},function(m){f.value='❌ '+m;});
+  getLoc(function(){showLoc();},function(m){f.value='❌ '+m;});
 }
 refLoc();
 
@@ -478,7 +500,13 @@ function doci(){
   if(si<0){toast('กรุณาเลือก Shift','err');return;}
   b.textContent='📍 กำลังจับพิกัด...';b.disabled=true;
   getLoc(function(){
-    document.getElementById('fl').value='✅ '+locTxt();
+    showLoc();
+    var zn=document.getElementById('fz').value,dd=distTo(zn);
+    if(dd!=null&&dd-loc.acc>ZR){
+      b.textContent='✅ Check-in เลย!';b.disabled=false;
+      toast('📍 อยู่ห่างจุด '+zn+' ประมาณ '+dd+' ม. (เกินรัศมี '+ZR+' ม.) เช็คอินไม่ได้'+(loc.acc>50?' · GPS คลาดเคลื่อน ±'+loc.acc+' ม. ลองแตะช่องพิกัดเพื่อจับใหม่':''),'err');
+      return;
+    }
     b.disabled=false;doci2();
   },function(m){
     b.textContent='✅ Check-in เลย!';b.disabled=false;
@@ -520,7 +548,7 @@ function doci2(){
 }
 function doSave(name,zone,sh,today,dateThai,timeTxt,btn){
   btn.textContent='⏳ กำลังบันทึก...';
-  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,lat:loc.lat,lng:loc.lng,acc:loc.acc,ca:Date.now(),sa:{'.sv':'timestamp'}};
+  var rec={id:String(Date.now()),name:name,zone:zone,shift:sh.v,date:today,dateThai:dateThai,time:timeTxt,lat:loc.lat,lng:loc.lng,acc:loc.acc,dist:distTo(zone),outside:(distTo(zone)||0)>ZR,ca:Date.now(),sa:{'.sv':'timestamp'}};
   if(lst.late&&lrs)rec.lateReason=lrs;
   fetch(FB+'/checkins/'+rec.id+'.json',{method:'PUT',body:JSON.stringify(rec)})
     .then(function(r){return r.json();})
@@ -759,6 +787,7 @@ function renderDash(list,leaves){
         html+='<div style="width:24px;height:24px;border-radius:7px;background:'+sh.c+';color:#fff;font-family:Kanit,sans-serif;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>';
         html+='<div style="flex:1;font-size:14px;font-weight:700">'+esc(m.name||'-')+'</div>';
         html+='<div style="font-size:11px;color:#888;background:#eee;border-radius:6px;padding:2px 7px">'+esc(m.zone||'')+'</div>';
+        if(m.outside)html+='<div style="background:#f59e0b;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">นอกรัศมี '+(m.dist||'')+' ม.</div>';
         if(m.lat!=null)html+='<a href="https://www.google.com/maps?q='+m.lat+','+m.lng+'" target="_blank" style="text-decoration:none;font-size:15px" title="ดูพิกัด">📍</a>';
         if(m._late)html+='<div style="background:#dc2626;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">สาย '+m._min+' น.</div>';
         html+='<div style="font-family:Kanit,sans-serif;font-size:11px;color:#aaa">'+esc(m.time||'')+'</div></div>';
@@ -790,8 +819,8 @@ function exDay(dateStr){
   fetchDay(dateStr,function(filtered,leaves){
     var st=dashStats(filtered,leaves);
     filtered.sort(function(a,b){return (a.shift||'').localeCompare(b.shift||'')||(a.time||'').localeCompare(b.time||'');});
-    var rows=[['#','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','วันที่','สถานะ','สายกี่นาที','พิกัด (Google Maps)','เหตุผลที่มาสาย']];
-    filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr,r._late?'สาย':'ตรงเวลา',r._late?r._min:0,r.lat!=null?'https://www.google.com/maps?q='+r.lat+','+r.lng:'-',r.lateReason||'']);});
+    var rows=[['#','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','วันที่','สถานะ','สายกี่นาที','พิกัด (Google Maps)','เหตุผลที่มาสาย','ห่างจากจุด Zone (ม.)']];
+    filtered.forEach(function(r,i){rows.push([i+1,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',r.dateThai||dateStr,r._late?'สาย':'ตรงเวลา',r._late?r._min:0,r.lat!=null?'https://www.google.com/maps?q='+r.lat+','+r.lng:'-',r.lateReason||'',r.dist!=null?r.dist:'']);});
     rows.push([]);rows.push(['','','','','รวม',filtered.length+' คน']);
     rows.push(['','','','','ตรงเวลา',st.ok+' คน']);rows.push(['','','','','สาย',st.late.length+' คน']);
     rows.push(['','','','','ลา',st.leaves.length+' คน']);rows.push(['','','','','ยังไม่รายงานตัว',st.missing.length+' คน']);
@@ -878,7 +907,7 @@ function exRange(from,to){
     var per={};
     getRoster().forEach(function(n){per[n]={days:0,late:0,min:0,lv:0};});
     var rows=[['รายงาน Check-in ช่วง '+thD(from)+' ถึง '+thD(to)],[],
-      ['#','วันที่','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','สถานะ','สายกี่นาที','พิกัด (Google Maps)','เหตุผลที่มาสาย']];
+      ['#','วันที่','ชื่อ-นามสกุล','Zone','Shift','เวลา Check-in','สถานะ','สายกี่นาที','พิกัด (Google Maps)','เหตุผลที่มาสาย','ห่างจากจุด Zone (ม.)']];
     var lateN=0;
     ci.forEach(function(r,i){
       var half=lv.some(function(l){return l.name===r.name&&l.period==='ครึ่งเช้า'&&inRange(l,r.date);});
@@ -886,7 +915,7 @@ function exRange(from,to){
       var p=per[r.name]||(per[r.name]={days:0,late:0,min:0,lv:0});
       p.days++;
       if(li.late){p.late++;p.min+=li.min;lateN++;}
-      rows.push([i+1,r.date,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',li.late?'สาย':'ตรงเวลา',li.late?li.min:0,r.lat!=null?'https://www.google.com/maps?q='+r.lat+','+r.lng:'-',r.lateReason||'']);
+      rows.push([i+1,r.date,r.name||'-',r.zone||'-',r.shift||'-',r.time||'-',li.late?'สาย':'ตรงเวลา',li.late?li.min:0,r.lat!=null?'https://www.google.com/maps?q='+r.lat+','+r.lng:'-',r.lateReason||'',r.dist!=null?r.dist:'']);
     });
     lv.forEach(function(l){
       var s1=lvS(l)<from?from:lvS(l),e1=lvE(l)>to?to:lvE(l);
